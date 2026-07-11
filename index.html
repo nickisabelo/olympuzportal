@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Olympuz Operations Hub</title>
-  <link rel="icon" type="image/png" href="Logo New.png">
+  <link rel="icon" type="image/png" href="logo.png">
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 <body class="bg-slate-50 font-sans text-slate-800">
@@ -51,6 +51,7 @@
       <nav class="w-full md:w-64 bg-white p-4 shadow-sm border-r border-slate-100 space-y-1 flex md:flex-col flex-row overflow-x-auto">
         <button onclick="showSection('attendance-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">🕒 Time Tracker</button>
         <button onclick="showSection('leave-request-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">📇 Leave Request</button>
+        <button onclick="showSection('task-report-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">📝 Task Done Report</button>
         <button onclick="routePayrollSection()" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">💵 Service Payment Portal</button>
         <button onclick="showSection('account-settings-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">⚙️ Account Settings</button>
         <button id="admin-dash-btn" onclick="showSection('admin-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg hidden font-semibold text-indigo-700 transition">📊 Global Overview</button>
@@ -114,6 +115,35 @@
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100"><h3 class="text-md font-bold text-slate-900 border-b pb-2 mb-3">My Personal Leave Queue Ledger</h3><div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Requested Date</th><th class="p-3">Reason Description</th><th class="p-3">Approval Status</th><th class="p-3">Management Comments</th></tr></thead><tbody id="personal-leave-table" class="divide-y divide-slate-50"></tbody></table></div></div>
         </section>
 
+        <!-- NEW MODULE: TASK DONE REPORT (ALL USERS VIEW & INPUT LEDGER) -->
+        <section id="task-report-sec" class="hidden space-y-6 max-w-6xl">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Submission Form -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4 h-fit">
+              <h2 class="text-xl font-bold text-slate-800">📝 Post Daily Report</h2>
+              <p class="text-xs text-slate-400">Log task deliverables and work details to the organizational activity timeline.</p>
+              <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">Work Date</label>
+                <input type="date" id="rep-date" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">Tasks Completed Summary</label>
+                <textarea id="rep-summary" rows="6" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="Provide clear metrics, items closed, links, or task highlights..."></textarea>
+              </div>
+              <button onclick="submitDailyWorkReport()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg font-bold text-sm shadow transition">Publish Report</button>
+              <p id="rep-feedback" class="text-center font-bold text-xs p-2 rounded hidden"></p>
+            </div>
+            <!-- Right Public Activity Timeline Feed -->
+            <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col">
+              <h2 class="text-xl font-bold text-slate-800 mb-1">📋 Company Task Registry Feed</h2>
+              <p class="text-xs text-slate-400 mb-4">Live public history ledger of day reports published by all freelancers across the agency.</p>
+              <div class="flex-1 overflow-y-auto max-h-[500px] border border-slate-100 rounded-lg p-4 bg-slate-50/50 space-y-3" id="public-reports-feed">
+                <div class="text-center py-8 text-slate-400 text-xs">Compiling transaction logs...</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <!-- MODULE: CREDENTIALS MANAGEMENT -->
         <section id="account-settings-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 max-w-md space-y-4">
           <h2 class="text-xl font-bold text-slate-800 border-b pb-2">⚙️ Manage Account Security</h2>
@@ -136,7 +166,7 @@
             <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Number of Service Weeks</label><input id="p-hours" type="number" step="0.1" class="w-full p-2 border border-slate-200 text-sm rounded-lg"></div>
             <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Prerogative Deductions (₱)</label><input id="p-deduct" type="number" class="w-full p-2 border border-slate-200 text-sm rounded-lg" value="0"></div>
             <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Service Billing Period</label><input id="p-month" type="text" class="w-full p-2 border border-slate-200 text-sm rounded-lg" placeholder="e.g., Week 1 - July 2026"></div>
-            <div class="sm:col-span-2"><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Service Remarks & Caveats</label><input id="p-remarks" type="text" class="w-full p-2 border border-slate-200 text-sm rounded-lg" placeholder="Add specific adjustments notes..."></div>
+            <div class="sm:col-span-2"><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Service Remarks & Caveats</label><input id="p-remarks" type="text" class="w-full p-2 border border-slate-200 text-sm rounded-lg" placeholder="Add adjustments notes..."></div>
           </div>
           <button onclick="submitPayrollForm()" class="bg-indigo-600 text-white px-5 py-2.5 text-sm rounded-lg font-bold shadow hover:bg-indigo-700 transition">Disburse Service Payment</button>
           <p id="payroll-feedback" class="text-emerald-600 bg-emerald-50 text-xs font-bold p-2 rounded-lg hidden"></p>
@@ -204,6 +234,24 @@
             <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Name</th><th class="p-3">Date/Type</th><th class="p-3">Clock In</th><th class="p-3">Clock Out</th><th class="p-3">Break Duration</th><th class="p-3">Lunch Duration</th><th class="p-3">Exception Status</th></tr></thead><tbody id="admin-attendance-table" class="divide-y divide-slate-50"></tbody></table></div>
           </div>
 
+          <!-- ADMIN CENTRAL REPORT MONITOR REGISTRY GRID -->
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+            <h2 class="text-xl font-bold text-slate-800">Master Task Done Historical Ledger Feed</h2>
+            <p class="text-xs text-slate-400 mb-3">Filter timelines to trace individual deliverable descriptions down to the freelancer.</p>
+            <div class="overflow-x-auto rounded-lg border border-slate-100">
+              <table class="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold">
+                    <th class="p-3 w-1/4">Tasker Name</th><th class="p-3 w-1/6">Log Date</th><th class="p-3 w-7/12">Tasks & Operations Performance Record</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-reports-table" class="divide-y divide-slate-50">
+                  <tr><td colspan="3" class="p-3 text-center text-slate-400">Awaiting filtration query...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
           <!-- Disbursements Ledger History -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-indigo-900">Master Service Payments Distribution History</h2>
@@ -225,7 +273,7 @@
             <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Employee</th><th class="p-3">Target Date</th><th class="p-3">Reason Statement</th><th class="p-3">Current Status</th><th class="p-3 text-center">Actions Ledger Control</th></tr></thead><tbody id="admin-leave-table" class="divide-y divide-slate-50"></tbody></table></div>
           </div>
 
-          <!-- Exception Roster With Advanced User Deletion Tool Actions -->
+          <!-- Exception Roster Actions -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-slate-800">Workday Exceptions & Absence Metrics</h2>
             <div class="overflow-x-auto rounded-lg border border-slate-100">
@@ -247,7 +295,7 @@
 
   <script>
     // ─── EXTERNAL CONFIGURATION LINK ──────────────────────────────────────
-    const API_URL = "https://script.google.com/macros/s/AKfycbzfwJC20rtOEQHzeMlpDAJjnbd4Sp8ubAXkMPQLv6lT5jXvnF9hByRjpHciM__gdVOx/exec"; 
+    const API_URL = "https://script.google.com/macros/s/AKfycbx1GRo8Ri9Qz7bjqLgEpo-khhDuaauKC3kRCh8KDcZGkx7CIexAAi7X-1i6C56Yb6tH/exec"; 
     // ──────────────────────────────────────────────────────────────────────
 
     let currentUser = null;
@@ -304,6 +352,47 @@
         stats.leaves.forEach(row => {
           leaveBody.innerHTML += `<tr><td class="p-3 font-medium">${row.date}</td><td class="p-3 text-slate-600">${row.reason}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}">${row.status}</span></td><td class="p-3 text-slate-500 italic">${row.comment}</td></tr>`;
         });
+      });
+    }
+
+    // ─── TASK REPORT FEED SYNC PROCESSES ──────────────────────────────────
+    function loadPublicTaskReportsFeed() {
+      const container = document.getElementById('public-reports-feed');
+      callAPI('GET', '?action=getAllTaskReports', null, function(records) {
+        container.innerHTML = "";
+        if (records.length === 0) {
+          container.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs">No day logs compiled inside the database registry sheet.</div>`;
+          return;
+        }
+        records.forEach(row => {
+          container.innerHTML += `<div class="bg-white p-3.5 rounded-lg shadow-sm border border-slate-100 flex flex-col gap-1">
+            <div class="flex justify-between items-center text-xs">
+              <span class="font-bold text-indigo-700">${row.name} <span class="text-slate-400 font-mono font-normal">(${row.userId})</span></span>
+              <span class="bg-slate-100 font-semibold px-2 py-0.5 rounded text-slate-500">${row.date}</span>
+            </div>
+            <p class="text-xs text-slate-600 font-medium whitespace-pre-wrap mt-1 leading-relaxed border-t border-slate-50 pt-2">${row.summary}</p>
+          </div>`;
+        });
+      });
+    }
+
+    function submitDailyWorkReport() {
+      const dateVal = document.getElementById('rep-date').value;
+      const textVal = document.getElementById('rep-summary').value;
+      const fb = document.getElementById('rep-feedback');
+      
+      fb.classList.add('hidden');
+      if (!dateVal || !textVal.trim()) { alert("Please complete all parameter metrics entries."); return; }
+      
+      fb.className = "text-center text-xs font-bold p-2 rounded bg-amber-50 text-amber-800"; fb.innerText = "Transmitting record lines..."; fb.classList.remove('hidden');
+      
+      callAPI('POST', '', { action: "submitDailyReport", userId: currentUser.id, userName: currentUser.name, reportDate: dateVal, summary: textVal }, function(res) {
+        fb.innerText = res.message;
+        fb.className = res.success ? "text-center text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800" : "text-center text-xs font-bold p-2 rounded bg-rose-50 text-rose-800";
+        if (res.success) {
+          document.getElementById('rep-summary').value = "";
+          loadPublicTaskReportsFeed();
+        }
       });
     }
 
@@ -406,8 +495,8 @@
     function renderFilteredGrids(data) {
       const selectedTasker = document.getElementById('filter-tasker').value, fromDateVal = document.getElementById('filter-from-date').value, toDateVal = document.getElementById('filter-to-date').value;
       const fromTime = fromDateVal ? new Date(fromDateVal).setHours(0,0,0,0) : null, toTime = toDateVal ? new Date(toDateVal).setHours(23,59,59,999) : null;
-      const pBody = document.getElementById('admin-attendance-table'), absBody = document.getElementById('admin-absence-table'), lBody = document.getElementById('admin-leave-table'), payBody = document.getElementById('admin-payments-history-table');
-      pBody.innerHTML = ""; absBody.innerHTML = ""; lBody.innerHTML = ""; payBody.innerHTML = "";
+      const pBody = document.getElementById('admin-attendance-table'), absBody = document.getElementById('admin-absence-table'), lBody = document.getElementById('admin-leave-table'), payBody = document.getElementById('admin-payments-history-table'), repBody = document.getElementById('admin-reports-table');
+      pBody.innerHTML = ""; absBody.innerHTML = ""; lBody.innerHTML = ""; payBody.innerHTML = ""; repBody.innerHTML = "";
 
       let filteredAttendance = data.attendance.filter(row => {
         if (selectedTasker !== "ALL" && row.name !== selectedTasker) return false;
@@ -420,6 +509,23 @@
           const bBadge = row.overBreak > 0 ? `<span class="bg-rose-50 text-rose-600 text-xs px-2 py-0.5 rounded font-bold ml-1">+${row.overBreak}m over</span>` : '';
           const lBadge = row.overLunch > 0 ? `<span class="bg-rose-50 text-rose-600 text-xs px-2 py-0.5 rounded font-bold ml-1">+${row.overLunch}m over</span>` : '';
           pBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 font-medium text-slate-900">${row.name}</td><td class="p-3 text-slate-500">${row.date}</td><td class="p-3 text-emerald-600 font-medium">${row.timeIn}</td><td class="p-3 text-rose-600 font-medium">${row.timeOut}</td><td class="p-3 text-slate-600">${row.breakText} ${bBadge}</td><td class="p-3 text-slate-600">${row.lunchText} ${lBadge}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${row.status === 'Late' ? 'bg-rose-50 text-rose-600':'bg-emerald-50 text-emerald-600'}">${row.status}</span></td></tr>`;
+        });
+      }
+
+      // Filter Admin Task Reports History Grid View Row Items
+      let filteredReports = data.reports.filter(row => {
+        if (selectedTasker !== "ALL" && row.name !== selectedTasker) return false;
+        if (fromTime || toTime) { const rowTime = new Date(row.date).getTime(); if (fromTime && rowTime < fromTime) return false; if (toTime && rowTime > toTime) return false; }
+        return true;
+      });
+      if(filteredReports.length === 0) { repBody.innerHTML = `<tr><td colspan="3" class="p-3 text-center text-slate-400">No performance summaries filed inside this time parameter block.</td></tr>`; }
+      else {
+        filteredReports.forEach(row => {
+          repBody.innerHTML += `<tr class="border-b border-slate-100 hover:bg-slate-50/50 transition">
+            <td class="p-3 font-bold text-slate-900">${row.name} <span class="text-slate-400 font-mono text-xs font-normal">(${row.userId})</span></td>
+            <td class="p-3 text-slate-500 font-medium">${row.date}</td>
+            <td class="p-3 text-slate-600 text-xs whitespace-pre-wrap leading-relaxed max-w-xl">${row.summary}</td>
+          </tr>`;
         });
       }
 
@@ -458,8 +564,13 @@
     }
 
     function showSection(id) {
-      ['attendance-sec', 'leave-request-sec', 'account-settings-sec', 'admin-payroll-sec', 'user-payroll-sec', 'admin-sec'].forEach(sec => document.getElementById(sec).className = 'hidden');
+      ['attendance-sec', 'leave-request-sec', 'task-report-sec', 'account-settings-sec', 'admin-payroll-sec', 'user-payroll-sec', 'admin-sec'].forEach(sec => document.getElementById(sec).className = 'hidden');
       document.getElementById(id).className = id === 'account-settings-sec' ? 'bg-white p-6 rounded-xl shadow-sm border border-slate-100 max-w-md space-y-4' : 'space-y-6';
+      
+      if (id === 'task-report-sec') {
+        document.getElementById('rep-date').value = new Date().toISOString().split('T')[0];
+        loadPublicTaskReportsFeed();
+      }
       if (id === 'admin-sec') fetchGlobalAdminLogs();
       if (id === 'attendance-sec' || id === 'leave-request-sec' || id === 'account-settings-sec') refreshUserTimers();
     }
