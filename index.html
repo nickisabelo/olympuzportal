@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Olympuz Operations Hub</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800">
+
+  <!-- AUTHENTICATION DIALOG -->
+  <div id="login-page" class="flex min-h-screen items-center justify-center px-4">
+    <div class="w-full max-w-md p-8 bg-white rounded-xl shadow-xl border border-slate-100">
+      <div class="text-center mb-8">
+        <h2 class="text-4xl font-black tracking-tight text-indigo-700 uppercase">Olympuz</h2>
+        <p class="text-xs text-slate-500 mt-1 font-medium tracking-wide">
+          powered by <span class="text-slate-700 font-semibold">Edward Belacse Career Consultancy Services</span>
+        </p>
+      </div>
+      
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Corporate Email</label>
+          <input type="email" id="email" class="w-full p-3 border border-slate-200 rounded-lg text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Password</label>
+          <input type="password" id="password" class="w-full p-3 border border-slate-200 rounded-lg text-sm">
+        </div>
+        <button onclick="handleLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg font-bold shadow transition mt-2">Sign In</button>
+      </div>
+      <p id="login-err" class="text-red-500 text-xs font-semibold mt-4 text-center hidden bg-red-50 p-2 rounded"></p>
+    </div>
+  </div>
+
+  <!-- MAIN DASHBOARD CONTENT GRID -->
+  <div id="app-page" class="hidden min-h-screen flex flex-col">
+    <header class="bg-indigo-900 text-white px-6 py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 shadow-md">
+      <div class="flex flex-col">
+        <span class="text-2xl font-black tracking-wider uppercase">Olympuz</span>
+        <span class="text-[10px] text-indigo-200 font-medium tracking-wider -mt-1">powered by Edward Belacse Career Consultancy Services</span>
+      </div>
+      <div class="flex items-center gap-4 self-end sm:self-auto">
+        <span id="user-display" class="bg-indigo-800 text-xs font-semibold px-3 py-1.5 rounded-full border border-indigo-700"></span>
+        <button onclick="logout()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition">Logout</button>
+      </div>
+    </header>
+
+    <div class="flex flex-1 flex-col md:flex-row">
+      <nav class="w-full md:w-64 bg-white p-4 shadow-sm border-r border-slate-100 space-y-1 flex md:flex-col flex-row overflow-x-auto">
+        <button onclick="showSection('attendance-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">🕒 Time Tracker</button>
+        <button onclick="showSection('leave-request-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">📇 Leave Request</button>
+        <button onclick="routePayrollSection()" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">💵 Service Payment Portal</button>
+        <button id="admin-dash-btn" onclick="showSection('admin-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg hidden font-semibold text-indigo-700 transition">📊 Global Overview</button>
+      </nav>
+
+      <main class="flex-1 p-6 md:p-8 overflow-y-auto">
+        
+        <!-- MODULE: TIME CLOCK -->
+        <section id="attendance-sec" class="hidden space-y-6 max-w-4xl">
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-6">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-100 pb-4 gap-4">
+              <div>
+                <h2 class="text-xl font-bold text-slate-800">Time Clock Operations <span id="halfday-banner" class="hidden text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-black ml-2">Half Day Active</span></h2>
+                <p class="text-xs text-slate-500">Log punch timestamps and view daily break metrics.</p>
+              </div>
+              <div class="bg-indigo-50 border border-indigo-100 p-3 rounded-xl text-xs space-y-1 text-indigo-950">
+                <div><strong>Schedule Matrix (5 Days + Half-day):</strong></div>
+                <div>Shift Window: <span id="sched-shift" class="font-bold text-indigo-700">-</span></div>
+                <div>Max Allotment: <span id="sched-limits" class="font-bold text-indigo-700">-</span></div>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center"><div class="text-xs text-slate-500 font-bold uppercase tracking-wider">Net Clocked Time</div><div id="stat-hours" class="text-3xl font-black text-indigo-600 mt-1">0.00 hrs</div></div>
+              <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center"><div class="text-xs text-slate-500 font-bold uppercase tracking-wider">Break Duration</div><div id="stat-break" class="text-3xl font-black text-amber-600 mt-1">0 mins</div></div>
+              <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center"><div class="text-xs text-slate-500 font-bold uppercase tracking-wider">Lunch Duration</div><div id="stat-lunch" class="text-3xl font-black text-orange-600 mt-1">0 mins</div></div>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-2">
+              <button onclick="triggerAttendance('Time In')" class="bg-emerald-600 text-white p-4 rounded-xl font-bold text-sm hover:bg-emerald-700 transition">Clock In</button>
+              <button onclick="triggerAttendance('Break Start')" class="bg-amber-500 text-white p-4 rounded-xl font-bold text-sm hover:bg-amber-600 transition">Break Out</button>
+              <button onclick="triggerAttendance('Break End')" class="bg-amber-600 text-white p-4 rounded-xl font-bold text-sm hover:bg-amber-700 transition">Break Return</button>
+              <button id="btn-lunch-s" onclick="triggerAttendance('Lunch Start')" class="bg-orange-500 text-white p-4 rounded-xl font-bold text-sm hover:bg-orange-600 transition block">Lunch Out</button>
+              <button id="btn-lunch-e" onclick="triggerAttendance('Lunch End')" class="bg-orange-600 text-white p-4 rounded-xl font-bold text-sm hover:bg-orange-700 transition block">Lunch Return</button>
+              <button onclick="triggerAttendance('Time Out')" class="bg-rose-600 text-white p-4 rounded-xl font-bold text-sm hover:bg-rose-700 transition">Clock Out</button>
+            </div>
+            <p id="attendance-feedback" class="text-center font-bold text-sm p-3 rounded-lg hidden"></p>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100"><h3 class="text-md font-bold text-slate-900 border-b pb-2 mb-3">My Personal Attendance History</h3><div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Logged Date</th><th class="p-3">Clock In</th><th class="p-3">Clock Out</th><th class="p-3">Break Duration</th><th class="p-3">Lunch Duration</th><th class="p-3">Exception Status</th></tr></thead><tbody id="personal-history-table" class="divide-y divide-slate-50"></tbody></table></div></div>
+        </section>
+
+        <!-- MODULE: FILE LEAVE -->
+        <section id="leave-request-sec" class="hidden space-y-6 max-w-4xl">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4">
+              <h2 class="text-xl font-bold text-slate-800">File a Leave Request</h2>
+              <div><label class="block text-xs font-bold text-slate-500 mb-1">Target Leave Date</label><input type="date" id="l-date" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm"></div>
+              <div><label class="block text-xs font-bold text-slate-500 mb-1">Explicit Reason for Absence</label><textarea id="l-reason" rows="3" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm" placeholder="Provide full justification comments..."></textarea></div>
+              <button onclick="submitLeaveForm()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-2.5 rounded-lg font-bold text-sm shadow transition">Submit Request</button>
+              <p id="leave-feedback" class="text-center font-bold text-xs bg-indigo-50 text-indigo-800 p-2 rounded hidden"></p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col justify-between text-center">
+              <div>
+                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wide">Yearly Allotted Balance</h3>
+                <div id="stat-leave-allow" class="text-6xl font-black text-indigo-700 mt-4">0</div>
+              </div>
+              <div class="border-t border-slate-100 pt-4 mt-4">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wide">Remaining Leaves</h3>
+                <div id="stat-leave-remain" class="text-3xl font-black text-emerald-600 mt-1">0 days</div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100"><h3 class="text-md font-bold text-slate-900 border-b pb-2 mb-3">My Personal Leave Queue Ledger</h3><div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Requested Date</th><th class="p-3">Reason Description</th><th class="p-3">Approval Status</th><th class="p-3">Management Comments</th></tr></thead><tbody id="personal-leave-table" class="divide-y divide-slate-50"></tbody></table></div></div>
+        </section>
+
+        <!-- MODULE: ADMIN CONTROL - PAYMENTS -->
+        <section id="admin-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-6 max-w-2xl">
+          <h2 class="text-xl font-bold text-indigo-700 border-b pb-2">Admin Control: Issue Fixed Weekly Payment</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Employee User ID</label><input id="p-uid" type="text" class="w-full p-2 border border-slate-200 text-sm rounded-lg"></div>
+            <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Employee Name</label><input id="p-name" type="text" class="w-full p-2 border border-slate-200 text-sm rounded-lg"></div>
+            <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Fixed Weekly Rate (₱)</label><input id="p-rate" type="number" class="w-full p-2 border border-slate-200 text-sm rounded-lg"></div>
+            <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Number of Service Weeks</label><input id="p-hours" type="number" step="0.1" class="w-full p-2 border border-slate-200 text-sm rounded-lg" placeholder="e.g., 1 or 4"></div>
+            <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Prerogative Deductions (₱)</label><input id="p-deduct" type="number" class="w-full p-2 border border-slate-200 text-sm rounded-lg" value="0"></div>
+            <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Service Billing Period</label><input id="p-month" type="text" class="w-full p-2 border border-slate-200 text-sm rounded-lg" placeholder="e.g., Week 1 - July 2026"></div>
+            <div class="sm:col-span-2"><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Service Remarks & Caveats</label><input id="p-remarks" type="text" class="w-full p-2 border border-slate-200 text-sm rounded-lg" placeholder="Add adjustments notes here..."></div>
+          </div>
+          <button onclick="submitPayrollForm()" class="bg-indigo-600 text-white px-5 py-2.5 text-sm rounded-lg font-bold shadow hover:bg-indigo-700 transition">Disburse Service Payment</button>
+          <p id="payroll-feedback" class="text-emerald-600 bg-emerald-50 text-xs font-bold p-2 rounded-lg hidden"></p>
+        </section>
+
+        <!-- MODULE: EMPLOYEE PAYMENTS VIEW -->
+        <section id="user-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4 max-w-5xl">
+          <h2 class="text-xl font-bold text-slate-800 border-b pb-2">My Service Payment Ledgers</h2>
+          <div class="overflow-x-auto rounded-lg border border-slate-100">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold">
+                  <th class="p-3">Service Period</th><th class="p-3">Weeks Logged</th><th class="p-3">Weekly Rate</th><th class="p-3">Gross Base</th><th class="p-3">Applied Deductions</th><th class="p-3 font-bold text-indigo-700">Net Credited Revenue</th><th class="p-3">Operational Remarks</th>
+                </tr>
+              </thead>
+              <tbody id="user-payroll-table" class="divide-y divide-slate-50"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- MODULE: ADMINISTRATIVE PANELS -->
+        <section id="admin-sec" class="hidden space-y-8 max-w-6xl">
+          <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 space-y-4">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-indigo-900">🔍 Real-Time Ledger Filtration Control</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">Target Tasker</label>
+                <select id="filter-tasker" onchange="applyGlobalFilters()" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-slate-50">
+                  <option value="ALL">-- Show All Taskers --</option>
+                </select>
+              </div>
+              <div><label class="block text-xs font-bold text-slate-500 mb-1">From Date</label><input type="date" id="filter-from-date" onchange="applyGlobalFilters()" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-slate-50"></div>
+              <div><label class="block text-xs font-bold text-slate-500 mb-1">To Date</label><input type="date" id="filter-to-date" onchange="applyGlobalFilters()" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-slate-50"></div>
+            </div>
+            <div class="flex justify-end"><button onclick="clearGlobalFilters()" class="text-xs bg-slate-100 text-slate-600 font-bold px-3 py-1.5 rounded-lg">Reset Filters</button></div>
+          </div>
+
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+            <h2 class="text-xl font-bold text-slate-800">Master Attendance & Overage Dashboard</h2>
+            <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Name</th><th class="p-3">Date/Type</th><th class="p-3">Clock In</th><th class="p-3">Clock Out</th><th class="p-3">Break Duration</th><th class="p-3">Lunch Duration</th><th class="p-3">Exception Status</th></tr></thead><tbody id="admin-attendance-table" class="divide-y divide-slate-50"></tbody></table></div>
+          </div>
+
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+            <h2 class="text-xl font-bold text-indigo-900">Master Service Payments Distribution History</h2>
+            <div class="overflow-x-auto rounded-lg border border-slate-100">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold">
+                    <th class="p-3">Tasker Name</th><th class="p-3">User ID</th><th class="p-3">Service Period</th><th class="p-3">Weeks</th><th class="p-3">Gross Base</th><th class="p-3">Deductions</th><th class="p-3 font-bold text-indigo-600">Net Distributed</th><th class="p-3">Remarks Log</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-payments-history-table" class="divide-y divide-slate-50"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+            <h2 class="text-xl font-bold text-slate-800">Corporate Leave Action & Approval Queue</h2>
+            <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Employee</th><th class="p-3">Target Date</th><th class="p-3">Reason Statement</th><th class="p-3">Current Status</th><th class="p-3 text-center">Actions Ledger Control</th></tr></thead><tbody id="admin-leave-table" class="divide-y divide-slate-50"></tbody></table></div>
+          </div>
+
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+            <h2 class="text-xl font-bold text-slate-800">Workday Exceptions & Absence Metrics</h2>
+            <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">User ID</th><th class="p-3">Tasker Name</th><th class="p-3">Scheduled Days Off</th><th class="p-3 text-indigo-700">Half Day Schedule</th><th class="p-3 font-bold text-rose-600">Total Absences Registered</th></tr></thead><tbody id="admin-absence-table" class="divide-y divide-slate-50"></tbody></table></div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // ─── EXTERNAL CONFIGURATION LINK ──────────────────────────────────────
+    const API_URL = "PASTE_YOUR_GOOGLE_WEB_APP_URL_HERE"; 
+    // ──────────────────────────────────────────────────────────────────────
+
+    let currentUser = null;
+    let cachedAdminMasterData = null;
+
+    // Secure cross-origin network communicator 
+    function callAPI(method, urlParams, payload, callback) {
+      let config = { method: method, headers: { 'Content-Type': 'text/plain;charset=utf-8' } };
+      if (payload) config.body = JSON.stringify(payload);
+      
+      fetch(API_URL + urlParams, config)
+        .then(res => res.json())
+        .then(data => callback(data))
+        .catch(err => { alert("Network Sync Defit:\n" + err); });
+    }
+
+    function handleLogin() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const errBox = document.getElementById('login-err');
+      errBox.classList.add('hidden');
+
+      callAPI('POST', '', { action: "loginUser", email: email, password: password }, function(response) {
+        if(response.success) { currentUser = response.user; bootPortalSession(); }
+        else { errBox.innerText = response.message; errBox.classList.remove('hidden'); }
+      });
+    }
+
+    function bootPortalSession() {
+      document.getElementById('login-page').classList.add('hidden');
+      document.getElementById('app-page').classList.remove('hidden');
+      document.getElementById('user-display').innerText = `${currentUser.name} | ${currentUser.role}`;
+      document.getElementById('sched-shift').innerText = `${currentUser.schedule.shiftStart} to ${currentUser.schedule.shiftEnd}`;
+      document.getElementById('stat-leave-allow').innerText = currentUser.schedule.leaveAllowance;
+      document.getElementById('stat-leave-remain').innerText = `${currentUser.schedule.remainingLeaves} days`;
+      
+      if (currentUser.schedule.isHalfDayToday) {
+        document.getElementById('halfday-banner').classList.remove('hidden');
+        document.getElementById('sched-limits').innerText = `Break: ${currentUser.schedule.maxBreak}m | Lunch: N/A (Half Day) | Days Off: ${currentUser.schedule.daysOff}`;
+        document.getElementById('btn-lunch-s').className = 'hidden';
+        document.getElementById('btn-lunch-e').className = 'hidden';
+      } else {
+        document.getElementById('halfday-banner').classList.add('hidden');
+        document.getElementById('sched-limits').innerText = `Break: ${currentUser.schedule.maxBreak}m | Lunch: ${currentUser.schedule.maxLunch}m | Days Off: ${currentUser.schedule.daysOff}`;
+      }
+      
+      if(currentUser.role === 'Admin') document.getElementById('admin-dash-btn').classList.remove('hidden');
+      showSection('attendance-sec');
+    }
+
+    function refreshUserTimers() {
+      if (!currentUser) return;
+      callAPI('GET', `?action=getLiveUserStats&userId=${currentUser.id}`, null, function(stats) {
+        document.getElementById('stat-hours').innerText = `${stats.clockedHours} hrs`;
+        document.getElementById('stat-break').innerText = `${stats.breakMinutes} mins`;
+        document.getElementById('stat-lunch').innerText = `${stats.lunchMinutes} mins`;
+        
+        const histBody = document.getElementById('personal-history-table'); histBody.innerHTML = "";
+        if (stats.history.length === 0) {
+          histBody.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-slate-400">No punch card records found.</td></tr>`;
+        } else {
+          stats.history.forEach(row => {
+            histBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 font-medium text-slate-900">${row.date}</td><td class="p-3 text-emerald-600">${row.timeIn}</td><td class="p-3 text-rose-600">${row.timeOut}</td><td class="p-3 text-slate-600">${row.breakText}</td><td class="p-3 text-slate-600">${row.lunchText}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${row.status === 'Late' ? 'bg-rose-50 text-rose-600':'bg-emerald-50 text-emerald-600'}">${row.status}</span></td></tr>`;
+          });
+        }
+
+        const leaveBody = document.getElementById('personal-leave-table'); leaveBody.innerHTML = "";
+        if(stats.leaves.length === 0) { 
+          leaveBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-slate-400">No filed leaves found.</td></tr>`; 
+        } else {
+          stats.leaves.forEach(row => {
+            leaveBody.innerHTML += `<tr><td class="p-3 font-medium">${row.date}</td><td class="p-3 text-slate-600">${row.reason}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : row.status === 'Denied' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-600'}">${row.status}</span></td><td class="p-3 text-slate-500 italic">${row.comment}</td></tr>`;
+          });
+        }
+      });
+    }
+
+    function triggerAttendance(punchType) {
+      const fb = document.getElementById('attendance-feedback'); fb.classList.remove('hidden'); fb.className = "text-center font-bold text-sm p-3 rounded-lg bg-indigo-50 text-indigo-800"; fb.innerText = "Transmitting record...";
+      callAPI('POST', '', { action: "logAttendance", userId: currentUser.id, userName: currentUser.name, actionType: punchType }, function(res) {
+        fb.innerText = res.message; fb.className = res.success ? "text-center font-bold text-sm p-3 rounded-lg bg-emerald-50 text-emerald-800" : "text-center font-bold text-sm p-3 rounded-lg bg-rose-50 text-rose-800";
+        refreshUserTimers();
+      });
+    }
+
+    function submitLeaveForm() {
+      const date = document.getElementById('l-date').value, reason = document.getElementById('l-reason').value, fb = document.getElementById('leave-feedback');
+      if(!date || !reason) { alert("Please compile all form fields."); return; }
+      fb.classList.remove('hidden'); fb.innerText = "Transmitting submission...";
+      callAPI('POST', '', { action: "submitLeaveRequest", userId: currentUser.id, userName: currentUser.name, leaveDate: date, reason: reason }, function(res) {
+        fb.innerText = res.message; document.getElementById('l-date').value = ""; document.getElementById('l-reason').value = ""; refreshUserTimers();
+      });
+    }
+
+    function adminExecuteLeave(reqId, status) {
+      const comment = prompt(`Provide management comments for decision mapping (${status}):`);
+      if(comment === null) return; 
+      callAPI('POST', '', { action: "processLeaveAction", requestId: reqId, status: status, comment: comment }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
+    }
+
+    function routePayrollSection() { if (currentUser.role === 'Admin') showSection('admin-payroll-sec'); else { showSection('user-payroll-sec'); fetchPersonalPayslips(); } }
+
+    function submitPayrollForm() {
+      const pData = { userId: document.getElementById('p-uid').value, name: document.getElementById('p-name').value, fixedRate: document.getElementById('p-rate').value, weeksLogged: document.getElementById('p-hours').value, deductions: document.getElementById('p-deduct').value, period: document.getElementById('p-month').value, remarks: document.getElementById('p-remarks').value };
+      callAPI('POST', '', { action: "postPayroll", payrollData: pData }, function(res) {
+        document.getElementById('payroll-feedback').innerText = res.message; document.getElementById('payroll-feedback').classList.remove('hidden');
+        ['p-uid', 'p-name', 'p-rate', 'p-hours', 'p-deduct', 'p-month', 'p-remarks'].forEach(id => document.getElementById(id).value = "");
+      });
+    }
+
+    function fetchPersonalPayslips() {
+      callAPI('GET', `?action=getUserPayroll&userId=${currentUser.id}`, null, function(records) {
+        const tbody = document.getElementById('user-payroll-table'); tbody.innerHTML = "";
+        if(records.length === 0) { tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400">No payment receipts issued yet.</td></tr>`; return; }
+        records.forEach(row => { 
+          tbody.innerHTML += `<tr class="hover:bg-slate-50/50 transition"><td class="p-3 font-medium">${row.period}</td><td class="p-3">${row.weeks} wks</td><td class="p-3">₱${row.rate.toFixed(2)}</td><td class="p-3">₱${row.gross.toFixed(2)}</td><td class="p-3 text-rose-600">-₱${row.deductions.toFixed(2)}</td><td class="p-3 font-bold text-emerald-600">₱${row.net.toFixed(2)}</td><td class="p-3 text-slate-500 italic max-w-xs truncate">${row.remarks}</td></tr>`; 
+        });
+      });
+    }
+
+    function fetchGlobalAdminLogs() {
+      callAPI('GET', '?action=getAdminDashboardData', null, function(data) {
+        if (!data || data.error) { alert(data ? data.error : 'Connection error'); return; }
+        cachedAdminMasterData = data;
+        populateTaskerDropdownOptions(data.absences);
+        renderFilteredGrids(data);
+      });
+    }
+
+    function populateTaskerDropdownOptions(absencesArray) {
+      const dropdown = document.getElementById('filter-tasker');
+      const savedValue = dropdown.value;
+      dropdown.innerHTML = `<option value="ALL">-- Show All Taskers --</option>`;
+      absencesArray.forEach(t => { dropdown.innerHTML += `<option value="${t.name}">${t.name} [${t.id}]</option>`; });
+      dropdown.value = savedValue;
+    }
+
+    function applyGlobalFilters() { if (cachedAdminMasterData) renderFilteredGrids(cachedAdminMasterData); }
+    function clearGlobalFilters() {
+      document.getElementById('filter-tasker').value = "ALL";
+      document.getElementById('filter-from-date').value = "";
+      document.getElementById('filter-to-date').value = "";
+      if (cachedAdminMasterData) renderFilteredGrids(cachedAdminMasterData);
+    }
+
+    function renderFilteredGrids(data) {
+      const selectedTasker = document.getElementById('filter-tasker').value;
+      const fromDateVal = document.getElementById('filter-from-date').value;
+      const toDateVal = document.getElementById('filter-to-date').value;
+      const fromTime = fromDateVal ? new Date(fromDateVal).setHours(0,0,0,0) : null;
+      const toTime = toDateVal ? new Date(toDateVal).setHours(23,59,59,999) : null;
+
+      const pBody = document.getElementById('admin-attendance-table');
+      const absBody = document.getElementById('admin-absence-table');
+      const lBody = document.getElementById('admin-leave-table');
+      const payBody = document.getElementById('admin-payments-history-table');
+
+      pBody.innerHTML = ""; absBody.innerHTML = ""; lBody.innerHTML = ""; payBody.innerHTML = "";
+
+      let filteredAttendance = data.attendance.filter(row => {
+        if (selectedTasker !== "ALL" && row.name !== selectedTasker) return false;
+        if (fromTime || toTime) {
+          const rowTime = new Date(row.date.replace(" (Half Day)", "")).getTime();
+          if (fromTime && rowTime < fromTime) return false;
+          if (toTime && rowTime > toTime) return false;
+        }
+        return true;
+      });
+
+      if(filteredAttendance.length === 0) {
+        pBody.innerHTML = `<tr><td colspan="7" class="p-3 text-center text-slate-400">No punch records found matching filter bounds.</td></tr>`;
+      } else {
+        filteredAttendance.forEach(row => {
+          const bBadge = row.overBreak > 0 ? `<span class="bg-rose-50 text-rose-600 text-xs px-2 py-0.5 rounded font-bold ml-1">+${row.overBreak}m over</span>` : '';
+          const lBadge = row.overLunch > 0 ? `<span class="bg-rose-50 text-rose-600 text-xs px-2 py-0.5 rounded font-bold ml-1">+${row.overLunch}m over</span>` : '';
+          pBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 font-medium text-slate-900">${row.name}</td><td class="p-3 text-slate-500">${row.date}</td><td class="p-3 text-emerald-600 font-medium">${row.timeIn}</td><td class="p-3 text-rose-600 font-medium">${row.timeOut}</td><td class="p-3 text-slate-600">${row.breakText} ${bBadge}</td><td class="p-3 text-slate-600">${row.lunchText} ${lBadge}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${row.status === 'Late' ? 'bg-rose-50 text-rose-600':'bg-emerald-50 text-emerald-600'}">${row.status}</span></td></tr>`;
+        });
+      }
+
+      let filteredPayments = data.payments.filter(row => { return !(selectedTasker !== "ALL" && row.name !== selectedTasker); });
+      if(filteredPayments.length === 0) {
+        payBody.innerHTML = `<tr><td colspan="8" class="p-3 text-center text-slate-400">No payout logs captured matching criteria filters.</td></tr>`;
+      } else {
+        filteredPayments.forEach(row => {
+          payBody.innerHTML += `<tr class="border-b border-slate-100 hover:bg-slate-50/50 transition"><td class="p-3 font-bold text-slate-900">${row.name}</td><td class="p-3 font-mono text-xs text-slate-500">${row.userId}</td><td class="p-3 font-medium text-indigo-700">${row.period}</td><td class="p-3 text-slate-600">${row.weeks} wks</td><td class="p-3 text-slate-600">₱${row.gross.toFixed(2)}</td><td class="p-3 text-rose-600">-₱${row.deductions.toFixed(2)}</td><td class="p-3 font-black text-emerald-600">₱${row.net.toFixed(2)}</td><td class="p-3 text-slate-500 italic max-w-xs truncate" title="${row.remarks}">${row.remarks}</td></tr>`;
+        });
+      }
+
+      data.absences.filter(r => !(selectedTasker !== "ALL" && r.name !== selectedTasker)).forEach(row => {
+        absBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 font-mono text-xs text-slate-500">${row.id}</td><td class="p-3 font-medium text-slate-900">${row.name}</td><td class="p-3 text-slate-500">${row.daysOff}</td><td class="p-3 text-indigo-600">${row.halfDay}</td><td class="p-3 font-black text-sm ${row.absents > 0 ? 'text-rose-600 bg-rose-50/30' : 'text-emerald-600'}">${row.absents} days missed</td></tr>`;
+      });
+
+      let filteredLeaves = data.leaves.filter(row => {
+        if (selectedTasker !== "ALL" && row.name !== selectedTasker) return false;
+        if (fromTime || toTime) {
+          const rowTime = new Date(row.date).getTime();
+          if (fromTime && rowTime < fromTime) return false;
+          if (toTime && rowTime > toTime) return false;
+        }
+        return true;
+      });
+
+      if(filteredLeaves.length === 0) { lBody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-400">Leave request clean queue.</td></tr>`; }
+      filteredLeaves.forEach(row => {
+        let controls = `<span class="text-slate-400 italic text-xs">Closed Logs (${row.comment})</span>`;
+        if (row.status === "Pending") {
+          controls = `<button onclick="adminExecuteLeave('${row.id}','Approved')" class="bg-emerald-600 text-white font-bold text-xs px-2.5 py-1 rounded shadow-sm mr-1">Approve</button>
+                      <button onclick="adminExecuteLeave('${row.id}','Denied')" class="bg-rose-600 text-white font-bold text-xs px-2.5 py-1 rounded shadow-sm">Deny</button>`;
+        }
+        lBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 font-medium">${row.name} <span class="text-slate-400 text-xs font-mono">(${row.userId})</span></td><td class="p-3 text-slate-500">${row.date}</td><td class="p-3 text-slate-600">${row.reason}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : row.status === 'Denied' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-600'}">${row.status}</span></td><td class="p-3 text-center">${controls}</td></tr>`;
+      });
+    }
+
+    function showSection(id) {
+      ['attendance-sec', 'leave-request-sec', 'admin-payroll-sec', 'user-payroll-sec', 'admin-sec'].forEach(sec => document.getElementById(sec).className = 'hidden');
+      document.getElementById(id).className = 'space-y-6';
+      if (id === 'admin-sec') fetchGlobalAdminLogs();
+      if (id === 'attendance-sec' || id === 'leave-request-sec') refreshUserTimers();
+    }
+
+    function logout() { currentUser = null; document.getElementById('app-page').className = 'hidden'; document.getElementById('login-page').className = 'flex min-h-screen items-center justify-center'; document.getElementById('admin-dash-btn').className = 'hidden'; }
+  </script>
+</body>
+</html>
