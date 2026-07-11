@@ -52,6 +52,7 @@
         <button onclick="showSection('attendance-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">🕒 Time Tracker</button>
         <button onclick="showSection('leave-request-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">📇 Leave Request</button>
         <button onclick="routePayrollSection()" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">💵 Service Payment Portal</button>
+        <button onclick="showSection('account-settings-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">⚙️ Account Settings</button>
         <button id="admin-dash-btn" onclick="showSection('admin-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg hidden font-semibold text-indigo-700 transition">📊 Global Overview</button>
       </nav>
 
@@ -113,6 +114,19 @@
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100"><h3 class="text-md font-bold text-slate-900 border-b pb-2 mb-3">My Personal Leave Queue Ledger</h3><div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Requested Date</th><th class="p-3">Reason Description</th><th class="p-3">Approval Status</th><th class="p-3">Management Comments</th></tr></thead><tbody id="personal-leave-table" class="divide-y divide-slate-50"></tbody></table></div></div>
         </section>
 
+        <!-- MODULE: SELF SERVICE PASSWORD ROTATION -->
+        <section id="account-settings-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 max-w-md space-y-4">
+          <h2 class="text-xl font-bold text-slate-800 border-b pb-2">⚙️ Manage Account Security</h2>
+          <p class="text-xs text-slate-400">Update your access credentials. For security, you must confirm your current active password.</p>
+          <div class="space-y-3">
+            <div><label class="block text-xs font-bold uppercase text-slate-500 mb-1">Current Active Password</label><input type="password" id="self-old-pass" class="w-full p-2.5 border border-slate-200 text-sm rounded-lg"></div>
+            <div><label class="block text-xs font-bold uppercase text-slate-500 mb-1">New Secure Password</label><input type="password" id="self-new-pass" class="w-full p-2.5 border border-slate-200 text-sm rounded-lg"></div>
+            <div><label class="block text-xs font-bold uppercase text-slate-500 mb-1">Confirm New Password</label><input type="password" id="self-confirm-pass" class="w-full p-2.5 border border-slate-200 text-sm rounded-lg"></div>
+            <button onclick="executeSelfPasswordChange()" class="w-full bg-indigo-600 text-white font-bold text-sm p-3 rounded-lg hover:bg-indigo-700 shadow transition mt-2">Update Password</button>
+          </div>
+          <p id="self-pass-feedback" class="text-center font-bold text-xs p-2 rounded hidden"></p>
+        </section>
+
         <!-- MODULE: ADMIN CONTROL - PAYMENTS -->
         <section id="admin-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-6 max-w-2xl">
           <h2 class="text-xl font-bold text-indigo-700 border-b pb-2">Admin Control: Issue Fixed Weekly Payment</h2>
@@ -144,8 +158,10 @@
           </div>
         </section>
 
-        <!-- MODULE: ADMINISTRATIVE PANELS -->
+        <!-- MODULE: GLOBAL ADMINISTRATIVE ANALYSIS PANELS -->
         <section id="admin-sec" class="hidden space-y-8 max-w-6xl">
+          
+          <!-- 1. Centralized Filtration -->
           <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 space-y-4">
             <h3 class="text-sm font-bold uppercase tracking-wider text-indigo-900">🔍 Real-Time Ledger Filtration Control</h3>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -161,11 +177,36 @@
             <div class="flex justify-end"><button onclick="clearGlobalFilters()" class="text-xs bg-slate-100 text-slate-600 font-bold px-3 py-1.5 rounded-lg">Reset Filters</button></div>
           </div>
 
+          <!-- ADMIN TOOL: REGISTER NEW TASKER USER FORM -->
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4">
+            <h2 class="text-xl font-bold text-indigo-900">👥 Add New Tasker (Freelancer Registration)</h2>
+            <p class="text-xs text-slate-400">Creates a new profile card line inside the main datastore sheets database matrix seamlessly.</p>
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
+              <div><label class="font-bold text-slate-600">Full Legal Name</label><input type="text" id="add-u-name" class="w-full p-2 border rounded mt-1 bg-slate-50"></div>
+              <div><label class="font-bold text-slate-600">Email Address</label><input type="email" id="add-u-email" class="w-full p-2 border rounded mt-1 bg-slate-50"></div>
+              <div><label class="font-bold text-slate-600">Initial Password</label><input type="text" id="add-u-pass" class="w-full p-2 border rounded mt-1 bg-slate-50" placeholder="e.g., ChangeMe123"></div>
+              <div><label class="font-bold text-slate-600">System Permission Role</label>
+                <select id="add-u-role" class="w-full p-2 border rounded mt-1 bg-slate-50 font-bold text-indigo-700">
+                  <option value="Employee">Employee (Standard Tasker)</option>
+                  <option value="Admin">Admin (Full Workspace Override)</option>
+                </select>
+              </div>
+              <div><label class="font-bold text-slate-600">Shift Window Range</label><input type="text" id="add-u-shift" class="w-full p-2 border rounded mt-1 bg-slate-50" value="09:00-18:00" placeholder="HH:MM-HH:MM"></div>
+              <div><label class="font-bold text-slate-600">Days Off Allotment</label><input type="text" id="add-u-off" class="w-full p-2 border rounded mt-1 bg-slate-50" value="Saturday, Sunday"></div>
+              <div><label class="font-bold text-slate-600">Half Day Configuration</label><input type="text" id="add-u-halfday" class="w-full p-2 border rounded mt-1 bg-slate-50" placeholder="e.g., Saturday 09:00-13:00"></div>
+              <div><label class="font-bold text-slate-600">Annual Leave Balance Allotment</label><input type="number" id="add-u-leaves" class="w-full p-2 border rounded mt-1 bg-slate-50" value="15"></div>
+            </div>
+            <button onclick="executeAdminCreateUser()" class="bg-indigo-600 text-white font-bold text-xs px-4 py-2 rounded shadow hover:bg-indigo-700 transition">Register Tasker Profile</button>
+            <p id="admin-create-feedback" class="text-xs font-bold p-2 rounded hidden"></p>
+          </div>
+
+          <!-- 2. Attendance Tracker -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-slate-800">Master Attendance & Overage Dashboard</h2>
             <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Name</th><th class="p-3">Date/Type</th><th class="p-3">Clock In</th><th class="p-3">Clock Out</th><th class="p-3">Break Duration</th><th class="p-3">Lunch Duration</th><th class="p-3">Exception Status</th></tr></thead><tbody id="admin-attendance-table" class="divide-y divide-slate-50"></tbody></table></div>
           </div>
 
+          <!-- 3. Master Payments tracker -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-indigo-900">Master Service Payments Distribution History</h2>
             <div class="overflow-x-auto rounded-lg border border-slate-100">
@@ -180,14 +221,25 @@
             </div>
           </div>
 
+          <!-- 4. Leaves Tracker -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-slate-800">Corporate Leave Action & Approval Queue</h2>
             <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Employee</th><th class="p-3">Target Date</th><th class="p-3">Reason Statement</th><th class="p-3">Current Status</th><th class="p-3 text-center">Actions Ledger Control</th></tr></thead><tbody id="admin-leave-table" class="divide-y divide-slate-50"></tbody></table></div>
           </div>
 
+          <!-- 5. Absences Tracker WITH SECURE MANUAL RE-AUTHENTICATION PANEL FOR ADMIN OVERRIDES -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-slate-800">Workday Exceptions & Absence Metrics</h2>
-            <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">User ID</th><th class="p-3">Tasker Name</th><th class="p-3">Scheduled Days Off</th><th class="p-3 text-indigo-700">Half Day Schedule</th><th class="p-3 font-bold text-rose-600">Total Absences Registered</th></tr></thead><tbody id="admin-absence-table" class="divide-y divide-slate-50"></tbody></table></div>
+            <div class="overflow-x-auto rounded-lg border border-slate-100">
+              <table class="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold">
+                    <th class="p-3">User ID</th><th class="p-3">Tasker Name</th><th class="p-3">Scheduled Days Off</th><th class="p-3 text-indigo-700">Half Day Schedule</th><th class="p-3 font-bold text-rose-600">Total Absences</th><th class="p-3 text-center">Security Overrides</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-absence-table" class="divide-y divide-slate-50"></tbody>
+              </table>
+            </div>
           </div>
         </section>
 
@@ -197,13 +249,12 @@
 
   <script>
     // ─── EXTERNAL CONFIGURATION LINK ──────────────────────────────────────
-    const API_URL = "https://script.google.com/macros/s/AKfycbwEpbT4ktfvjyrgcLBjvH-g9jijtPbkr69ZK1p1uqFmNMo3jM9ZJoGNBdQgj5AmlGUw/exec"; 
+    const API_URL = "PASTE_YOUR_GOOGLE_WEB_APP_URL_HERE"; 
     // ──────────────────────────────────────────────────────────────────────
 
     let currentUser = null;
     let cachedAdminMasterData = null;
 
-    // Secure cross-origin network communicator 
     function callAPI(method, urlParams, payload, callback) {
       let config = { method: method, headers: { 'Content-Type': 'text/plain;charset=utf-8' } };
       if (payload) config.body = JSON.stringify(payload);
@@ -211,7 +262,7 @@
       fetch(API_URL + urlParams, config)
         .then(res => res.json())
         .then(data => callback(data))
-        .catch(err => { alert("Network Sync Defit:\n" + err); });
+        .catch(err => { alert("Network Sync Deficit:\n" + err); });
     }
 
     function handleLogin() {
@@ -256,21 +307,39 @@
         document.getElementById('stat-lunch').innerText = `${stats.lunchMinutes} mins`;
         
         const histBody = document.getElementById('personal-history-table'); histBody.innerHTML = "";
-        if (stats.history.length === 0) {
-          histBody.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-slate-400">No punch card records found.</td></tr>`;
-        } else {
-          stats.history.forEach(row => {
-            histBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 font-medium text-slate-900">${row.date}</td><td class="p-3 text-emerald-600">${row.timeIn}</td><td class="p-3 text-rose-600">${row.timeOut}</td><td class="p-3 text-slate-600">${row.breakText}</td><td class="p-3 text-slate-600">${row.lunchText}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${row.status === 'Late' ? 'bg-rose-50 text-rose-600':'bg-emerald-50 text-emerald-600'}">${row.status}</span></td></tr>`;
-          });
-        }
+        stats.history.forEach(row => {
+          histBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 font-medium text-slate-900">${row.date}</td><td class="p-3 text-emerald-600">${row.timeIn}</td><td class="p-3 text-rose-600">${row.timeOut}</td><td class="p-3 text-slate-600">${row.breakText}</td><td class="p-3 text-slate-600">${row.lunchText}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${row.status === 'Late' ? 'bg-rose-50 text-rose-600':'bg-emerald-50 text-emerald-600'}">${row.status}</span></td></tr>`;
+        });
 
         const leaveBody = document.getElementById('personal-leave-table'); leaveBody.innerHTML = "";
-        if(stats.leaves.length === 0) { 
-          leaveBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-slate-400">No filed leaves found.</td></tr>`; 
-        } else {
-          stats.leaves.forEach(row => {
-            leaveBody.innerHTML += `<tr><td class="p-3 font-medium">${row.date}</td><td class="p-3 text-slate-600">${row.reason}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : row.status === 'Denied' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-600'}">${row.status}</span></td><td class="p-3 text-slate-500 italic">${row.comment}</td></tr>`;
-          });
+        if(stats.leaves.length === 0) { leaveBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-slate-400">No filed leaves found.</td></tr>`; }
+        stats.leaves.forEach(row => {
+          leaveBody.innerHTML += `<tr><td class="p-3 font-medium">${row.date}</td><td class="p-3 text-slate-600">${row.reason}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : row.status === 'Denied' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-600'}">${row.status}</span></td><td class="p-3 text-slate-500 italic">${row.comment}</td></tr>`;
+        });
+      });
+    }
+
+    function executeSelfPasswordChange() {
+      const oldPass = document.getElementById('self-old-pass').value;
+      const newPass = document.getElementById('self-new-pass').value;
+      const confirmPass = document.getElementById('self-confirm-pass').value;
+      const fb = document.getElementById('self-pass-feedback');
+      
+      fb.classList.add('hidden');
+      if (!oldPass || !newPass || !confirmPass) { alert("Please complete all parameter input fields."); return; }
+      if (newPass !== confirmPass) { alert("Matching Discrepancy: New password entries do not match."); return; }
+      
+      fb.className = "text-center font-bold text-xs p-2 rounded bg-amber-50 text-amber-800";
+      fb.innerText = "Synchronizing records...";
+      fb.classList.remove('hidden');
+      
+      callAPI('POST', '', { action: "changePasswordSelf", userId: currentUser.id, oldPassword: oldPass, newPassword: newPass }, function(res) {
+        fb.innerText = res.message;
+        fb.className = res.success ? "text-center font-bold text-xs p-2 rounded bg-emerald-50 text-emerald-800" : "text-center font-bold text-xs p-2 rounded bg-rose-50 text-rose-800";
+        if(res.success) {
+          document.getElementById('self-old-pass').value = "";
+          document.getElementById('self-new-pass').value = "";
+          document.getElementById('self-confirm-pass').value = "";
         }
       });
     }
@@ -296,6 +365,50 @@
       const comment = prompt(`Provide management comments for decision mapping (${status}):`);
       if(comment === null) return; 
       callAPI('POST', '', { action: "processLeaveAction", requestId: reqId, status: status, comment: comment }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
+    }
+
+    function executeAdminOverridePassword(targetUid) {
+      const newPass = prompt(`Enter new secure password override value for Tasker [${targetUid}]:`);
+      if (!newPass || newPass.trim() === "") return;
+      
+      callAPI('POST', '', { action: "adminChangePassword", targetUserId: targetUid, newPassword: newPass }, function(res) {
+        alert(res.message);
+      });
+    }
+
+    function executeAdminCreateUser() {
+      const name = document.getElementById('add-u-name').value;
+      const email = document.getElementById('add-u-email').value;
+      const pass = document.getElementById('add-u-pass').value;
+      const role = document.getElementById('add-u-role').value;
+      const shift = document.getElementById('add-u-shift').value;
+      const offDays = document.getElementById('add-u-off').value;
+      const halfDay = document.getElementById('add-u-halfday').value;
+      const allowance = document.getElementById('add-u-leaves').value;
+      const fb = document.getElementById('admin-create-feedback');
+      
+      fb.classList.add('hidden');
+      if(!name || !email || !pass || !shift || !offDays) { alert("Please supply all mandatory fields."); return; }
+      
+      const parts = shift.split('-');
+      if(parts.length !== 2) { alert("Invalid Shift Window formatting logic structure. Use format HH:MM-HH:MM"); return; }
+      
+      const payload = {
+        action: "adminCreateUser",
+        newUserData: { name: name, email: email, password: pass, role: role },
+        defaultSettings: { shiftStart: parts[0], shiftEnd: parts[1], maxBreak: 15, maxLunch: 60, daysOff: offDays, halfDayConfig: halfDay, leaveAllowance: allowance }
+      };
+      
+      fb.className = "text-xs font-bold p-2 rounded bg-amber-50 text-amber-800"; fb.innerText = "Registering user profile line..."; fb.classList.remove('hidden');
+      
+      callAPI('POST', '', payload, function(res) {
+        fb.innerText = res.message;
+        fb.className = res.success ? "text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800" : "text-xs font-bold p-2 rounded bg-rose-50 text-rose-800";
+        if (res.success) {
+          ['add-u-name', 'add-u-email', 'add-u-pass', 'add-u-halfday'].forEach(id => document.getElementById(id).value = "");
+          fetchGlobalAdminLogs();
+        }
+      });
     }
 
     function routePayrollSection() { if (currentUser.role === 'Admin') showSection('admin-payroll-sec'); else { showSection('user-payroll-sec'); fetchPersonalPayslips(); } }
@@ -387,7 +500,16 @@
       }
 
       data.absences.filter(r => !(selectedTasker !== "ALL" && r.name !== selectedTasker)).forEach(row => {
-        absBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 font-mono text-xs text-slate-500">${row.id}</td><td class="p-3 font-medium text-slate-900">${row.name}</td><td class="p-3 text-slate-500">${row.daysOff}</td><td class="p-3 text-indigo-600">${row.halfDay}</td><td class="p-3 font-black text-sm ${row.absents > 0 ? 'text-rose-600 bg-rose-50/30' : 'text-emerald-600'}">${row.absents} days missed</td></tr>`;
+        absBody.innerHTML += `<tr class="border-b border-slate-100">
+          <td class="p-3 font-mono text-xs text-slate-500">${row.id}</td>
+          <td class="p-3 font-medium text-slate-900">${row.name}</td>
+          <td class="p-3 text-slate-500">${row.daysOff}</td>
+          <td class="p-3 text-indigo-600">${row.halfDay}</td>
+          <td class="p-3 font-black text-sm ${row.absents > 0 ? 'text-rose-600 bg-rose-50/30' : 'text-emerald-600'}">${row.absents} days missed</td>
+          <td class="p-3 text-center">
+            <button onclick="executeAdminOverridePassword('${row.id}')" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-2 py-1 rounded transition border border-indigo-200">Reset Password</button>
+          </td>
+        </tr>`;
       });
 
       let filteredLeaves = data.leaves.filter(row => {
@@ -412,10 +534,10 @@
     }
 
     function showSection(id) {
-      ['attendance-sec', 'leave-request-sec', 'admin-payroll-sec', 'user-payroll-sec', 'admin-sec'].forEach(sec => document.getElementById(sec).className = 'hidden');
-      document.getElementById(id).className = 'space-y-6';
+      ['attendance-sec', 'leave-request-sec', 'account-settings-sec', 'admin-payroll-sec', 'user-payroll-sec', 'admin-sec'].forEach(sec => document.getElementById(sec).className = 'hidden');
+      document.getElementById(id).className = id === 'account-settings-sec' ? 'bg-white p-6 rounded-xl shadow-sm border border-slate-100 max-w-md space-y-4' : 'space-y-6';
       if (id === 'admin-sec') fetchGlobalAdminLogs();
-      if (id === 'attendance-sec' || id === 'leave-request-sec') refreshUserTimers();
+      if (id === 'attendance-sec' || id === 'leave-request-sec' || id === 'account-settings-sec') refreshUserTimers();
     }
 
     function logout() { currentUser = null; document.getElementById('app-page').className = 'hidden'; document.getElementById('login-page').className = 'flex min-h-screen items-center justify-center'; document.getElementById('admin-dash-btn').className = 'hidden'; }
