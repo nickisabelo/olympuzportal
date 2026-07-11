@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Olympuz Operations Hub</title>
-  <link rel="icon" type="image/png" href="Logo New.png">
+  <link rel="icon" type="image/png" href="logo.png">
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 <body class="bg-slate-50 font-sans text-slate-800">
@@ -247,7 +247,7 @@
 
   <script>
     // ─── EXTERNAL CONFIGURATION LINK ──────────────────────────────────────
-    const API_URL = "https://script.google.com/macros/s/AKfycbx87TuP_UX14B8Px-uD9ubHOfHq5OiquZT7_AJriotykAp7BUq--hiRLywG_s8_zu1l/exec"; 
+    const API_URL = "https://script.google.com/macros/s/AKfycbzfwJC20rtOEQHzeMlpDAJjnbd4Sp8ubAXkMPQLv6lT5jXvnF9hByRjpHciM__gdVOx/exec"; 
     // ──────────────────────────────────────────────────────────────────────
 
     let currentUser = null;
@@ -347,7 +347,7 @@
     }
 
     function executeAdminRemoveUser(targetUid, targetName) {
-      if (!confirm(`🚨 CRITICAL ACTION VERIFICATION:\nAre you absolutely certain you want to remove ${targetName} [${targetUid}]? This will permanently delete their access profile and shift settings lines from the primary database!`)) return;
+      if (!confirm(`🚨 CRITICAL ACTION:\nAre you absolutely certain you want to remove ${targetName} [${targetUid}]? This permanently purges their access profile settings lines!`)) return;
       callAPI('POST', '', { action: "adminDeleteUser", targetUserId: targetUid }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
     }
 
