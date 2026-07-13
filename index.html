@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Olympuz Operations Hub</title>
+  <title>Olympuz Operations Hub Portal</title>
   <link rel="icon" type="image/png" href="Logo New.png">
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
@@ -224,19 +224,19 @@
             <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Name</th><th class="p-3">Date/Type</th><th class="p-3">Clock In</th><th class="p-3">Clock Out</th><th class="p-3">Break Duration</th><th class="p-3">Lunch Duration</th><th class="p-3">Exception Status</th></tr></thead><tbody id="admin-attendance-table" class="divide-y divide-slate-50"></tbody></table></div>
           </div>
 
-          <!-- NEW MODULE: ABSENTEE SELECTION & EXPLICIT HISTORICAL LEDGER OVERVIEW -->
+          <!-- NEW MODULE: ABSENTEE SELECTION & HISTORICAL LEDGER WITH UNTAG PERMISSION OVERRIDES -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4">
             <h2 class="text-xl font-bold text-rose-800">📋 Master Absences Historical Database Registry</h2>
-            <p class="text-xs text-slate-400">View registered day omissions published directly inside the spreadsheets architecture.</p>
+            <p class="text-xs text-slate-400">View registered day omissions inside the database. Admins can permanently remove or undo an absence here.</p>
             <div class="overflow-x-auto rounded-lg border border-slate-100">
               <table class="w-full text-left border-collapse text-sm">
                 <thead>
                   <tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold">
-                    <th class="p-3">User ID</th><th class="p-3">Tasker Name</th><th class="p-3">Date of Absence</th><th class="p-3">Verification Entry Mode</th>
+                    <th class="p-3">User ID</th><th class="p-3">Tasker Name</th><th class="p-3">Date of Absence</th><th class="p-3">Verification Entry Mode</th><th class="p-3 text-center">Actions Control</th>
                   </tr>
                 </thead>
                 <tbody id="admin-explicit-absents-table" class="divide-y divide-slate-50">
-                  <tr><td colspan="4" class="p-3 text-center text-slate-400">Loading sheets logs metrics...</td></tr>
+                  <tr><td colspan="5" class="p-3 text-center text-slate-400">Loading sheet log logs metrics...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -254,7 +254,7 @@
             <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Employee</th><th class="p-3">Target Date</th><th class="p-3">Reason Statement</th><th class="p-3">Current Status</th><th class="p-3 text-center">Actions Ledger Control</th></tr></thead><tbody id="admin-leave-table" class="divide-y divide-slate-50"></tbody></table></div>
           </div>
 
-          <!-- Exception Roster With Advanced User Deletion Tool Actions -->
+          <!-- Exception Roster With Advanced Actions -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-slate-800">Workday Exceptions & Absence Metrics</h2>
             <div class="overflow-x-auto rounded-lg border border-slate-100">
@@ -276,7 +276,7 @@
 
   <script>
     // ─── EXTERNAL CONFIGURATION LINK ──────────────────────────────────────
-    const API_URL = "https://script.google.com/macros/s/AKfycbwQtZhP1SfYY__evaXqVZJYi4FtLeD45z2m79B7tkmzXOZJ7iWXpk87SNg9r2J9JRM2/exec"; 
+    const API_URL = "https://script.google.com/macros/s/AKfycbxhegrH1WST9pImnjfT3oTLssmTDYp8O5EwihPc9lm-BTAGpCN8Ch2bQPhmpcg66OyQ/exec"; 
     // ──────────────────────────────────────────────────────────────────────
 
     let currentUser = null;
@@ -318,7 +318,7 @@
       if(currentUser.role === 'Admin') document.getElementById('admin-dash-btn').classList.remove('hidden');
       showSection('attendance-sec');
 
-      // Heartbeat timers for background pooling refreshes
+      // Heartbeat background syncing loops
       setInterval(refreshUserTimers, 30000);
       setInterval(function() {
         const reportSection = document.getElementById('task-report-sec');
@@ -439,6 +439,15 @@
       });
     }
 
+    function executeAdminUntagAbsentLog(absId, targetName, targetDate) {
+      if (!confirm(`Are you certain you want to clear the absence log for ${targetName} on ${targetDate}?`)) return;
+      
+      callAPI('POST', '', { action: "adminUntagAbsent", absentId: absId }, function(res) {
+        alert(res.message);
+        if (res.success) fetchGlobalAdminLogs();
+      });
+    }
+
     function executeAdminCreateUser() {
       const name = document.getElementById('add-u-name').value, email = document.getElementById('add-u-email').value, pass = document.getElementById('add-u-pass').value, role = document.getElementById('add-u-role').value;
       const shift = document.getElementById('add-u-shift').value, offDays = document.getElementById('add-u-off').value, halfDay = document.getElementById('add-u-halfday').value, allowance = document.getElementById('add-u-leaves').value, fb = document.getElementById('admin-create-feedback');
@@ -510,13 +519,13 @@
         });
       }
 
-      // Render the Explicit Sheet-Tracked Hardcoded Absences
+      // Render the Explicit Registry with Untag Button overrides
       let filteredExplicitAbsents = data.explicitAbsents.filter(row => {
         if (selectedTasker !== "ALL" && row.name !== selectedTasker) return false;
         if (fromTime || toTime) { const rowTime = new Date(row.date).getTime(); if (fromTime && rowTime < fromTime) return false; if (toTime && rowTime > toTime) return false; }
         return true;
       });
-      if (filteredExplicitAbsents.length === 0) { explicitAbsBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-slate-400">No database absence logs recorded matching filter query.</td></tr>`; }
+      if (filteredExplicitAbsents.length === 0) { explicitAbsBody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-400">No database absence records found.</td></tr>`; }
       else {
         filteredExplicitAbsents.forEach(row => {
           explicitAbsBody.innerHTML += `<tr class="border-b border-slate-100 hover:bg-slate-50/50 transition">
@@ -524,6 +533,9 @@
             <td class="p-3 font-bold text-slate-900">${row.name}</td>
             <td class="p-3 text-rose-600 font-semibold">${row.date}</td>
             <td class="p-3 text-slate-500 italic text-xs">${row.type}</td>
+            <td class="p-3 text-center">
+              <button onclick="executeAdminUntagAbsentLog('${row.absentId}', '${row.name}', '${row.date}')" class="text-[11px] bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-700 font-bold px-2 py-1 rounded border border-slate-200 hover:border-rose-200 transition">Remove Absent</button>
+            </td>
           </tr>`;
         });
       }
