@@ -115,10 +115,23 @@
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100"><h3 class="text-md font-bold text-slate-900 border-b pb-2 mb-3">My Personal Leave Queue Ledger</h3><div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Requested Date</th><th class="p-3">Reason Description</th><th class="p-3">Approval Status</th><th class="p-3">Management Comments</th></tr></thead><tbody id="personal-leave-table" class="divide-y divide-slate-50"></tbody></table></div></div>
         </section>
 
-        <!-- NEW MODULE: TASK DONE REPORT (ALL USERS VIEW & INPUT LEDGER) -->
+        <!-- UPGRADED MODULE: TASK DONE REPORT (WITH EVERYONE FILTER & TRUE ACCURATE SUBMISSION TIMESTAMPS) -->
         <section id="task-report-sec" class="hidden space-y-6 max-w-6xl">
+          <!-- Filter Control Banner for Everyone -->
+          <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h3 class="text-sm font-bold text-slate-800">🎯 Task Filter Control Panel</h3>
+              <p class="text-[11px] text-slate-400">Everyone can sort and screen work logs by individual tasker profiles.</p>
+            </div>
+            <div class="w-full sm:w-64">
+              <select id="public-filter-tasker" onchange="applyPublicReportFilter()" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-slate-50 font-semibold text-indigo-900">
+                <option value="ALL">-- Show Everyone's Reports --</option>
+              </select>
+            </div>
+          </div>
+
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Left Submission Form -->
+            <!-- Left Submission Form Card -->
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4 h-fit">
               <h2 class="text-xl font-bold text-slate-800">📝 Post Daily Report</h2>
               <p class="text-xs text-slate-400">Log task deliverables and work details to the organizational activity timeline.</p>
@@ -133,10 +146,10 @@
               <button onclick="submitDailyWorkReport()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg font-bold text-sm shadow transition">Publish Report</button>
               <p id="rep-feedback" class="text-center font-bold text-xs p-2 rounded hidden"></p>
             </div>
-            <!-- Right Public Activity Timeline Feed -->
+            <!-- Right Public Activity Timeline Feed Grid -->
             <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col">
               <h2 class="text-xl font-bold text-slate-800 mb-1">📋 Company Task Registry Feed</h2>
-              <p class="text-xs text-slate-400 mb-4">Live public history ledger of day reports published by all freelancers across the agency.</p>
+              <p class="text-xs text-slate-400 mb-4">Live chronological stream showing explicit system verified submission timestamps.</p>
               <div class="flex-1 overflow-y-auto max-h-[500px] border border-slate-100 rounded-lg p-4 bg-slate-50/50 space-y-3" id="public-reports-feed">
                 <div class="text-center py-8 text-slate-400 text-xs">Compiling transaction logs...</div>
               </div>
@@ -187,7 +200,7 @@
           </div>
         </section>
 
-        <!-- MODULE: SYSTEM ADMINISTRATION PANELS -->
+        <!-- MODULE: SYSTEM ADMINISTRATION PANELS (HISTORICAL FEED PURGED AS REQUESTED) -->
         <section id="admin-sec" class="hidden space-y-8 max-w-6xl">
           
           <!-- Filtration Matrix Controls -->
@@ -234,24 +247,6 @@
             <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Name</th><th class="p-3">Date/Type</th><th class="p-3">Clock In</th><th class="p-3">Clock Out</th><th class="p-3">Break Duration</th><th class="p-3">Lunch Duration</th><th class="p-3">Exception Status</th></tr></thead><tbody id="admin-attendance-table" class="divide-y divide-slate-50"></tbody></table></div>
           </div>
 
-          <!-- ADMIN CENTRAL REPORT MONITOR REGISTRY GRID -->
-          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-            <h2 class="text-xl font-bold text-slate-800">Master Task Done Historical Ledger Feed</h2>
-            <p class="text-xs text-slate-400 mb-3">Filter timelines to trace individual deliverable descriptions down to the freelancer.</p>
-            <div class="overflow-x-auto rounded-lg border border-slate-100">
-              <table class="w-full text-left border-collapse text-sm">
-                <thead>
-                  <tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold">
-                    <th class="p-3 w-1/4">Tasker Name</th><th class="p-3 w-1/6">Log Date</th><th class="p-3 w-7/12">Tasks & Operations Performance Record</th>
-                  </tr>
-                </thead>
-                <tbody id="admin-reports-table" class="divide-y divide-slate-50">
-                  <tr><td colspan="3" class="p-3 text-center text-slate-400">Awaiting filtration query...</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
           <!-- Disbursements Ledger History -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-indigo-900">Master Service Payments Distribution History</h2>
@@ -273,7 +268,7 @@
             <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Employee</th><th class="p-3">Target Date</th><th class="p-3">Reason Statement</th><th class="p-3">Current Status</th><th class="p-3 text-center">Actions Ledger Control</th></tr></thead><tbody id="admin-leave-table" class="divide-y divide-slate-50"></tbody></table></div>
           </div>
 
-          <!-- Exception Roster Actions -->
+          <!-- Exception Roster With Advanced User Deletion Tool Actions -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-slate-800">Workday Exceptions & Absence Metrics</h2>
             <div class="overflow-x-auto rounded-lg border border-slate-100">
@@ -295,11 +290,12 @@
 
   <script>
     // ─── EXTERNAL CONFIGURATION LINK ──────────────────────────────────────
-    const API_URL = "https://script.google.com/macros/s/AKfycbx1GRo8Ri9Qz7bjqLgEpo-khhDuaauKC3kRCh8KDcZGkx7CIexAAi7X-1i6C56Yb6tH/exec"; 
+    const API_URL = "https://script.google.com/macros/s/AKfycbziPO0FEBJhDWqK0z-5wmEm9-sIcefY1SdV0tveuwrm0lvs5Fwgv7XWs70i-qkeey0c/exec"; 
     // ──────────────────────────────────────────────────────────────────────
 
     let currentUser = null;
     let cachedAdminMasterData = null;
+    let cachedPublicReports = [];
 
     function callAPI(method, urlParams, payload, callback) {
       let config = { method: method, headers: { 'Content-Type': 'text/plain;charset=utf-8' } };
@@ -317,50 +313,36 @@
     }
 
     function bootPortalSession() {
-  document.getElementById('login-page').classList.add('hidden');
-  document.getElementById('app-page').classList.remove('hidden');
-  document.getElementById('user-display').innerText = `${currentUser.name} | ${currentUser.role}`;
-  document.getElementById('sched-shift').innerText = `${currentUser.schedule.shiftStart} to ${currentUser.schedule.shiftEnd}`;
-  document.getElementById('stat-leave-allow').innerText = currentUser.schedule.leaveAllowance;
-  document.getElementById('stat-leave-remain').innerText = `${currentUser.schedule.remainingLeaves} days`;
-  
-  if (currentUser.schedule.isHalfDayToday) {
-    document.getElementById('halfday-banner').classList.remove('hidden');
-    document.getElementById('sched-limits').innerText = `Break: ${currentUser.schedule.maxBreak}m | Lunch: N/A (Half Day) | Days Off: ${currentUser.schedule.daysOff}`;
-    document.getElementById('btn-lunch-s').className = 'hidden';
-    document.getElementById('btn-lunch-e').className = 'hidden';
-  } else {
-    document.getElementById('halfday-banner').classList.add('hidden');
-    document.getElementById('sched-limits').innerText = `Break: ${currentUser.schedule.maxBreak}m | Lunch: ${currentUser.schedule.maxLunch}m | Days Off: ${currentUser.schedule.daysOff}`;
-  }
-  if(currentUser.role === 'Admin') document.getElementById('admin-dash-btn').classList.remove('hidden');
-  
-  // Open the primary view dashboard
-  showSection('attendance-sec');
+      document.getElementById('login-page').classList.add('hidden');
+      document.getElementById('app-page').classList.remove('hidden');
+      document.getElementById('user-display').innerText = `${currentUser.name} | ${currentUser.role}`;
+      document.getElementById('sched-shift').innerText = `${currentUser.schedule.shiftStart} to ${currentUser.schedule.shiftEnd}`;
+      document.getElementById('stat-leave-allow').innerText = currentUser.schedule.leaveAllowance;
+      document.getElementById('stat-leave-remain').innerText = `${currentUser.schedule.remainingLeaves} days`;
+      
+      if (currentUser.schedule.isHalfDayToday) {
+        document.getElementById('halfday-banner').classList.remove('hidden');
+        document.getElementById('sched-limits').innerText = `Break: ${currentUser.schedule.maxBreak}m | Lunch: N/A (Half Day) | Days Off: ${currentUser.schedule.daysOff}`;
+        document.getElementById('btn-lunch-s').className = 'hidden';
+        document.getElementById('btn-lunch-e').className = 'hidden';
+      } else {
+        document.getElementById('halfday-banner').classList.add('hidden');
+        document.getElementById('sched-limits').innerText = `Break: ${currentUser.schedule.maxBreak}m | Lunch: ${currentUser.schedule.maxLunch}m | Days Off: ${currentUser.schedule.daysOff}`;
+      }
+      if(currentUser.role === 'Admin') document.getElementById('admin-dash-btn').classList.remove('hidden');
+      showSection('attendance-sec');
 
-  // ─── START AUTOMATED BACKGROUND SYNC TIMERS ───
-  // Automatically updates user tickers and history grids every 30 seconds
-  setInterval(function() {
-    refreshUserTimers();
-  }, 30000);
-
-  // Automatically updates the central public activity stream feed every 60 seconds
-  setInterval(function() {
-    const reportSection = document.getElementById('task-report-sec');
-    if (reportSection && !reportSection.classList.contains('hidden')) {
-      loadPublicTaskReportsFeed();
+      // Heartbeat timers for background pooling refreshes
+      setInterval(refreshUserTimers, 30000);
+      setInterval(function() {
+        const reportSection = document.getElementById('task-report-sec');
+        if (reportSection && !reportSection.classList.contains('hidden')) loadPublicTaskReportsFeed();
+      }, 60000);
+      setInterval(function() {
+        const adminSection = document.getElementById('admin-sec');
+        if (currentUser.role === 'Admin' && adminSection && !adminSection.classList.contains('hidden')) fetchGlobalAdminLogs();
+      }, 45000);
     }
-  }, 60000);
-
-  // Automatically refreshes management tables if the user is an logged in as Admin
-  setInterval(function() {
-    const adminSection = document.getElementById('admin-sec');
-    if (currentUser.role === 'Admin' && adminSection && !adminSection.classList.contains('hidden')) {
-      fetchGlobalAdminLogs();
-    }
-  }, 45000);
-  // ───────────────────────────────────────────────
-}
 
     function refreshUserTimers() {
       if (!currentUser) return;
@@ -380,24 +362,57 @@
       });
     }
 
-    // ─── TASK REPORT FEED SYNC PROCESSES ──────────────────────────────────
+    // ─── TASK REPORT FEED SYNC PROCESSES (WITH ADVANCED DYNAMIC DROPDOWN FILTER & VERIFIED TIME SUBMISSIONS) ───
     function loadPublicTaskReportsFeed() {
       const container = document.getElementById('public-reports-feed');
       callAPI('GET', '?action=getAllTaskReports', null, function(records) {
-        container.innerHTML = "";
-        if (records.length === 0) {
-          container.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs">No day logs compiled inside the database registry sheet.</div>`;
-          return;
-        }
-        records.forEach(row => {
-          container.innerHTML += `<div class="bg-white p-3.5 rounded-lg shadow-sm border border-slate-100 flex flex-col gap-1">
-            <div class="flex justify-between items-center text-xs">
-              <span class="font-bold text-indigo-700">${row.name} <span class="text-slate-400 font-mono font-normal">(${row.userId})</span></span>
-              <span class="bg-slate-100 font-semibold px-2 py-0.5 rounded text-slate-500">${row.date}</span>
-            </div>
-            <p class="text-xs text-slate-600 font-medium whitespace-pre-wrap mt-1 leading-relaxed border-t border-slate-50 pt-2">${row.summary}</p>
-          </div>`;
+        cachedPublicReports = records;
+        
+        // Dynamically compile available names mapping inside public select menu dropdown options
+        const filterSelect = document.getElementById('public-filter-tasker');
+        const currentSelection = filterSelect.value;
+        filterSelect.innerHTML = `<option value="ALL">-- Show Everyone's Reports --</option>`;
+        
+        const uniqueNames = [...new Set(records.map(r => r.name))].sort();
+        uniqueNames.forEach(name => {
+          filterSelect.innerHTML += `<option value="${name}">${name}</option>`;
         });
+        filterSelect.value = currentSelection;
+        
+        renderFilteredPublicReports();
+      });
+    }
+
+    function applyPublicReportFilter() {
+      renderFilteredPublicReports();
+    }
+
+    function renderFilteredPublicReports() {
+      const container = document.getElementById('public-reports-feed');
+      const selection = document.getElementById('public-filter-tasker').value;
+      
+      let items = cachedPublicReports;
+      if (selection !== "ALL") {
+        items = cachedPublicReports.filter(r => r.name === selection);
+      }
+      
+      container.innerHTML = "";
+      if (items.length === 0) {
+        container.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs">No task report lines fit your filtration selection criteria.</div>`;
+        return;
+      }
+      
+      items.forEach(row => {
+        container.innerHTML += `<div class="bg-white p-3.5 rounded-lg shadow-sm border border-slate-100 flex flex-col gap-1">
+          <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center text-xs gap-1">
+            <span class="font-bold text-indigo-700">${row.name} <span class="text-slate-400 font-mono font-normal">(${row.userId})</span></span>
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="bg-slate-100 font-semibold px-2 py-0.5 rounded text-slate-500 text-[10px]">Work Date: ${row.date}</span>
+              <span class="bg-emerald-50 font-bold px-2 py-0.5 rounded text-emerald-700 text-[10px]">Sent: ${row.timestamp}</span>
+            </div>
+          </div>
+          <p class="text-xs text-slate-600 font-medium whitespace-pre-wrap mt-1 leading-relaxed border-t border-slate-50 pt-2">${row.summary}</p>
+        </div>`;
       });
     }
 
@@ -408,7 +423,6 @@
       
       fb.classList.add('hidden');
       if (!dateVal || !textVal.trim()) { alert("Please complete all parameter metrics entries."); return; }
-      
       fb.className = "text-center text-xs font-bold p-2 rounded bg-amber-50 text-amber-800"; fb.innerText = "Transmitting record lines..."; fb.classList.remove('hidden');
       
       callAPI('POST', '', { action: "submitDailyReport", userId: currentUser.id, userName: currentUser.name, reportDate: dateVal, summary: textVal }, function(res) {
@@ -520,8 +534,8 @@
     function renderFilteredGrids(data) {
       const selectedTasker = document.getElementById('filter-tasker').value, fromDateVal = document.getElementById('filter-from-date').value, toDateVal = document.getElementById('filter-to-date').value;
       const fromTime = fromDateVal ? new Date(fromDateVal).setHours(0,0,0,0) : null, toTime = toDateVal ? new Date(toDateVal).setHours(23,59,59,999) : null;
-      const pBody = document.getElementById('admin-attendance-table'), absBody = document.getElementById('admin-absence-table'), lBody = document.getElementById('admin-leave-table'), payBody = document.getElementById('admin-payments-history-table'), repBody = document.getElementById('admin-reports-table');
-      pBody.innerHTML = ""; absBody.innerHTML = ""; lBody.innerHTML = ""; payBody.innerHTML = ""; repBody.innerHTML = "";
+      const pBody = document.getElementById('admin-attendance-table'), absBody = document.getElementById('admin-absence-table'), lBody = document.getElementById('admin-leave-table'), payBody = document.getElementById('admin-payments-history-table');
+      pBody.innerHTML = ""; absBody.innerHTML = ""; lBody.innerHTML = ""; payBody.innerHTML = "";
 
       let filteredAttendance = data.attendance.filter(row => {
         if (selectedTasker !== "ALL" && row.name !== selectedTasker) return false;
@@ -534,23 +548,6 @@
           const bBadge = row.overBreak > 0 ? `<span class="bg-rose-50 text-rose-600 text-xs px-2 py-0.5 rounded font-bold ml-1">+${row.overBreak}m over</span>` : '';
           const lBadge = row.overLunch > 0 ? `<span class="bg-rose-50 text-rose-600 text-xs px-2 py-0.5 rounded font-bold ml-1">+${row.overLunch}m over</span>` : '';
           pBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 font-medium text-slate-900">${row.name}</td><td class="p-3 text-slate-500">${row.date}</td><td class="p-3 text-emerald-600 font-medium">${row.timeIn}</td><td class="p-3 text-rose-600 font-medium">${row.timeOut}</td><td class="p-3 text-slate-600">${row.breakText} ${bBadge}</td><td class="p-3 text-slate-600">${row.lunchText} ${lBadge}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${row.status === 'Late' ? 'bg-rose-50 text-rose-600':'bg-emerald-50 text-emerald-600'}">${row.status}</span></td></tr>`;
-        });
-      }
-
-      // Filter Admin Task Reports History Grid View Row Items
-      let filteredReports = data.reports.filter(row => {
-        if (selectedTasker !== "ALL" && row.name !== selectedTasker) return false;
-        if (fromTime || toTime) { const rowTime = new Date(row.date).getTime(); if (fromTime && rowTime < fromTime) return false; if (toTime && rowTime > toTime) return false; }
-        return true;
-      });
-      if(filteredReports.length === 0) { repBody.innerHTML = `<tr><td colspan="3" class="p-3 text-center text-slate-400">No performance summaries filed inside this time parameter block.</td></tr>`; }
-      else {
-        filteredReports.forEach(row => {
-          repBody.innerHTML += `<tr class="border-b border-slate-100 hover:bg-slate-50/50 transition">
-            <td class="p-3 font-bold text-slate-900">${row.name} <span class="text-slate-400 font-mono text-xs font-normal">(${row.userId})</span></td>
-            <td class="p-3 text-slate-500 font-medium">${row.date}</td>
-            <td class="p-3 text-slate-600 text-xs whitespace-pre-wrap leading-relaxed max-w-xl">${row.summary}</td>
-          </tr>`;
         });
       }
 
@@ -594,6 +591,7 @@
       
       if (id === 'task-report-sec') {
         document.getElementById('rep-date').value = new Date().toISOString().split('T')[0];
+        document.getElementById('public-filter-tasker').value = "ALL";
         loadPublicTaskReportsFeed();
       }
       if (id === 'admin-sec') fetchGlobalAdminLogs();
