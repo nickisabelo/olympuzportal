@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Olympuz Operations Hub Portal</title>
-  <link rel="icon" type="image/png" href="Logo New.png">
+  <title>Olympuz Operations Hub</title>
+  <link rel="icon" type="image/png" href="logo.png">
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 <body class="bg-slate-50 font-sans text-slate-800">
@@ -171,10 +171,19 @@
           <p id="payroll-feedback" class="text-emerald-600 bg-emerald-50 text-xs font-bold p-2 rounded-lg hidden"></p>
         </section>
 
-        <!-- MODULE: TASKER PAYMENTS LEDGER -->
-        <section id="user-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4 max-w-5xl">
+        <!-- MODULE: TASKER PAYMENTS LEDGER (UPGRADED WITH ACKNOWLEDGE & DISPUTE REVIEW LOOPS) -->
+        <section id="user-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4 max-w-7xl">
           <h2 class="text-xl font-bold text-slate-800 border-b pb-2">My Service Payment Ledgers</h2>
-          <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Service Period</th><th class="p-3">Weeks Logged</th><th class="p-3">Weekly Rate</th><th class="p-3">Gross Base</th><th class="p-3">Applied Deductions</th><th class="p-3 font-bold text-indigo-700">Net Credited Revenue</th><th class="p-3">Operational Remarks</th></tr></thead><tbody id="user-payroll-table" class="divide-y divide-slate-50"></tbody></table></div>
+          <div class="overflow-x-auto rounded-lg border border-slate-100">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold">
+                  <th class="p-3">Service Period</th><th class="p-3">Weeks Logged</th><th class="p-3">Weekly Rate</th><th class="p-3">Gross Base</th><th class="p-3">Applied Deductions</th><th class="p-3 font-bold text-indigo-700">Net Credited Revenue</th><th class="p-3">Operational Remarks</th><th class="p-3 text-center">Status & Review Actions</th>
+                </tr>
+              </thead>
+              <tbody id="user-payroll-table" class="divide-y divide-slate-50"></tbody>
+            </table>
+          </div>
         </section>
 
         <!-- MODULE: SYSTEM ADMINISTRATION PANELS -->
@@ -224,7 +233,7 @@
             <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Name</th><th class="p-3">Date/Type</th><th class="p-3">Clock In</th><th class="p-3">Clock Out</th><th class="p-3">Break Duration</th><th class="p-3">Lunch Duration</th><th class="p-3">Exception Status</th></tr></thead><tbody id="admin-attendance-table" class="divide-y divide-slate-50"></tbody></table></div>
           </div>
 
-          <!-- NEW MODULE: ABSENTEE SELECTION & HISTORICAL LEDGER WITH UNTAG PERMISSION OVERRIDES -->
+          <!-- MODULE: ABSENTEE SELECTION & HISTORICAL LEDGER -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4">
             <h2 class="text-xl font-bold text-rose-800">📋 Master Absences Historical Database Registry</h2>
             <p class="text-xs text-slate-400">View registered day omissions inside the database. Admins can permanently remove or undo an absence here.</p>
@@ -242,10 +251,20 @@
             </div>
           </div>
 
-          <!-- Disbursements Ledger History -->
+          <!-- UPGRADED MODULE: Disbursements Ledger History (WITH SYSTEM STATUS AUDIT & REASON LOGS) -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-indigo-900">Master Service Payments Distribution History</h2>
-            <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Tasker Name</th><th class="p-3">User ID</th><th class="p-3">Service Period</th><th class="p-3">Weeks</th><th class="p-3">Gross Base</th><th class="p-3">Deductions</th><th class="p-3 font-bold text-indigo-600">Net Distributed</th><th class="p-3">Remarks Log</th></tr></thead><tbody id="admin-payments-history-table" class="divide-y divide-slate-50"></tbody></table></div>
+            <p class="text-xs text-slate-400 mb-3">Monitor corporate payouts, tasker review confirmations, or active dispute arguments.</p>
+            <div class="overflow-x-auto rounded-lg border border-slate-100">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold">
+                    <th class="p-3">Tasker Name</th><th class="p-3">User ID</th><th class="p-3">Service Period</th><th class="p-3">Weeks</th><th class="p-3">Gross Base</th><th class="p-3">Deductions</th><th class="p-3 font-bold text-indigo-600">Net Distributed</th><th class="p-3">Operational Remarks</th><th class="p-3 font-bold text-center">Review Status</th><th class="p-3 max-w-xs">Dispute Conflict Arguments Notes</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-payments-history-table" class="divide-y divide-slate-50"></tbody>
+              </table>
+            </div>
           </div>
 
           <!-- Leaves Monitor Queue -->
@@ -254,7 +273,7 @@
             <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Employee</th><th class="p-3">Target Date</th><th class="p-3">Reason Statement</th><th class="p-3">Current Status</th><th class="p-3 text-center">Actions Ledger Control</th></tr></thead><tbody id="admin-leave-table" class="divide-y divide-slate-50"></tbody></table></div>
           </div>
 
-          <!-- Exception Roster With Advanced Actions -->
+          <!-- Exception Roster Actions -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-slate-800">Workday Exceptions & Absence Metrics</h2>
             <div class="overflow-x-auto rounded-lg border border-slate-100">
@@ -276,7 +295,7 @@
 
   <script>
     // ─── EXTERNAL CONFIGURATION LINK ──────────────────────────────────────
-    const API_URL = "https://script.google.com/macros/s/AKfycbxhegrH1WST9pImnjfT3oTLssmTDYp8O5EwihPc9lm-BTAGpCN8Ch2bQPhmpcg66OyQ/exec"; 
+    const API_URL = "https://script.google.com/macros/s/AKfycbwE1AuUvevlgPZhkheQzjY2NCBjiEBGrkryA3L0Qnu5gfxHZ-O7np9xS-5fX7pe1nnC/exec"; 
     // ──────────────────────────────────────────────────────────────────────
 
     let currentUser = null;
@@ -318,7 +337,7 @@
       if(currentUser.role === 'Admin') document.getElementById('admin-dash-btn').classList.remove('hidden');
       showSection('attendance-sec');
 
-      // Heartbeat background syncing loops
+      // Heartbeat background pooling sync loops
       setInterval(refreshUserTimers, 30000);
       setInterval(function() {
         const reportSection = document.getElementById('task-report-sec');
@@ -378,8 +397,8 @@
 
     function submitDailyWorkReport() {
       const dateVal = document.getElementById('rep-date').value; const textVal = document.getElementById('rep-summary').value; const fb = document.getElementById('rep-feedback');
-      fb.classList.add('hidden'); if (!dateVal || !textVal.trim()) { alert("Please complete all parameter metrics entries."); return; }
-      fb.className = "text-center text-xs font-bold p-2 rounded bg-amber-50 text-amber-800"; fb.innerText = "Transmitting record lines..."; fb.classList.remove('hidden');
+      fb.classList.add('hidden'); if (!dateVal || !textVal.trim()) { alert("Please complete all parameter entries."); return; }
+      fb.className = "text-center text-xs font-bold p-2 rounded bg-amber-50 text-amber-800"; fb.innerText = "Transmitting records..."; fb.classList.remove('hidden');
       callAPI('POST', '', { action: "submitDailyReport", userId: currentUser.id, userName: currentUser.name, reportDate: dateVal, summary: textVal }, function(res) {
         fb.innerText = res.message; fb.className = res.success ? "text-center text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800" : "text-center text-xs font-bold p-2 rounded bg-rose-50 text-rose-800";
         if (res.success) { document.getElementById('rep-summary').value = ""; loadPublicTaskReportsFeed(); }
@@ -432,19 +451,15 @@
     function executeAdminTagUserAbsent(targetUid, targetName) {
       const inputDate = prompt(`Manually tag ${targetName} [${targetUid}] as ABSENT.\nEnter target date (YYYY-MM-DD):`, new Date().toISOString().split('T')[0]);
       if (!inputDate || inputDate.trim() === "") return;
-      
       callAPI('POST', '', { action: "adminTagAbsent", targetUserId: targetUid, targetName: targetName, absentDate: inputDate }, function(res) {
-        alert(res.message);
-        if (res.success) fetchGlobalAdminLogs();
+        alert(res.message); if (res.success) fetchGlobalAdminLogs();
       });
     }
 
     function executeAdminUntagAbsentLog(absId, targetName, targetDate) {
       if (!confirm(`Are you certain you want to clear the absence log for ${targetName} on ${targetDate}?`)) return;
-      
       callAPI('POST', '', { action: "adminUntagAbsent", absentId: absId }, function(res) {
-        alert(res.message);
-        if (res.success) fetchGlobalAdminLogs();
+        alert(res.message); if (res.success) fetchGlobalAdminLogs();
       });
     }
 
@@ -472,12 +487,55 @@
       });
     }
 
+    // ─── USER LEVEL STATEMENT ACKNOWLEDGE & DISPUTE OPERATIONS ───────────
+    function executeUserAcknowledgePayroll(payId) {
+      if(!confirm("Confirm Receipt:\nAre you certain you want to acknowledge this statement calculation? This confirms transaction data consensus.")) return;
+      callAPI('POST', '', { action: "updatePayrollReviewStatus", payrollId: payId, status: "Acknowledged", disputeReason: "" }, function(res) {
+        alert(res.message); fetchPersonalPayslips();
+      });
+    }
+
+    function executeUserDisputePayroll(payId) {
+      const reason = prompt("⚠️ Initiate Invoice Dispute Process:\nProvide detailed arguments or calculation discrepancies notes down below for management review:");
+      if (reason === null) return;
+      if (reason.trim() === "") { alert("Action Cancelled: You must supply a valid reason description to file a dispute."); return; }
+      
+      callAPI('POST', '', { action: "updatePayrollReviewStatus", payrollId: payId, status: "Disputed", disputeReason: reason }, function(res) {
+        alert(res.message); fetchPersonalPayslips();
+      });
+    }
+
     function fetchPersonalPayslips() {
       callAPI('GET', `?action=getUserPayroll&userId=${currentUser.id}`, null, function(records) {
         const tbody = document.getElementById('user-payroll-table'); tbody.innerHTML = "";
-        if(records.length === 0) { tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400">No payment receipts issued yet.</td></tr>`; return; }
+        if(records.length === 0) { tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400">No payment receipts issued yet.</td></tr>`; return; }
         records.forEach(row => { 
-          tbody.innerHTML += `<tr class="hover:bg-slate-50/50 transition"><td class="p-3 font-medium">${row.period}</td><td class="p-3">${row.weeks} wks</td><td class="p-3">₱${row.rate.toFixed(2)}</td><td class="p-3">₱${row.gross.toFixed(2)}</td><td class="p-3 text-rose-600">-₱${row.deductions.toFixed(2)}</td><td class="p-3 font-bold text-emerald-600">₱${row.net.toFixed(2)}</td><td class="p-3 text-slate-500 italic max-w-xs truncate">${row.remarks}</td></tr>`; 
+          let statusBadge = "";
+          let actionsHtml = "";
+          
+          if (row.status === "Acknowledged") {
+            statusBadge = `<span class="bg-emerald-50 text-emerald-700 font-bold px-2 py-1 rounded text-xs">✓ Acknowledged</span>`;
+            actionsHtml = `<span class="text-slate-400 italic text-xs">Review Locked</span>`;
+          } else if (row.status === "Disputed") {
+            statusBadge = `<span class="bg-rose-50 text-rose-700 font-bold px-2 py-1 rounded text-xs block text-center">⚠ Disputed</span>
+                           <span class="text-[10px] text-rose-400 block mt-1 italic max-w-[150px] truncate" title="${row.disputeReason}">Reason: ${row.disputeReason}</span>`;
+            actionsHtml = `<button onclick="executeUserAcknowledgePayroll('${row.payrollId}')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-2 py-1 rounded shadow-sm mr-1 transition">Accept</button>`;
+          } else {
+            statusBadge = `<span class="bg-amber-50 text-amber-700 font-bold px-2 py-1 rounded text-xs">Pending Review</span>`;
+            actionsHtml = `<button onclick="executeUserAcknowledgePayroll('${row.payrollId}')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-2 py-1 rounded shadow-sm mr-1 transition">Acknowledge</button>
+                           <button onclick="executeUserDisputePayroll('${row.payrollId}')" class="bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold px-2 py-1 rounded shadow-sm transition">Dispute</button>`;
+          }
+
+          tbody.innerHTML += `<tr class="hover:bg-slate-50/50 transition">
+            <td class="p-3 font-medium">${row.period}</td>
+            <td class="p-3">${row.weeks} wks</td>
+            <td class="p-3">₱${row.rate.toFixed(2)}</td>
+            <td class="p-3">₱${row.gross.toFixed(2)}</td>
+            <td class="p-3 text-rose-600">-₱${row.deductions.toFixed(2)}</td>
+            <td class="p-3 font-bold text-emerald-600">₱${row.net.toFixed(2)}</td>
+            <td class="p-3 text-slate-500 italic max-w-xs truncate">${row.remarks}</td>
+            <td class="p-3 text-center">${actionsHtml}<div class="mt-1.5">${statusBadge}</div></td>
+          </tr>`; 
         });
       });
     }
@@ -519,7 +577,6 @@
         });
       }
 
-      // Render the Explicit Registry with Untag Button overrides
       let filteredExplicitAbsents = data.explicitAbsents.filter(row => {
         if (selectedTasker !== "ALL" && row.name !== selectedTasker) return false;
         if (fromTime || toTime) { const rowTime = new Date(row.date).getTime(); if (fromTime && rowTime < fromTime) return false; if (toTime && rowTime > toTime) return false; }
@@ -541,10 +598,26 @@
       }
 
       let filteredPayments = data.payments.filter(row => { return !(selectedTasker !== "ALL" && row.name !== selectedTasker); });
-      if(filteredPayments.length === 0) { payBody.innerHTML = `<tr><td colspan="8" class="p-3 text-center text-slate-400">No payout logs captured matching criteria filters.</td></tr>`; }
+      if(filteredPayments.length === 0) { payBody.innerHTML = `<tr><td colspan="10" class="p-3 text-center text-slate-400">No payout logs captured matching criteria filters.</td></tr>`; }
       else {
         filteredPayments.forEach(row => {
-          payBody.innerHTML += `<tr class="border-b border-slate-100 hover:bg-slate-50/50 transition"><td class="p-3 font-bold text-slate-900">${row.name}</td><td class="p-3 font-mono text-xs text-slate-500">${row.userId}</td><td class="p-3 font-medium text-indigo-700">${row.period}</td><td class="p-3 text-slate-600">${row.weeks} wks</td><td class="p-3 text-slate-600">₱${row.gross.toFixed(2)}</td><td class="p-3 text-rose-600">-₱${row.deductions.toFixed(2)}</td><td class="p-3 font-black text-emerald-600">₱${row.net.toFixed(2)}</td><td class="p-3 text-slate-500 italic max-w-xs truncate" title="${row.remarks}">${row.remarks}</td></tr>`;
+          let statusBadge = "";
+          if (row.status === "Acknowledged") statusBadge = `<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[11px]">✓ Confirmed</span>`;
+          else if (row.status === "Disputed") statusBadge = `<span class="bg-rose-100 text-rose-800 font-extrabold px-2 py-0.5 rounded text-[11px] animate-pulse">⚠ Dispute Filed</span>`;
+          else statusBadge = `<span class="bg-amber-100 text-amber-800 font-medium px-2 py-0.5 rounded text-[11px]">Unreviewed</span>`;
+
+          payBody.innerHTML += `<tr class="border-b border-slate-100 hover:bg-slate-50/50 transition">
+            <td class="p-3 font-bold text-slate-900">${row.name}</td>
+            <td class="p-3 font-mono text-xs text-slate-500">${row.userId}</td>
+            <td class="p-3 font-medium text-indigo-700 text-xs">${row.period}</td>
+            <td class="p-3 text-slate-600">${row.weeks} wks</td>
+            <td class="p-3 text-slate-600">₱${row.gross.toFixed(2)}</td>
+            <td class="p-3 text-rose-600">-₱${row.deductions.toFixed(2)}</td>
+            <td class="p-3 font-black text-emerald-600">₱${row.net.toFixed(2)}</td>
+            <td class="p-3 text-slate-500 italic max-w-xs truncate">${row.remarks}</td>
+            <td class="p-3 text-center">${statusBadge}</td>
+            <td class="p-3 text-xs text-rose-600 font-semibold max-w-xs whitespace-pre-wrap break-words">${row.disputeReason || "-"}</td>
+          </tr>`;
         });
       }
 
