@@ -317,25 +317,50 @@
     }
 
     function bootPortalSession() {
-      document.getElementById('login-page').classList.add('hidden');
-      document.getElementById('app-page').classList.remove('hidden');
-      document.getElementById('user-display').innerText = `${currentUser.name} | ${currentUser.role}`;
-      document.getElementById('sched-shift').innerText = `${currentUser.schedule.shiftStart} to ${currentUser.schedule.shiftEnd}`;
-      document.getElementById('stat-leave-allow').innerText = currentUser.schedule.leaveAllowance;
-      document.getElementById('stat-leave-remain').innerText = `${currentUser.schedule.remainingLeaves} days`;
-      
-      if (currentUser.schedule.isHalfDayToday) {
-        document.getElementById('halfday-banner').classList.remove('hidden');
-        document.getElementById('sched-limits').innerText = `Break: ${currentUser.schedule.maxBreak}m | Lunch: N/A (Half Day) | Days Off: ${currentUser.schedule.daysOff}`;
-        document.getElementById('btn-lunch-s').className = 'hidden';
-        document.getElementById('btn-lunch-e').className = 'hidden';
-      } else {
-        document.getElementById('halfday-banner').classList.add('hidden');
-        document.getElementById('sched-limits').innerText = `Break: ${currentUser.schedule.maxBreak}m | Lunch: ${currentUser.schedule.maxLunch}m | Days Off: ${currentUser.schedule.daysOff}`;
-      }
-      if(currentUser.role === 'Admin') document.getElementById('admin-dash-btn').classList.remove('hidden');
-      showSection('attendance-sec');
+  document.getElementById('login-page').classList.add('hidden');
+  document.getElementById('app-page').classList.remove('hidden');
+  document.getElementById('user-display').innerText = `${currentUser.name} | ${currentUser.role}`;
+  document.getElementById('sched-shift').innerText = `${currentUser.schedule.shiftStart} to ${currentUser.schedule.shiftEnd}`;
+  document.getElementById('stat-leave-allow').innerText = currentUser.schedule.leaveAllowance;
+  document.getElementById('stat-leave-remain').innerText = `${currentUser.schedule.remainingLeaves} days`;
+  
+  if (currentUser.schedule.isHalfDayToday) {
+    document.getElementById('halfday-banner').classList.remove('hidden');
+    document.getElementById('sched-limits').innerText = `Break: ${currentUser.schedule.maxBreak}m | Lunch: N/A (Half Day) | Days Off: ${currentUser.schedule.daysOff}`;
+    document.getElementById('btn-lunch-s').className = 'hidden';
+    document.getElementById('btn-lunch-e').className = 'hidden';
+  } else {
+    document.getElementById('halfday-banner').classList.add('hidden');
+    document.getElementById('sched-limits').innerText = `Break: ${currentUser.schedule.maxBreak}m | Lunch: ${currentUser.schedule.maxLunch}m | Days Off: ${currentUser.schedule.daysOff}`;
+  }
+  if(currentUser.role === 'Admin') document.getElementById('admin-dash-btn').classList.remove('hidden');
+  
+  // Open the primary view dashboard
+  showSection('attendance-sec');
+
+  // ─── START AUTOMATED BACKGROUND SYNC TIMERS ───
+  // Automatically updates user tickers and history grids every 30 seconds
+  setInterval(function() {
+    refreshUserTimers();
+  }, 30000);
+
+  // Automatically updates the central public activity stream feed every 60 seconds
+  setInterval(function() {
+    const reportSection = document.getElementById('task-report-sec');
+    if (reportSection && !reportSection.classList.contains('hidden')) {
+      loadPublicTaskReportsFeed();
     }
+  }, 60000);
+
+  // Automatically refreshes management tables if the user is an logged in as Admin
+  setInterval(function() {
+    const adminSection = document.getElementById('admin-sec');
+    if (currentUser.role === 'Admin' && adminSection && !adminSection.classList.contains('hidden')) {
+      fetchGlobalAdminLogs();
+    }
+  }, 45000);
+  // ───────────────────────────────────────────────
+}
 
     function refreshUserTimers() {
       if (!currentUser) return;
