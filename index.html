@@ -9,6 +9,7 @@
 </head>
 <body class="bg-slate-50 font-sans text-slate-800">
 
+  <!-- AUTHENTICATION DIALOG -->
   <div id="login-page" class="flex min-h-screen items-center justify-center px-4">
     <div class="w-full max-w-md p-8 bg-white rounded-xl shadow-xl border border-slate-100">
       <div class="text-center mb-8">
@@ -18,7 +19,8 @@
         </p>
       </div>
       
-      <div class="space-y-4">
+      <!-- Primary Credentials Block -->
+      <div id="credentials-form" class="space-y-4">
         <div>
           <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Corporate Email</label>
           <input type="email" id="email" class="w-full p-3 border border-slate-200 rounded-lg text-sm">
@@ -29,10 +31,26 @@
         </div>
         <button onclick="handleLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg font-bold shadow transition mt-2">Sign In</button>
       </div>
+
+      <!-- Verification OTP Block (Initially Hidden) -->
+      <div id="otp-form" class="space-y-4 hidden">
+        <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl text-xs text-indigo-950 mb-2">
+          <strong>New Device/24hr Verification Required:</strong>
+          <p class="mt-1 text-indigo-800">We sent a 6-digit verification code to your email inbox. Please type it in below to authorize this access session.</p>
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-600 mb-1">6-Digit Verification Code</label>
+          <input type="text" id="otp-code" maxlength="6" placeholder="000000" class="w-full p-3 border border-slate-200 rounded-lg text-center tracking-widest font-mono text-xl">
+        </div>
+        <button onclick="handleVerifyOTP()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white p-3 rounded-lg font-bold shadow transition">Verify Code & Enter</button>
+        <button onclick="cancelOTPFlow()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 p-2 rounded-lg text-xs font-semibold mt-1">Back to Login</button>
+      </div>
+
       <p id="login-err" class="text-red-500 text-xs font-semibold mt-4 text-center hidden bg-red-50 p-2 rounded"></p>
     </div>
   </div>
 
+  <!-- MAIN DASHBOARD CONTENT GRID -->
   <div id="app-page" class="hidden min-h-screen flex flex-col">
     <header class="bg-indigo-900 text-white px-6 py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 shadow-md">
       <div class="flex flex-col">
@@ -58,6 +76,7 @@
 
       <main class="flex-1 p-6 md:p-8 overflow-y-auto">
         
+        <!-- MODULE: TIME CLOCK -->
         <section id="attendance-sec" class="hidden space-y-6 max-w-4xl">
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-6">
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-100 pb-4 gap-4">
@@ -89,6 +108,7 @@
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100"><h3 class="text-md font-bold text-slate-900 border-b pb-2 mb-3">My Personal Attendance History</h3><div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Logged Date</th><th class="p-3">Clock In</th><th class="p-3">Clock Out</th><th class="p-3">Break Duration</th><th class="p-3">Lunch Duration</th><th class="p-3">Exception Status</th></tr></thead><tbody id="personal-history-table" class="divide-y divide-slate-50"></tbody></table></div></div>
         </section>
 
+        <!-- MODULE: FILE LEAVE -->
         <section id="leave-request-sec" class="hidden space-y-6 max-w-4xl">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4">
@@ -112,6 +132,7 @@
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100"><h3 class="text-md font-bold text-slate-900 border-b pb-2 mb-3">My Personal Leave Queue Ledger</h3><div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Requested Date</th><th class="p-3">Reason Description</th><th class="p-3">Approval Status</th><th class="p-3">Management Comments</th></tr></thead><tbody id="personal-leave-table" class="divide-y divide-slate-50"></tbody></table></div></div>
         </section>
 
+        <!-- NEW MODULE: REST DAY OVERTIME & COVER ABSENT REQUEST PANEL -->
         <section id="restday-request-sec" class="hidden space-y-6 max-w-5xl">
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4 max-w-md">
             <h2 class="text-xl font-bold text-slate-800">📅 Rest Day Work Authorization</h2>
@@ -144,6 +165,7 @@
           </div>
         </section>
 
+        <!-- MODULE: TASK DONE REPORT -->
         <section id="task-report-sec" class="hidden space-y-6 max-w-6xl">
           <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
@@ -171,6 +193,7 @@
           </div>
         </section>
 
+        <!-- MODULE: CREDENTIALS MANAGEMENT -->
         <section id="account-settings-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 max-w-md space-y-4">
           <h2 class="text-xl font-bold text-slate-800 border-b pb-2">⚙️ Manage Account Security</h2>
           <div class="space-y-3">
@@ -182,6 +205,7 @@
           <p id="self-pass-feedback" class="text-center font-bold text-xs p-2 rounded hidden"></p>
         </section>
 
+        <!-- MODULE: ADMIN CONTROL - PAYROLL DISBURSEMENT -->
         <section id="admin-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-6 max-w-2xl">
           <h2 class="text-xl font-bold text-indigo-700 border-b pb-2">Admin Control: Issue Fixed Weekly Payment</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -197,13 +221,16 @@
           <p id="payroll-feedback" class="text-emerald-600 bg-emerald-50 text-xs font-bold p-2 rounded-lg hidden"></p>
         </section>
 
+        <!-- MODULE: TASKER PAYMENTS LEDGER -->
         <section id="user-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4 max-w-7xl">
           <h2 class="text-xl font-bold text-slate-800 border-b pb-2">My Service Payment Ledgers</h2>
           <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Service Period</th><th class="p-3">Weeks Logged</th><th class="p-3">Weekly Rate</th><th class="p-3">Gross Base</th><th class="p-3">Applied Deductions</th><th class="p-3 font-bold text-indigo-700">Net Credited Revenue</th><th class="p-3">Operational Remarks</th><th class="p-3 text-center">Status & Review Actions</th></tr></thead><tbody id="user-payroll-table" class="divide-y divide-slate-50"></tbody></table></div>
         </section>
 
+        <!-- MODULE: SYSTEM ADMINISTRATION PANELS -->
         <section id="admin-sec" class="hidden space-y-8 max-w-6xl">
           
+          <!-- Filtration Matrix Controls -->
           <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 space-y-4">
             <h3 class="text-sm font-bold uppercase tracking-wider text-indigo-900">🔍 Real-Time Ledger Filtration Control</h3>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -219,6 +246,7 @@
             <div class="flex justify-end"><button onclick="clearGlobalFilters()" class="text-xs bg-slate-100 text-slate-600 font-bold px-3 py-1.5 rounded-lg">Reset Filters</button></div>
           </div>
 
+          <!-- TASKER CREATION ENGINE BLOCK -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4">
             <h2 class="text-xl font-bold text-indigo-900">👥 Add New Tasker (Freelancer Registration)</h2>
             <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
@@ -240,11 +268,13 @@
             <p id="admin-create-feedback" class="text-xs font-bold p-2 rounded hidden"></p>
           </div>
 
+          <!-- Attendance Logs Monitor -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-slate-800">Master Attendance & Overage Dashboard</h2>
             <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Name</th><th class="p-3">Date/Type</th><th class="p-3">Clock In</th><th class="p-3">Clock Out</th><th class="p-3">Break Duration</th><th class="p-3">Lunch Duration</th><th class="p-3">Exception Status</th></tr></thead><tbody id="admin-attendance-table" class="divide-y divide-slate-50"></tbody></table></div>
           </div>
 
+          <!-- NEW ADMIN ACTION PORTAL: REST DAY WORK AUTHORIZATION MANAGEMENT OVERRIDES -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-slate-800 border-b pb-2 mb-3">Master Rest Day OT / Absence Coverage Queue</h2>
             <div class="overflow-x-auto rounded-lg border border-slate-100">
@@ -261,22 +291,26 @@
             </div>
           </div>
 
+          <!-- MODULE: ABSENTEE SELECTION & HISTORICAL LEDGER -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4">
             <h2 class="text-xl font-bold text-rose-800">📋 Master Absences Historical Database Registry</h2>
             <p class="text-xs text-slate-400">View registered day omissions inside the database. Admins can permanently remove or undo an absence here.</p>
             <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">User ID</th><th class="p-3">Tasker Name</th><th class="p-3">Date of Absence</th><th class="p-3">Verification Entry Mode</th><th class="p-3 text-center">Actions Control</th></tr></thead><tbody id="admin-explicit-absents-table" class="divide-y divide-slate-50"></tbody></table></div>
           </div>
 
+          <!-- Disbursements Ledger History -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-indigo-900">Master Service Payments Distribution History</h2>
             <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Tasker Name</th><th class="p-3">User ID</th><th class="p-3">Service Period</th><th class="p-3">Weeks</th><th class="p-3">Gross Base</th><th class="p-3">Deductions</th><th class="p-3 font-bold text-indigo-600">Net Distributed</th><th class="p-3">Operational Remarks</th><th class="p-3 font-bold text-center">Review Status</th><th class="p-3 max-w-xs">Dispute Notes / Resolution Log</th></tr></thead><tbody id="admin-payments-history-table" class="divide-y divide-slate-50"></tbody></table></div>
           </div>
 
+          <!-- Leaves Monitor Queue -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-slate-800">Corporate Leave Action & Approval Queue</h2>
             <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Tasker</th><th class="p-3">Target Date</th><th class="p-3">Reason Statement</th><th class="p-3">Current Status</th><th class="p-3 text-center">Actions Ledger Control</th></tr></thead><tbody id="admin-leave-table" class="divide-y divide-slate-50"></tbody></table></div>
           </div>
 
+          <!-- Exception Roster Actions -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-slate-800">Workday Exceptions & Absence Metrics</h2>
             <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">User ID</th><th class="p-3">Tasker Name</th><th class="p-3">Scheduled Days Off</th><th class="p-3 text-indigo-700">Half Day Schedule</th><th class="p-3 font-bold text-rose-600">Total Absences</th><th class="p-3 text-center">Security Overrides & Actions</th></tr></thead><tbody id="admin-absence-table" class="divide-y divide-slate-50"></tbody></table></div>
@@ -295,6 +329,20 @@
     let currentUser = null;
     let cachedAdminMasterData = null;
     let cachedPublicReports = [];
+    
+    // Inactivity Tracking Variables
+    let inactivityTimer = null;
+    const MAX_INACTIVITY_LIMIT = 30 * 60 * 1000; // 30 minutes in milliseconds
+
+    // Device ID Setup: Read from localStorage or generate a fresh key
+    let deviceId = localStorage.getItem("olympuz_device_id");
+    if (!deviceId) {
+      deviceId = "DEV-" + crypto.randomUUID();
+      localStorage.setItem("olympuz_device_id", deviceId);
+    }
+
+    // Temporary variables to hold input across OTP transitions
+    let tempLoginEmail = "";
 
     function callAPI(method, urlParams, payload, callback) {
       let config = { method: method, headers: { 'Content-Type': 'text/plain;charset=utf-8' } };
@@ -302,18 +350,132 @@
       fetch(API_URL + urlParams, config).then(res => res.json()).then(data => callback(data)).catch(err => { alert("Sync Error:\n" + err); });
     }
 
+    // --- SESSION MEMORY & AUTO-RESTORE LOOP ---
+    window.onload = function() {
+      const savedSession = localStorage.getItem("olympuz_active_session");
+      if (savedSession) {
+        try {
+          const parsed = JSON.parse(savedSession);
+          // Check if saved session has expired (30 minutes hard limit since last update)
+          if (Date.now() < parsed.expiresAt) {
+            currentUser = parsed.user;
+            bootPortalSession();
+            resetInactivityTracker(); // Start watching idle time
+          } else {
+            localStorage.removeItem("olympuz_active_session");
+          }
+        } catch(e) {
+          localStorage.removeItem("olympuz_active_session");
+        }
+      }
+    };
+
+    // --- INACTIVITY TRACER LOOP ---
+    function resetInactivityTracker() {
+      if (!currentUser) return;
+      
+      // Update our stored session expiration timestamp (+30 mins from now)
+      const sessionData = {
+        user: currentUser,
+        expiresAt: Date.now() + MAX_INACTIVITY_LIMIT
+      };
+      localStorage.setItem("olympuz_active_session", JSON.stringify(sessionData));
+
+      // Reset frontend timeout callback
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(() => {
+        alert("Session Expired: You have been logged out due to 30 minutes of inactivity.");
+        logout();
+      }, MAX_INACTIVITY_LIMIT);
+    }
+
+    // Watch for user activity to reset the timer
+    ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(eventName => {
+      document.addEventListener(eventName, () => {
+        if (currentUser) resetInactivityTracker();
+      }, true);
+    });
+
+    // --- STEP 1: INITIALIZE LOGIN SUBMISSION ---
     function handleLogin() {
-      const email = document.getElementById('email').value, password = document.getElementById('password').value, errBox = document.getElementById('login-err');
+      const emailInput = document.getElementById('email').value;
+      const passwordInput = document.getElementById('password').value;
+      const errBox = document.getElementById('login-err');
+
       errBox.classList.add('hidden');
-      callAPI('POST', '', { action: "loginUser", email: email, password: password }, function(response) {
-        if(response.success) { currentUser = response.user; bootPortalSession(); }
-        else { errBox.innerText = response.message; errBox.classList.remove('hidden'); }
+      if (!emailInput || !passwordInput) {
+        errBox.innerText = "Please complete all mandatory parameters.";
+        errBox.classList.remove('hidden');
+        return;
+      }
+
+      tempLoginEmail = emailInput;
+
+      callAPI('POST', '', { 
+        action: "loginUser", 
+        email: emailInput, 
+        password: passwordInput,
+        deviceId: deviceId
+      }, function(response) {
+        if (response.success) {
+          if (response.requireOtp) {
+            // Unrecognized/Expired Device - Show OTP code form
+            document.getElementById('credentials-form').classList.add('hidden');
+            document.getElementById('otp-form').classList.remove('hidden');
+            document.getElementById('otp-code').value = "";
+            if (response.message) alert(response.message);
+          } else {
+            // Pre-Authorized Recognized Device - Log in immediately
+            currentUser = response.user;
+            bootPortalSession();
+          }
+        } else {
+          errBox.innerText = response.message;
+          errBox.classList.remove('hidden');
+        }
       });
     }
 
+    // --- STEP 2: OTP SECURITY SUBMISSION ---
+    function handleVerifyOTP() {
+      const code = document.getElementById('otp-code').value;
+      const errBox = document.getElementById('login-err');
+
+      errBox.classList.add('hidden');
+      if (!code || code.length < 6) {
+        alert("Please provide the full 6-digit verification code.");
+        return;
+      }
+
+      callAPI('POST', '', {
+        action: "verifyLoginOTP",
+        email: tempLoginEmail,
+        code: code,
+        deviceId: deviceId
+      }, function(response) {
+        if (response.success) {
+          currentUser = response.user;
+          bootPortalSession();
+        } else {
+          errBox.innerText = response.message;
+          errBox.classList.remove('hidden');
+          alert(response.message);
+        }
+      });
+    }
+
+    function cancelOTPFlow() {
+      document.getElementById('otp-form').classList.add('hidden');
+      document.getElementById('credentials-form').classList.remove('hidden');
+      document.getElementById('login-err').classList.add('hidden');
+    }
+
     function bootPortalSession() {
+      // Hide Login Form, show App Grid
       document.getElementById('login-page').classList.add('hidden');
       document.getElementById('app-page').classList.remove('hidden');
+
+      // Display Details
       document.getElementById('user-display').innerText = `${currentUser.name} | ${currentUser.role}`;
       document.getElementById('sched-shift').innerText = `${currentUser.schedule.shiftStart} to ${currentUser.schedule.shiftEnd}`;
       document.getElementById('stat-leave-allow').innerText = currentUser.schedule.leaveAllowance;
@@ -328,10 +490,14 @@
         document.getElementById('halfday-banner').classList.add('hidden');
         document.getElementById('sched-limits').innerText = `Break: ${currentUser.schedule.maxBreak}m | Lunch: ${currentUser.schedule.maxLunch}m | Days Off: ${currentUser.schedule.daysOff}`;
       }
-      if(currentUser.role === 'Admin') document.getElementById('admin-dash-btn').classList.remove('hidden');
+      
+      if (currentUser.role === 'Admin') document.getElementById('admin-dash-btn').classList.remove('hidden');
       showSection('attendance-sec');
 
-      // Pooling triggers loops
+      // Start Session Expiration Tracking (30-Minute hard timer)
+      resetInactivityTracker();
+
+      // Trigger automatic pooling intervals
       setInterval(refreshUserTimers, 30000);
       setInterval(function() {
         const reportSection = document.getElementById('task-report-sec');
@@ -359,7 +525,6 @@
           leaveBody.innerHTML += `<tr><td class="p-3 font-medium">${row.date}</td><td class="p-3 text-slate-600">${row.reason}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}">${row.status}</span></td><td class="p-3 text-slate-500 italic">${row.comment}</td></tr>`;
         });
         
-        // Render Rest Day requests inside Tasker perspective historical queue grid
         const rdBody = document.getElementById('personal-restday-table'); rdBody.innerHTML = "";
         if (stats.restDays.length === 0) {
           rdBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-slate-400">No Rest Day work authorization lines filed yet.</td></tr>`;
@@ -376,7 +541,6 @@
       });
     }
 
-    // ─── REST DAY MANAGEMENT REQUEST DISPATCH LOOPS ───────────────────────
     function submitRestDayForm() {
       const targetDate = document.getElementById('rd-date').value;
       const comments = document.getElementById('rd-comments').value;
@@ -498,7 +662,6 @@
     // ADMIN ACTION: REGISTER NEW TASKER (CORRECTED)
     // ==========================================
     async function executeAdminCreateUser() {
-      // Clean inputs mapped from the actual HTML inputs
       const name = document.getElementById('add-u-name')?.value;
       const email = document.getElementById('add-u-email')?.value;
       const pass = document.getElementById('add-u-pass')?.value;
@@ -508,17 +671,13 @@
       const halfDay = document.getElementById('add-u-halfday')?.value;
       const leaves = document.getElementById('add-u-leaves')?.value;
 
-      // Select your correct feedback element card
       const fb = document.getElementById('admin-create-feedback');
 
       const updateFeedback = (text, classString, isHidden) => {
         if (!fb) return;
         fb.innerText = text || '';
-        
-        // RESET styles completely
         fb.className = 'text-xs font-bold p-2 rounded'; 
         
-        // FIX: Split classString by space and add them as individual tokens
         if (classString) {
           const classes = classString.split(' ').filter(c => c.trim() !== '');
           classes.forEach(cls => fb.classList.add(cls));
@@ -583,13 +742,11 @@
             alert(successMsg);
           }
 
-          // Clear text input metrics on success
           ['add-u-name', 'add-u-email', 'add-u-pass', 'add-u-halfday'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.value = '';
           });
 
-          // Refresh logs
           fetchGlobalAdminLogs();
         } else {
           const failMsg = data.message || "Failed to write database record.";
@@ -751,7 +908,6 @@
         });
       }
 
-      // Render the Administration rest day requests dashboard grid items
       let filteredRestDays = data.restDays.filter(row => {
         if (selectedTasker !== "ALL" && row.name !== selectedTasker) return false;
         if (fromTime || toTime) { const rowTime = new Date(row.date).getTime(); if (fromTime && rowTime < fromTime) return false; if (toTime && rowTime > toTime) return false; }
@@ -823,7 +979,23 @@
       if (id === 'admin-sec') fetchGlobalAdminLogs();
       if (id === 'attendance-sec' || id === 'leave-request-sec' || id === 'account-settings-sec' || id === 'restday-request-sec') refreshUserTimers();
     }
-    function logout() { currentUser = null; document.getElementById('app-page').className = 'hidden'; document.getElementById('login-page').className = 'flex min-h-screen items-center justify-center'; document.getElementById('admin-dash-btn').className = 'hidden'; }
+
+    function logout() {
+      currentUser = null;
+      clearTimeout(inactivityTimer);
+      localStorage.removeItem("olympuz_active_session");
+
+      // Reset login form fields and states
+      document.getElementById('email').value = "";
+      document.getElementById('password').value = "";
+      document.getElementById('otp-code').value = "";
+      document.getElementById('otp-form').classList.add('hidden');
+      document.getElementById('credentials-form').classList.remove('hidden');
+
+      document.getElementById('app-page').className = 'hidden';
+      document.getElementById('login-page').className = 'flex min-h-screen items-center justify-center';
+      document.getElementById('admin-dash-btn').className = 'hidden';
+    }
   </script>
 </body>
 </html>
