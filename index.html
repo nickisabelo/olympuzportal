@@ -9,7 +9,6 @@
 </head>
 <body class="bg-slate-50 font-sans text-slate-800">
 
-  <!-- AUTHENTICATION DIALOG -->
   <div id="login-page" class="flex min-h-screen items-center justify-center px-4">
     <div class="w-full max-w-md p-8 bg-white rounded-xl shadow-xl border border-slate-100">
       <div class="text-center mb-8">
@@ -34,7 +33,6 @@
     </div>
   </div>
 
-  <!-- MAIN DASHBOARD CONTENT GRID -->
   <div id="app-page" class="hidden min-h-screen flex flex-col">
     <header class="bg-indigo-900 text-white px-6 py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 shadow-md">
       <div class="flex flex-col">
@@ -60,7 +58,6 @@
 
       <main class="flex-1 p-6 md:p-8 overflow-y-auto">
         
-        <!-- MODULE: TIME CLOCK -->
         <section id="attendance-sec" class="hidden space-y-6 max-w-4xl">
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-6">
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-100 pb-4 gap-4">
@@ -92,7 +89,6 @@
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100"><h3 class="text-md font-bold text-slate-900 border-b pb-2 mb-3">My Personal Attendance History</h3><div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Logged Date</th><th class="p-3">Clock In</th><th class="p-3">Clock Out</th><th class="p-3">Break Duration</th><th class="p-3">Lunch Duration</th><th class="p-3">Exception Status</th></tr></thead><tbody id="personal-history-table" class="divide-y divide-slate-50"></tbody></table></div></div>
         </section>
 
-        <!-- MODULE: FILE LEAVE -->
         <section id="leave-request-sec" class="hidden space-y-6 max-w-4xl">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4">
@@ -116,7 +112,6 @@
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100"><h3 class="text-md font-bold text-slate-900 border-b pb-2 mb-3">My Personal Leave Queue Ledger</h3><div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Requested Date</th><th class="p-3">Reason Description</th><th class="p-3">Approval Status</th><th class="p-3">Management Comments</th></tr></thead><tbody id="personal-leave-table" class="divide-y divide-slate-50"></tbody></table></div></div>
         </section>
 
-        <!-- NEW MODULE: REST DAY OVERTIME & COVER ABSENT REQUEST PANEL -->
         <section id="restday-request-sec" class="hidden space-y-6 max-w-5xl">
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4 max-w-md">
             <h2 class="text-xl font-bold text-slate-800">📅 Rest Day Work Authorization</h2>
@@ -149,7 +144,6 @@
           </div>
         </section>
 
-        <!-- MODULE: TASK DONE REPORT -->
         <section id="task-report-sec" class="hidden space-y-6 max-w-6xl">
           <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
@@ -177,7 +171,6 @@
           </div>
         </section>
 
-        <!-- MODULE: CREDENTIALS MANAGEMENT -->
         <section id="account-settings-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 max-w-md space-y-4">
           <h2 class="text-xl font-bold text-slate-800 border-b pb-2">⚙️ Manage Account Security</h2>
           <div class="space-y-3">
@@ -189,7 +182,6 @@
           <p id="self-pass-feedback" class="text-center font-bold text-xs p-2 rounded hidden"></p>
         </section>
 
-        <!-- MODULE: ADMIN CONTROL - PAYROLL DISBURSEMENT -->
         <section id="admin-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-6 max-w-2xl">
           <h2 class="text-xl font-bold text-indigo-700 border-b pb-2">Admin Control: Issue Fixed Weekly Payment</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -205,16 +197,13 @@
           <p id="payroll-feedback" class="text-emerald-600 bg-emerald-50 text-xs font-bold p-2 rounded-lg hidden"></p>
         </section>
 
-        <!-- MODULE: TASKER PAYMENTS LEDGER -->
         <section id="user-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4 max-w-7xl">
           <h2 class="text-xl font-bold text-slate-800 border-b pb-2">My Service Payment Ledgers</h2>
           <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Service Period</th><th class="p-3">Weeks Logged</th><th class="p-3">Weekly Rate</th><th class="p-3">Gross Base</th><th class="p-3">Applied Deductions</th><th class="p-3 font-bold text-indigo-700">Net Credited Revenue</th><th class="p-3">Operational Remarks</th><th class="p-3 text-center">Status & Review Actions</th></tr></thead><tbody id="user-payroll-table" class="divide-y divide-slate-50"></tbody></table></div>
         </section>
 
-        <!-- MODULE: SYSTEM ADMINISTRATION PANELS -->
         <section id="admin-sec" class="hidden space-y-8 max-w-6xl">
           
-          <!-- Filtration Matrix Controls -->
           <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 space-y-4">
             <h3 class="text-sm font-bold uppercase tracking-wider text-indigo-900">🔍 Real-Time Ledger Filtration Control</h3>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -230,7 +219,6 @@
             <div class="flex justify-end"><button onclick="clearGlobalFilters()" class="text-xs bg-slate-100 text-slate-600 font-bold px-3 py-1.5 rounded-lg">Reset Filters</button></div>
           </div>
 
-          <!-- TASKER CREATION ENGINE BLOCK -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4">
             <h2 class="text-xl font-bold text-indigo-900">👥 Add New Tasker (Freelancer Registration)</h2>
             <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
@@ -252,13 +240,11 @@
             <p id="admin-create-feedback" class="text-xs font-bold p-2 rounded hidden"></p>
           </div>
 
-          <!-- Attendance Logs Monitor -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-slate-800">Master Attendance & Overage Dashboard</h2>
             <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Name</th><th class="p-3">Date/Type</th><th class="p-3">Clock In</th><th class="p-3">Clock Out</th><th class="p-3">Break Duration</th><th class="p-3">Lunch Duration</th><th class="p-3">Exception Status</th></tr></thead><tbody id="admin-attendance-table" class="divide-y divide-slate-50"></tbody></table></div>
           </div>
 
-          <!-- NEW ADMIN ACTION PORTAL: REST DAY WORK AUTHORIZATION MANAGEMENT OVERRIDES -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-slate-800 border-b pb-2 mb-3">Master Rest Day OT / Absence Coverage Queue</h2>
             <div class="overflow-x-auto rounded-lg border border-slate-100">
@@ -275,26 +261,22 @@
             </div>
           </div>
 
-          <!-- MODULE: ABSENTEE SELECTION & HISTORICAL LEDGER -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4">
             <h2 class="text-xl font-bold text-rose-800">📋 Master Absences Historical Database Registry</h2>
             <p class="text-xs text-slate-400">View registered day omissions inside the database. Admins can permanently remove or undo an absence here.</p>
             <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">User ID</th><th class="p-3">Tasker Name</th><th class="p-3">Date of Absence</th><th class="p-3">Verification Entry Mode</th><th class="p-3 text-center">Actions Control</th></tr></thead><tbody id="admin-explicit-absents-table" class="divide-y divide-slate-50"></tbody></table></div>
           </div>
 
-          <!-- Disbursements Ledger History -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-indigo-900">Master Service Payments Distribution History</h2>
             <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Tasker Name</th><th class="p-3">User ID</th><th class="p-3">Service Period</th><th class="p-3">Weeks</th><th class="p-3">Gross Base</th><th class="p-3">Deductions</th><th class="p-3 font-bold text-indigo-600">Net Distributed</th><th class="p-3">Operational Remarks</th><th class="p-3 font-bold text-center">Review Status</th><th class="p-3 max-w-xs">Dispute Notes / Resolution Log</th></tr></thead><tbody id="admin-payments-history-table" class="divide-y divide-slate-50"></tbody></table></div>
           </div>
 
-          <!-- Leaves Monitor Queue -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-slate-800">Corporate Leave Action & Approval Queue</h2>
-            <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Tasker</th><th class="p-3">Target Date</th><th class="p-3">Reason Statement</th><th class="p-3">Current Status</th><th class="p-3 text-center">Actions Ledger Control</th></tr></thead><tbody id="admin-leave-table" class="divide-y divide-slate-50"></tbody></table></div>
+            <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Tasker</th><th class="p-3">Target Date</th><th class="p-3">Reason Statement</th><th class="p-3">Current Status</th><th class="p-3 text-center">Actions Ledger Control</th></tr></thead><tbody id="admin-leave-table" class="divide-y divide-slate-50"></tbody></table></div>
           </div>
 
-          <!-- Exception Roster Actions -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-slate-800">Workday Exceptions & Absence Metrics</h2>
             <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">User ID</th><th class="p-3">Tasker Name</th><th class="p-3">Scheduled Days Off</th><th class="p-3 text-indigo-700">Half Day Schedule</th><th class="p-3 font-bold text-rose-600">Total Absences</th><th class="p-3 text-center">Security Overrides & Actions</th></tr></thead><tbody id="admin-absence-table" class="divide-y divide-slate-50"></tbody></table></div>
@@ -307,7 +289,7 @@
 
   <script>
     // ─── EXTERNAL CONFIGURATION LINK ──────────────────────────────────────
-    const API_URL = "https://olympuz-api-engine.nickisabelo.workers.dev/"; 
+    const API_URL = "https://olympuz-api-engine.nickisabelo.workers.dev"; 
     // ──────────────────────────────────────────────────────────────────────
 
     let currentUser = null;
@@ -513,146 +495,112 @@
     }
 
     // ==========================================
-// 1. ADMIN ACTION: REGISTER NEW TASKER
-// ==========================================
-async function executeAdminCreateUser() {
-    // Safely retrieve inputs (using optional chaining ?. to prevent null errors)
-    const name = document.getElementById('newMemberName')?.value;
-    const email = document.getElementById('newMemberEmail')?.value;
-    const pass = document.getElementById('newMemberPass')?.value;
-    const role = document.getElementById('newMemberRole')?.value || 'Employee';
-    const shift = document.getElementById('newMemberShift')?.value;
-    const offDays = document.getElementById('newMemberOffDays')?.value;
+    // ADMIN ACTION: REGISTER NEW TASKER
+    // ==========================================
+    async function executeAdminCreateUser() {
+      // Clean inputs mapped from the actual HTML inputs
+      const name = document.getElementById('add-u-name')?.value;
+      const email = document.getElementById('add-u-email')?.value;
+      const pass = document.getElementById('add-u-pass')?.value;
+      const role = document.getElementById('add-u-role')?.value || 'Employee';
+      const shift = document.getElementById('add-u-shift')?.value;
+      const offDays = document.getElementById('add-u-off')?.value;
+      const halfDay = document.getElementById('add-u-halfday')?.value;
+      const leaves = document.getElementById('add-u-leaves')?.value;
 
-    // Safely grab the feedback element (if it exists in your HTML)
-    const fb = document.getElementById('adminCreateUserFeedback') || document.getElementById('feedback');
+      // Select your correct feedback element card
+      const fb = document.getElementById('admin-create-feedback');
 
-    // Safe Helper: Updates style classes and text only if the element actually exists
-    const updateFeedback = (text, className, isHidden) => {
-        if (!fb) return; // Exit silently if no feedback box is present in the HTML
-        
+      const updateFeedback = (text, className, isHidden) => {
+        if (!fb) return;
         fb.innerText = text || '';
-        
-        // Reset old classes safely
-        fb.className = ''; 
+        fb.className = 'text-xs font-bold p-2 rounded'; 
         if (className) fb.classList.add(className);
-        
         if (isHidden) {
-            fb.classList.add('hidden');
+          fb.classList.add('hidden');
         } else {
-            fb.classList.remove('hidden');
+          fb.classList.remove('hidden');
         }
-    };
+      };
 
-    // Initialize/Reset feedback panel
-    updateFeedback('', '', true);
+      updateFeedback('', '', true);
 
-    // Form Input Validation Check
-    if (!name || !email || !pass || !shift || !offDays) {
+      if (!name || !email || !pass || !shift || !offDays) {
         const errorMsg = "Please supply all mandatory fields.";
         if (fb) {
-            updateFeedback(errorMsg, "error-message", false);
+          updateFeedback(errorMsg, "bg-red-50 text-red-600", false);
         } else {
-            alert(errorMsg); // Fallback alert box
+          alert(errorMsg);
         }
         return;
-    }
+      }
 
-    try {
-        // Show loading state
+      try {
         if (fb) {
-            updateFeedback("Creating tasker profile inside SQL database...", "info-message", false);
+          updateFeedback("Creating tasker profile inside SQL database...", "bg-amber-50 text-amber-600", false);
         }
 
-        // Send payload to your Cloudflare D1 Worker
         const response = await fetch(`${API_URL}`, {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json' 
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'adminCreateUser',
+            newUserData: {
+              name: name.trim(),
+              email: email.trim().toLowerCase(),
+              password: pass.trim(),
+              role: role
             },
-            body: JSON.stringify({
-                action: 'adminCreateUser',
-                newUserData: {
-                    name: name.trim(),
-                    email: email.trim().toLowerCase(),
-                    password: pass.trim(),
-                    role: role,
-                    shiftStart: shift,
-                    shiftEnd: '18:00', // standard corporate boundary fallback
-                    daysOff: offDays
-                }
-            })
+            defaultSettings: {
+              shiftStart: shift.split('-')[0] || '09:00',
+              shiftEnd: shift.split('-')[1] || '18:00',
+              maxBreak: 15,
+              maxLunch: 60,
+              daysOff: offDays,
+              halfDayConfig: halfDay || '',
+              leaveAllowance: parseInt(leaves) || 15
+            }
+          })
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP network error: status ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`HTTP network error: status ${response.status}`);
 
         const data = await response.json();
 
         if (data.success) {
-            const successMsg = data.message || "Tasker profile successfully registered!";
-            
-            if (fb) {
-                updateFeedback(successMsg, "success-message", false);
-            } else {
-                alert(successMsg);
-            }
+          const successMsg = data.message || "Tasker profile successfully registered!";
+          if (fb) {
+            updateFeedback(successMsg, "bg-emerald-50 text-emerald-800", false);
+          } else {
+            alert(successMsg);
+          }
 
-            // Clean input text fields upon success
-            const fieldsToClear = ['newMemberName', 'newMemberEmail', 'newMemberPass'];
-            fieldsToClear.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.value = '';
-            });
+          // Clear text input metrics on success
+          ['add-u-name', 'add-u-email', 'add-u-pass', 'add-u-halfday'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+          });
 
-            // Optional: Auto refresh lists on your dashboard if they exist
-            if (typeof loadAdminDashboardData === 'function') {
-                setTimeout(() => {
-                    loadAdminDashboardData();
-                }, 1000);
-            }
-
+          // Refresh logs
+          fetchGlobalAdminLogs();
         } else {
-            const failMsg = data.message || "Failed to write database record.";
-            if (fb) {
-                updateFeedback(failMsg, "error-message", false);
-            } else {
-                alert(failMsg);
-            }
+          const failMsg = data.message || "Failed to write database record.";
+          if (fb) {
+            updateFeedback(failMsg, "bg-red-50 text-red-600", false);
+          } else {
+            alert(failMsg);
+          }
         }
-
-    } catch (err) {
+      } catch (err) {
         console.error("Critical network write exception:", err);
-        const systemErrorMsg = "System Connection Error. Your request could not reach the Cloudflare database.";
-        
+        const systemErrorMsg = "System Connection Error. Check your internet or Cloudflare database connections.";
         if (fb) {
-            updateFeedback(systemErrorMsg, "error-message", false);
+          updateFeedback(systemErrorMsg, "bg-red-50 text-red-600", false);
         } else {
-            alert(systemErrorMsg);
+          alert(systemErrorMsg);
         }
+      }
     }
-}
-
-    function executeAdminCreateUser() {
-      const name = document.getElementById('add-u-name').value, email = document.getElementById('add-u-email').value, pass = document.getElementById('add-u-pass').value, role = document.getElementById('add-u-role').value;
-      const shift = document.getElementById('add-u-shift').value, offDays = document.getElementById('add-u-off').value, halfDay = document.getElementById('add-u-halfday').value, allowance = document.getElementById('add-u-leaves').value, fb = document.getElementById('add-admin-create-feedback');
-      
-      // Fixed default settings parameter injection mappings references down line
-     // Safely hide feedback if it exists
-if (fb) fb.classList.add('hidden'); 
-
-if(!name || !email || !pass || !shift || !offDays) {
-    if (fb) {
-        fb.className = "error-message"; // This was line 531!
-        fb.innerText = "Please supply all mandatory fields.";
-        fb.classList.remove('hidden');
-    } else {
-        // Fallback to a standard browser alert if the feedback box isn't in your HTML
-        alert("Please supply all mandatory fields.");
-    }
-    return; 
-}
 
     function routePayrollSection() { if (currentUser.role === 'Admin') showSection('admin-payroll-sec'); else { showSection('user-payroll-sec'); fetchPersonalPayslips(); } }
     function submitPayrollForm() {
