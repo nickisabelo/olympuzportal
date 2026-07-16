@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Olympuz Operations Portal</title>
-  <link rel="icon" type="image/png" href="Logo New.png">
+  <link class="w-full" rel="icon" type="image/png" href="Logo New.png">
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 <body class="bg-slate-50 font-sans text-slate-800">
@@ -420,7 +420,6 @@
       }, MAX_INACTIVITY_LIMIT);
     }
 
-    // Input handlers to track user actions
     ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(eventName => {
       document.addEventListener(eventName, () => {
         if (currentUser) resetInactivityTracker();
@@ -755,6 +754,43 @@
       });
     }
 
+    // --- RE-ADDED MISSING CORE WORKSPACE CONTROLS ---
+    function showSection(id) {
+      var modules = ['attendance-sec', 'leave-request-sec', 'restday-request-sec', 'task-report-sec', 'account-settings-sec', 'admin-payroll-sec', 'user-payroll-sec', 'admin-sec'];
+      modules.forEach(function(sec) { 
+        var el = document.getElementById(sec);
+        if(el) el.className = 'hidden'; 
+      });
+      
+      var target = document.getElementById(id);
+      if(target) {
+        target.className = id === 'account-settings-sec' ? 'bg-white p-6 rounded-xl shadow-sm border border-slate-100 max-w-md space-y-4' : 'space-y-6';
+      }
+      
+      if (id === 'task-report-sec') {
+        document.getElementById('rep-date').value = new Date().toISOString().split('T')[0];
+        document.getElementById('public-filter-tasker').value = "ALL"; loadPublicTaskReportsFeed();
+      }
+      if (id === 'admin-sec') fetchGlobalAdminLogs();
+      if (id === 'attendance-sec' || id === 'leave-request-sec' || id === 'account-settings-sec' || id === 'restday-request-sec') refreshUserTimers();
+    }
+
+    function logout() {
+      currentUser = null;
+      clearTimeout(inactivityTimer);
+      localStorage.removeItem("olympuz_active_session");
+
+      document.getElementById('email').value = "";
+      document.getElementById('password').value = "";
+      document.getElementById('otp-code').value = "";
+      document.getElementById('otp-form').className = 'space-y-4 hidden';
+      document.getElementById('credentials-form').className = 'space-y-4';
+
+      document.getElementById('app-page').className = 'hidden';
+      document.getElementById('login-page').className = 'flex min-h-screen items-center justify-center';
+      document.getElementById('admin-dash-btn').className = 'hidden';
+    }
+
     function renderFilteredGrids(data) {
       const selectedTasker = document.getElementById('filter-tasker').value, fromDateVal = document.getElementById('filter-from-date').value, toDateVal = document.getElementById('filter-to-date').value;
       const fromTime = fromDateVal ? new Date(fromDateVal).setHours(0,0,0,0) : null, toTime = toDateVal ? new Date(toDateVal).setHours(23,59,59,999) : null;
@@ -866,148 +902,8 @@
     }
 
     // ==========================================
-    // ADMIN ACTION: REGISTER NEW TASKER
+    // ADMIN ACTION: REGISTER NEW TASKER (SUPPLEMENTAL)
     // ==========================================
-    async function executeAdminCreateUser() {
-      const name = document.getElementById('add-u-name')?.value;
-      const email = document.getElementById('add-u-email')?.value;
-      const pass = document.getElementById('add-u-pass')?.value;
-      const role = document.getElementById('add-u-role')?.value || 'Employee';
-      const shiftStart = document.getElementById('add-u-shift-start')?.value;
-      const shiftEnd = document.getElementById('add-u-shift-end')?.value;
-      const offDays = document.getElementById('add-u-off')?.value;
-      const leaves = document.getElementById('add-u-leaves')?.value;
-      
-      const lunch = document.getElementById('add-u-lunch')?.value;
-      const break1 = document.getElementById('add-u-break1')?.value;
-      const break2 = document.getElementById('add-u-break2')?.value;
-      const meal = document.getElementById('add-u-meal')?.value;
-
-      const fb = document.getElementById('admin-create-feedback');
-
-      const updateFeedback = (text, classString, isHidden) => {
-        if (!fb) return;
-        fb.innerText = text || '';
-        fb.className = 'text-xs font-bold p-2 rounded'; 
-        
-        if (classString) {
-          const classes = classString.split(' ').filter(c => c.trim() !== '');
-          classes.forEach(cls => fb.classList.add(cls));
-        }
-        if (isHidden) fb.classList.add('hidden'); else fb.classList.remove('hidden');
-      };
-
-      updateFeedback('', '', true);
-
-      if (!name || !email || !pass) {
-        updateFeedback("Please supply all mandatory fields.", "bg-red-50 text-red-600", false);
-        return;
-      }
-
-      try {
-        updateFeedback("Creating profile inside SQL database...", "bg-amber-50 text-amber-600", false);
-
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'adminCreateUser',
-            newUserData: { name: name.trim(), email: email.trim().toLowerCase(), password: pass.trim(), role: role },
-            defaultSettings: {
-              shiftStart: shiftStart,
-              shiftEnd: shiftEnd,
-              maxBreak: 15,
-              maxLunch: 60,
-              daysOff: offDays,
-              halfDayConfig: '',
-              leaveAllowance: parseInt(leaves) || 15,
-              lunch: lunch,
-              break1: break1,
-              break2: break2,
-              meal: meal
-            }
-          })
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-          updateFeedback(data.message, "bg-emerald-50 text-emerald-800", false);
-          ['add-u-name', 'add-u-email', 'add-u-pass', 'add-u-lunch', 'add-u-break1', 'add-u-break2', 'add-u-meal'].forEach(id => {
-            const el = document.getElementById(id); if (el) el.value = '';
-          });
-          fetchGlobalAdminLogs();
-        } else {
-          updateFeedback(data.message, "bg-red-50 text-red-600", false);
-        }
-      } catch (err) {
-        updateFeedback("System Connection Error.", "bg-red-50 text-red-600", false);
-      }
-    }
-
-    function routePayrollSection() { if (currentUser.role === 'Admin') showSection('admin-payroll-sec'); else { showSection('user-payroll-sec'); fetchPersonalPayslips(); } }
-    
-    function submitPayrollForm() {
-      const pData = { userId: document.getElementById('p-uid').value, name: document.getElementById('p-name').value, fixedRate: document.getElementById('p-rate').value, weeksLogged: document.getElementById('p-hours').value, deductions: document.getElementById('p-deduct').value, period: document.getElementById('p-month').value, remarks: document.getElementById('p-remarks').value };
-      callAPI('POST', '', { action: "postPayroll", payrollData: pData }, function(res) {
-        document.getElementById('payroll-feedback').innerText = res.message; document.getElementById('payroll-feedback').classList.remove('hidden');
-        ['p-uid', 'p-name', 'p-rate', 'p-hours', 'p-deduct', 'p-month', 'p-remarks'].forEach(id => document.getElementById(id).value = "");
-      });
-    }
-
-    function executeUserAcknowledgePayroll(payId) {
-      if(!confirm("Are you certain you want to acknowledge this calculation?")) return;
-      callAPI('POST', '', { action: "updatePayrollReviewStatus", payrollId: payId, status: "Acknowledged", disputeReason: "" }, function(res) {
-        alert(res.message); fetchPersonalPayslips();
-      });
-    }
-
-    function executeUserDisputePayroll(payId) {
-      const reason = prompt("Provide calculation discrepancies notes:");
-      if (reason === null) return; if (reason.trim() === "") { alert("Reason required."); return; }
-      callAPI('POST', '', { action: "updatePayrollReviewStatus", payrollId: payId, status: "Disputed", disputeReason: reason }, function(res) {
-        alert(res.message); fetchPersonalPayslips();
-      });
-    }
-
-    function fetchPersonalPayslips() {
-      callAPI('GET', "?action=getUserPayroll&userId=" + currentUser.id, null, function(records) {
-        const tbody = document.getElementById('user-payroll-table'); tbody.innerHTML = "";
-        if(records.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-400">No payout statements.</td></tr>'; return; }
-        records.forEach(row => { 
-          let statusBadge = ""; let actionsHtml = "";
-          if (row.status === "Acknowledged" || row.status === "Settled & Adjusted") {
-            statusBadge = '<span class="bg-emerald-50 text-emerald-700 font-bold px-2 py-1 rounded text-xs">✓ ' + row.status + '</span>';
-            actionsHtml = '<span class="text-slate-400 italic text-xs">Closed</span>';
-          } else if (row.status === "Dispute Declined") {
-            statusBadge = '<span class="bg-rose-50 text-rose-700 font-bold px-2 py-1 rounded text-xs block text-center">⚠ Dispute Declined</span>';
-            actionsHtml = '<button onclick="executeUserAcknowledgePayroll(\'' + row.payrollId + '\')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-2 py-1 rounded shadow-sm mr-1 transition">Accept</button>';
-          } else {
-            statusBadge = '<span class="bg-amber-50 text-amber-700 font-bold px-2 py-1 rounded text-xs">Pending Review</span>';
-            actionsHtml = '<button onclick="executeUserAcknowledgePayroll(\'' + row.payrollId + '\')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-2 py-1 rounded shadow-sm mr-1 transition">Accept</button><button onclick="executeUserDisputePayroll(\'' + row.payrollId + '\')" class="bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold px-2 py-1 rounded shadow-sm transition">Dispute</button>';
-          }
-          tbody.innerHTML += '<tr class="hover:bg-slate-50/50 transition"><td class="p-3 font-medium">' + row.period + '</td><td class="p-3">' + row.weeks + ' wks</td><td class="p-3">₱' + row.rate.toFixed(2) + '</td><td class="p-3">₱' + row.gross.toFixed(2) + '</td><td class="p-3 text-rose-600">-₱' + row.deductions.toFixed(2) + '</td><td class="p-3 font-bold text-emerald-600">₱' + row.net.toFixed(2) + '</td><td class="p-3 text-slate-500 italic max-w-xs truncate">' + row.remarks + '</td><td class="p-3 text-center">' + actionsHtml + '<div class="mt-1.5">' + statusBadge + '</div></td></tr>'; 
-        });
-      });
-    }
-
-    function fetchGlobalAdminLogs() {
-      callAPI('GET', '?action=getAdminDashboardData', null, function(data) {
-        if (!data || data.error) { alert(data ? data.error : 'Connection error'); return; }
-        cachedAdminMasterData = data; populateTaskerDropdownOptions(data.absences); renderFilteredGrids(data);
-      });
-    }
-
-    function populateTaskerDropdownOptions(absencesArray) {
-      const dropdown = document.getElementById('filter-tasker'); const savedValue = dropdown.value;
-      dropdown.innerHTML = '<option value="ALL">-- Show All Taskers --</option>';
-      absencesArray.forEach(t => { dropdown.innerHTML += '<option value="' + t.name + '">' + t.name + ' [' + t.id + ']</option>'; }); dropdown.value = savedValue;
-
-      const targetDrop = document.getElementById('sched-target-uid');
-      targetDrop.innerHTML = '<option value="">-- Choose Target Tasker --</option>';
-      absencesArray.forEach(t => { targetDrop.innerHTML += '<option value="' + t.id + '">' + t.name + ' [' + t.id + ']</option>'; });
-    }
-
     function applyGlobalFilters() { if (cachedAdminMasterData) renderFilteredGrids(cachedAdminMasterData); }
     function clearGlobalFilters() { document.getElementById('filter-tasker').value = "ALL"; document.getElementById('filter-from-date').value = ""; document.getElementById('filter-to-date').value = ""; if (cachedAdminMasterData) renderFilteredGrids(cachedAdminMasterData); }
   </script>
