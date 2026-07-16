@@ -248,7 +248,7 @@
 
           <!-- TASKER CREATION ENGINE BLOCK -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4">
-            <h2 class="text-xl font-bold text-indigo-900">👥 Add New Tasker (Freelancer Registration)</h2>
+            <h2 class="text-xl font-bold text-indigo-900">👥 Add New Tasker (With Dynamic Scheduling Targets)</h2>
             <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
               <div><label class="font-bold text-slate-600">Full Legal Name</label><input type="text" id="add-u-name" class="w-full p-2 border rounded mt-1 bg-slate-50"></div>
               <div><label class="font-bold text-slate-600">Email Address</label><input type="email" id="add-u-email" class="w-full p-2 border rounded mt-1 bg-slate-50"></div>
@@ -259,13 +259,77 @@
                   <option value="Admin">Admin (Full Workspace Override)</option>
                 </select>
               </div>
-              <div><label class="font-bold text-slate-600">Shift Window Range</label><input type="text" id="add-u-shift" class="w-full p-2 border rounded mt-1 bg-slate-50" value="09:00-18:00"></div>
+              <div><label class="font-bold text-slate-600">Shift Window Start</label><input type="time" id="add-u-shift-start" class="w-full p-2 border rounded mt-1 bg-slate-50" value="09:00"></div>
+              <div><label class="font-bold text-slate-600">Shift Window End</label><input type="time" id="add-u-shift-end" class="w-full p-2 border rounded mt-1 bg-slate-50" value="18:00"></div>
               <div><label class="font-bold text-slate-600">Days Off Allotment</label><input type="text" id="add-u-off" class="w-full p-2 border rounded mt-1 bg-slate-50" value="Saturday, Sunday"></div>
-              <div><label class="font-bold text-slate-600">Half Day Configuration</label><input type="text" id="add-u-halfday" class="w-full p-2 border rounded mt-1 bg-slate-50" placeholder="Saturday 09:00-13:00"></div>
               <div><label class="font-bold text-slate-600">Leave Balance</label><input type="number" id="add-u-leaves" class="w-full p-2 border rounded mt-1 bg-slate-50" value="15"></div>
+              
+              <!-- Target break configurations -->
+              <div><label class="font-bold text-slate-600 text-rose-600">Lunch Target (Optional)</label><input type="time" id="add-u-lunch" class="w-full p-2 border rounded mt-1 bg-slate-50"></div>
+              <div><label class="font-bold text-slate-600 text-rose-600">First Break (Optional)</label><input type="time" id="add-u-break1" class="w-full p-2 border rounded mt-1 bg-slate-50"></div>
+              <div><label class="font-bold text-slate-600 text-rose-600">Second Break (Optional)</label><input type="time" id="add-u-break2" class="w-full p-2 border rounded mt-1 bg-slate-50"></div>
+              <div><label class="font-bold text-slate-600 text-rose-600">Meal Break (Optional)</label><input type="time" id="add-u-meal" class="w-full p-2 border rounded mt-1 bg-slate-50"></div>
             </div>
             <button onclick="executeAdminCreateUser()" class="bg-indigo-600 text-white font-bold text-xs px-4 py-2 rounded shadow hover:bg-indigo-700 transition">Register Tasker Profile</button>
             <p id="admin-create-feedback" class="text-xs font-bold p-2 rounded hidden"></p>
+          </div>
+
+          <!-- NEW ADMIN PANEL: SCHEDULING CONTROL STATION -->
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4">
+            <h2 class="text-xl font-bold text-indigo-900 border-b pb-2">📅 Tasker Scheduling Override Command Center</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+              
+              <!-- Override controls -->
+              <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                <h3 class="text-sm font-bold text-slate-800">Assign Schedule Updates</h3>
+                <div>
+                  <label class="font-bold text-slate-600">Select Tasker Target</label>
+                  <select id="sched-target-uid" class="w-full p-2 border rounded mt-1 bg-white"></select>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                  <div><label class="font-bold text-slate-600">Shift Start</label><input type="time" id="sched-shift-start" class="w-full p-2 border rounded mt-1 bg-white"></div>
+                  <div><label class="font-bold text-slate-600">Shift End</label><input type="time" id="sched-shift-end" class="w-full p-2 border rounded mt-1 bg-white"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                  <div><label class="font-bold text-slate-600">Lunch Time</label><input type="time" id="sched-lunch" class="w-full p-2 border rounded mt-1 bg-white"></div>
+                  <div><label class="font-bold text-slate-600">First Break</label><input type="time" id="sched-break1" class="w-full p-2 border rounded mt-1 bg-white"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                  <div><label class="font-bold text-slate-600">Second Break</label><input type="time" id="sched-break2" class="w-full p-2 border rounded mt-1 bg-white"></div>
+                  <div><label class="font-bold text-slate-600">Meal Break</label><input type="time" id="sched-meal" class="w-full p-2 border rounded mt-1 bg-white"></div>
+                </div>
+                
+                <div class="pt-2 flex gap-2">
+                  <button onclick="submitScheduleAdjustment(true)" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded">Save Permanently</button>
+                  <button onclick="submitScheduleAdjustment(false)" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 rounded">For Today Only</button>
+                </div>
+              </div>
+
+              <!-- View current allocations -->
+              <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                <h3 class="text-sm font-bold text-slate-800">Configured Master Schedules</h3>
+                <div class="overflow-y-auto max-h-[300px] divide-y divide-slate-100" id="current-schedule-audit-list">
+                  <p class="text-slate-400 py-4 text-center">Loading list profiles...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- NEW ADMIN PANEL: LATE BREAK EXCEPTION MANAGEMENT QUEUE -->
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+            <h2 class="text-xl font-bold text-slate-800 border-b pb-2 mb-3">⚠️ Late Lunch, Break, & Meal Exception Approvals Queue</h2>
+            <div class="overflow-x-auto rounded-lg border border-slate-100">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold">
+                    <th class="p-3">Tasker Name</th><th class="p-3">Date</th><th class="p-3">Break Type</th><th class="p-3">Scheduled</th><th class="p-3">Actual Out</th><th class="p-3 font-bold">Status</th><th class="p-3 text-center">Decisions Console</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-exceptions-table" class="divide-y divide-slate-50">
+                  <tr><td colspan="7" class="p-3 text-center text-slate-400">No late break warnings currently registered.</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <!-- Attendance Logs Monitor -->
@@ -334,14 +398,13 @@
     let inactivityTimer = null;
     const MAX_INACTIVITY_LIMIT = 30 * 60 * 1000; // 30 minutes in milliseconds
 
-    // Device ID Setup: Read from localStorage or generate a fresh key
+    // Device ID Setup
     let deviceId = localStorage.getItem("olympuz_device_id");
     if (!deviceId) {
       deviceId = "DEV-" + crypto.randomUUID();
       localStorage.setItem("olympuz_device_id", deviceId);
     }
 
-    // Temporary variables to hold input across OTP transitions
     let tempLoginEmail = "";
 
     function callAPI(method, urlParams, payload, callback) {
@@ -350,17 +413,16 @@
       fetch(API_URL + urlParams, config).then(res => res.json()).then(data => callback(data)).catch(err => { alert("Sync Error:\n" + err); });
     }
 
-    // --- SESSION MEMORY & AUTO-RESTORE LOOP ---
+    // --- SESSION MEMORY & AUTO-RESTORE ---
     window.onload = function() {
       const savedSession = localStorage.getItem("olympuz_active_session");
       if (savedSession) {
         try {
           const parsed = JSON.parse(savedSession);
-          // Check if saved session has expired (30 minutes hard limit since last update)
           if (Date.now() < parsed.expiresAt) {
             currentUser = parsed.user;
             bootPortalSession();
-            resetInactivityTracker(); // Start watching idle time
+            resetInactivityTracker();
           } else {
             localStorage.removeItem("olympuz_active_session");
           }
@@ -370,18 +432,12 @@
       }
     };
 
-    // --- INACTIVITY TRACER LOOP ---
+    // --- INACTIVITY TRACER ---
     function resetInactivityTracker() {
       if (!currentUser) return;
-      
-      // Update our stored session expiration timestamp (+30 mins from now)
-      const sessionData = {
-        user: currentUser,
-        expiresAt: Date.now() + MAX_INACTIVITY_LIMIT
-      };
+      const sessionData = { user: currentUser, expiresAt: Date.now() + MAX_INACTIVITY_LIMIT };
       localStorage.setItem("olympuz_active_session", JSON.stringify(sessionData));
 
-      // Reset frontend timeout callback
       clearTimeout(inactivityTimer);
       inactivityTimer = setTimeout(() => {
         alert("Session Expired: You have been logged out due to 30 minutes of inactivity.");
@@ -389,14 +445,13 @@
       }, MAX_INACTIVITY_LIMIT);
     }
 
-    // Watch for user activity to reset the timer
     ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(eventName => {
       document.addEventListener(eventName, () => {
         if (currentUser) resetInactivityTracker();
       }, true);
     });
 
-    // --- STEP 1: INITIALIZE LOGIN SUBMISSION ---
+    // --- STEP 1: INITIALIZE LOGIN ---
     function handleLogin() {
       const emailInput = document.getElementById('email').value;
       const passwordInput = document.getElementById('password').value;
@@ -404,7 +459,7 @@
 
       errBox.classList.add('hidden');
       if (!emailInput || !passwordInput) {
-        errBox.innerText = "Please complete all mandatory parameters.";
+        errBox.innerText = "Please complete all fields.";
         errBox.classList.remove('hidden');
         return;
       }
@@ -419,13 +474,11 @@
       }, function(response) {
         if (response.success) {
           if (response.requireOtp) {
-            // Unrecognized/Expired Device - Show OTP code form
             document.getElementById('credentials-form').classList.add('hidden');
             document.getElementById('otp-form').classList.remove('hidden');
             document.getElementById('otp-code').value = "";
             if (response.message) alert(response.message);
           } else {
-            // Pre-Authorized Recognized Device - Log in immediately
             currentUser = response.user;
             bootPortalSession();
           }
@@ -436,7 +489,7 @@
       });
     }
 
-    // --- STEP 2: OTP SECURITY SUBMISSION ---
+    // --- STEP 2: OTP VERIFICATION ---
     function handleVerifyOTP() {
       const code = document.getElementById('otp-code').value;
       const errBox = document.getElementById('login-err');
@@ -471,11 +524,9 @@
     }
 
     function bootPortalSession() {
-      // Hide Login Form, show App Grid
       document.getElementById('login-page').classList.add('hidden');
       document.getElementById('app-page').classList.remove('hidden');
 
-      // Display Details
       document.getElementById('user-display').innerText = `${currentUser.name} | ${currentUser.role}`;
       document.getElementById('sched-shift').innerText = `${currentUser.schedule.shiftStart} to ${currentUser.schedule.shiftEnd}`;
       document.getElementById('stat-leave-allow').innerText = currentUser.schedule.leaveAllowance;
@@ -493,11 +544,8 @@
       
       if (currentUser.role === 'Admin') document.getElementById('admin-dash-btn').classList.remove('hidden');
       showSection('attendance-sec');
-
-      // Start Session Expiration Tracking (30-Minute hard timer)
       resetInactivityTracker();
 
-      // Trigger automatic pooling intervals
       setInterval(refreshUserTimers, 30000);
       setInterval(function() {
         const reportSection = document.getElementById('task-report-sec');
@@ -527,17 +575,66 @@
         
         const rdBody = document.getElementById('personal-restday-table'); rdBody.innerHTML = "";
         if (stats.restDays.length === 0) {
-          rdBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-slate-400">No Rest Day work authorization lines filed yet.</td></tr>`;
+          rdBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-slate-400">No Rest Day requests found.</td></tr>`;
         } else {
           stats.restDays.forEach(row => {
             rdBody.innerHTML += `<tr>
               <td class="p-3 font-medium text-slate-900">${row.date}</td>
               <td class="p-3 text-slate-600 whitespace-pre-wrap">${row.comments}</td>
-              <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : row.status === 'Denied' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-100 text-amber-800'}">${row.status}</span></td>
+              <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : row.status === 'Denied' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-800'}">${row.status}</span></td>
               <td class="p-3 text-slate-500 italic">${row.feedback}</td>
             </tr>`;
           });
         }
+      });
+    }
+
+    // --- SCHEDULE ADJUSTMENTS OVERRIDES ---
+    function submitScheduleAdjustment(isPermanent) {
+      const targetUserId = document.getElementById('sched-target-uid').value;
+      const shiftStart = document.getElementById('sched-shift-start').value;
+      const shiftEnd = document.getElementById('sched-shift-end').value;
+      const lunch = document.getElementById('sched-lunch').value;
+      const break1 = document.getElementById('sched-break1').value;
+      const break2 = document.getElementById('sched-break2').value;
+      const meal = document.getElementById('sched-meal').value;
+
+      if (!targetUserId || !shiftStart || !shiftEnd) {
+        alert("Please select a target user and specify shift bounds.");
+        return;
+      }
+
+      const payload = {
+        action: isPermanent ? "updatePermanentSchedule" : "updateDailyScheduleAdjustment",
+        targetUserId: targetUserId,
+        shiftStart: shiftStart,
+        shiftEnd: shiftEnd,
+        lunch: lunch,
+        break1: break1,
+        break2: break2,
+        meal: meal,
+        date: new Date().toLocaleDateString('en-US') // used for temporary schedules
+      };
+
+      callAPI('POST', '', payload, function(res) {
+        alert(res.message);
+        fetchGlobalAdminLogs();
+      });
+    }
+
+    // --- EXCEPTION APPROVALS ---
+    function resolveLateBreakException(exceptionId, verdict) {
+      const comment = prompt(`Enter optional review notes regarding this decision:`);
+      if (comment === null) return;
+
+      callAPI('POST', '', {
+        action: "resolveBreakException",
+        exceptionId: exceptionId,
+        status: verdict,
+        comment: comment
+      }, function(res) {
+        alert(res.message);
+        fetchGlobalAdminLogs();
       });
     }
 
@@ -547,8 +644,8 @@
       const fb = document.getElementById('rd-feedback-msg');
       
       fb.classList.add('hidden');
-      if (!targetDate || !comments.trim()) { alert("Please compile all mandatory parameters."); return; }
-      fb.className = "text-center text-xs font-bold p-2 rounded bg-amber-50 text-amber-800"; fb.innerText = "Transmitting authorization data..."; fb.classList.remove('hidden');
+      if (!targetDate || !comments.trim()) { alert("Please compile all parameters."); return; }
+      fb.className = "text-center text-xs font-bold p-2 rounded bg-amber-50 text-amber-800"; fb.innerText = "Transmitting request..."; fb.classList.remove('hidden');
       
       callAPI('POST', '', { action: "submitRestDayRequest", userId: currentUser.id, userName: currentUser.name, targetDate: targetDate, comments: comments }, function(res) {
         fb.innerText = res.message;
@@ -557,15 +654,6 @@
           document.getElementById('rd-date').value = ""; document.getElementById('rd-comments').value = "";
           refreshUserTimers();
         }
-      });
-    }
-
-    function executeAdminProcessRestDay(reqId, actionStatus) {
-      const feedback = prompt(`Map resolution mode (${actionStatus}) for request.\nEnter feedback comment back to Tasker:`);
-      if (feedback === null) return;
-      
-      callAPI('POST', '', { action: "processRestDayAction", requestId: reqId, status: actionStatus, feedback: feedback }, function(res) {
-        alert(res.message); fetchGlobalAdminLogs();
       });
     }
 
@@ -585,7 +673,7 @@
     function renderFilteredPublicReports() {
       const container = document.getElementById('public-reports-feed'); const selection = document.getElementById('public-filter-tasker').value;
       let items = cachedPublicReports; if (selection !== "ALL") { items = cachedPublicReports.filter(r => r.name === selection); }
-      container.innerHTML = ""; if (items.length === 0) { container.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs">No task report lines fit selection criteria.</div>`; return; }
+      container.innerHTML = ""; if (items.length === 0) { container.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs">No reports fit criteria.</div>`; return; }
       items.forEach(row => {
         container.innerHTML += `<div class="bg-white p-3.5 rounded-lg shadow-sm border border-slate-100 flex flex-col gap-1">
           <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center text-xs gap-1">
@@ -636,7 +724,7 @@
     }
 
     function adminExecuteLeave(reqId, status) {
-      const comment = prompt(`Provide management comments for decision mapping (${status}):`); if(comment === null) return; 
+      const comment = prompt(`Provide comments for decision mapping (${status}):`); if(comment === null) return; 
       callAPI('POST', '', { action: "processLeaveAction", requestId: reqId, status: status, comment: comment }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
     }
 
@@ -646,7 +734,7 @@
     }
 
     function executeAdminRemoveUser(targetUid, targetName) {
-      if (!confirm(`🚨 CRITICAL ACTION:\nAre you absolutely certain you want to remove ${targetName} [${targetUid}]? This permanently purges their access profile settings lines!`)) return;
+      if (!confirm(`Are you certain you want to remove ${targetName} [${targetUid}]?`)) return;
       callAPI('POST', '', { action: "adminDeleteUser", targetUserId: targetUid }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
     }
 
@@ -659,17 +747,22 @@
     }
 
     // ==========================================
-    // ADMIN ACTION: REGISTER NEW TASKER (CORRECTED)
+    // ADMIN ACTION: REGISTER NEW TASKER
     // ==========================================
     async function executeAdminCreateUser() {
       const name = document.getElementById('add-u-name')?.value;
       const email = document.getElementById('add-u-email')?.value;
       const pass = document.getElementById('add-u-pass')?.value;
       const role = document.getElementById('add-u-role')?.value || 'Employee';
-      const shift = document.getElementById('add-u-shift')?.value;
+      const shiftStart = document.getElementById('add-u-shift-start')?.value;
+      const shiftEnd = document.getElementById('add-u-shift-end')?.value;
       const offDays = document.getElementById('add-u-off')?.value;
-      const halfDay = document.getElementById('add-u-halfday')?.value;
       const leaves = document.getElementById('add-u-leaves')?.value;
+      
+      const lunch = document.getElementById('add-u-lunch')?.value;
+      const break1 = document.getElementById('add-u-break1')?.value;
+      const break2 = document.getElementById('add-u-break2')?.value;
+      const meal = document.getElementById('add-u-meal')?.value;
 
       const fb = document.getElementById('admin-create-feedback');
 
@@ -682,92 +775,59 @@
           const classes = classString.split(' ').filter(c => c.trim() !== '');
           classes.forEach(cls => fb.classList.add(cls));
         }
-
-        if (isHidden) {
-          fb.classList.add('hidden');
-        } else {
-          fb.classList.remove('hidden');
-        }
+        if (isHidden) fb.classList.add('hidden'); else fb.classList.remove('hidden');
       };
 
       updateFeedback('', '', true);
 
-      if (!name || !email || !pass || !shift || !offDays) {
-        const errorMsg = "Please supply all mandatory fields.";
-        if (fb) {
-          updateFeedback(errorMsg, "bg-red-50 text-red-600", false);
-        } else {
-          alert(errorMsg);
-        }
+      if (!name || !email || !pass || !shiftStart || !shiftEnd || !offDays) {
+        updateFeedback("Please supply all mandatory fields.", "bg-red-50 text-red-600", false);
         return;
       }
 
       try {
-        if (fb) {
-          updateFeedback("Creating tasker profile inside SQL database...", "bg-amber-50 text-amber-600", false);
-        }
+        updateFeedback("Creating tasker profile inside SQL database...", "bg-amber-50 text-amber-600", false);
 
         const response = await fetch(`${API_URL}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             action: 'adminCreateUser',
-            newUserData: {
-              name: name.trim(),
-              email: email.trim().toLowerCase(),
-              password: pass.trim(),
-              role: role
-            },
+            newUserData: { name: name.trim(), email: email.trim().toLowerCase(), password: pass.trim(), role: role },
             defaultSettings: {
-              shiftStart: shift.split('-')[0] || '09:00',
-              shiftEnd: shift.split('-')[1] || '18:00',
+              shiftStart: shiftStart,
+              shiftEnd: shiftEnd,
               maxBreak: 15,
               maxLunch: 60,
               daysOff: offDays,
-              halfDayConfig: halfDay || '',
-              leaveAllowance: parseInt(leaves) || 15
+              halfDayConfig: '',
+              leaveAllowance: parseInt(leaves) || 15,
+              lunch: lunch,
+              break1: break1,
+              break2: break2,
+              meal: meal
             }
           })
         });
 
-        if (!response.ok) throw new Error(`HTTP network error: status ${response.status}`);
-
         const data = await response.json();
 
         if (data.success) {
-          const successMsg = data.message || "Tasker profile successfully registered!";
-          if (fb) {
-            updateFeedback(successMsg, "bg-emerald-50 text-emerald-800", false);
-          } else {
-            alert(successMsg);
-          }
-
-          ['add-u-name', 'add-u-email', 'add-u-pass', 'add-u-halfday'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.value = '';
+          updateFeedback(data.message, "bg-emerald-50 text-emerald-800", false);
+          ['add-u-name', 'add-u-email', 'add-u-pass', 'add-u-lunch', 'add-u-break1', 'add-u-break2', 'add-u-meal'].forEach(id => {
+            const el = document.getElementById(id); if (el) el.value = '';
           });
-
           fetchGlobalAdminLogs();
         } else {
-          const failMsg = data.message || "Failed to write database record.";
-          if (fb) {
-            updateFeedback(failMsg, "bg-red-50 text-red-600", false);
-          } else {
-            alert(failMsg);
-          }
+          updateFeedback(data.message, "bg-red-50 text-red-600", false);
         }
       } catch (err) {
-        console.error("Critical network write exception:", err);
-        const systemErrorMsg = "System Connection Error. Check your internet or Cloudflare database connections.";
-        if (fb) {
-          updateFeedback(systemErrorMsg, "bg-red-50 text-red-600", false);
-        } else {
-          alert(systemErrorMsg);
-        }
+        updateFeedback("System Connection Error.", "bg-red-50 text-red-600", false);
       }
     }
 
     function routePayrollSection() { if (currentUser.role === 'Admin') showSection('admin-payroll-sec'); else { showSection('user-payroll-sec'); fetchPersonalPayslips(); } }
+    
     function submitPayrollForm() {
       const pData = { userId: document.getElementById('p-uid').value, name: document.getElementById('p-name').value, fixedRate: document.getElementById('p-rate').value, weeksLogged: document.getElementById('p-hours').value, deductions: document.getElementById('p-deduct').value, period: document.getElementById('p-month').value, remarks: document.getElementById('p-remarks').value };
       callAPI('POST', '', { action: "postPayroll", payrollData: pData }, function(res) {
@@ -777,15 +837,15 @@
     }
 
     function executeUserAcknowledgePayroll(payId) {
-      if(!confirm("Confirm Receipt:\nAre you certain you want to acknowledge this statement calculation?")) return;
+      if(!confirm("Are you certain you want to acknowledge this calculation?")) return;
       callAPI('POST', '', { action: "updatePayrollReviewStatus", payrollId: payId, status: "Acknowledged", disputeReason: "" }, function(res) {
         alert(res.message); fetchPersonalPayslips();
       });
     }
 
     function executeUserDisputePayroll(payId) {
-      const reason = prompt("⚠️ Initiate Invoice Dispute Process:\nProvide detailed arguments or calculation discrepancies notes down below:");
-      if (reason === null) return; if (reason.trim() === "") { alert("Action Cancelled: You must supply a valid reason description."); return; }
+      const reason = prompt("Provide reasons or calculation discrepancies notes:");
+      if (reason === null) return; if (reason.trim() === "") { alert("Reason required."); return; }
       callAPI('POST', '', { action: "updatePayrollReviewStatus", payrollId: payId, status: "Disputed", disputeReason: reason }, function(res) {
         alert(res.message); fetchPersonalPayslips();
       });
@@ -794,24 +854,18 @@
     function fetchPersonalPayslips() {
       callAPI('GET', `?action=getUserPayroll&userId=${currentUser.id}`, null, function(records) {
         const tbody = document.getElementById('user-payroll-table'); tbody.innerHTML = "";
-        if(records.length === 0) { tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400">No payment receipts issued yet.</td></tr>`; return; }
+        if(records.length === 0) { tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400">No payout statements.</td></tr>`; return; }
         records.forEach(row => { 
           let statusBadge = ""; let actionsHtml = "";
           if (row.status === "Acknowledged" || row.status === "Settled & Adjusted") {
             statusBadge = `<span class="bg-emerald-50 text-emerald-700 font-bold px-2 py-1 rounded text-xs">✓ ${row.status}</span>`;
             actionsHtml = `<span class="text-slate-400 italic text-xs">Closed</span>`;
           } else if (row.status === "Dispute Declined") {
-            statusBadge = `<span class="bg-rose-50 text-rose-700 font-bold px-2 py-1 rounded text-xs block text-center">⚠ Dispute Declined</span>
-                           <span class="text-[10px] text-slate-500 block mt-1 italic max-w-[150px] truncate" title="${row.disputeReason}">Feedback: ${row.disputeReason}</span>`;
-            actionsHtml = `<button onclick="executeUserAcknowledgePayroll('${row.payrollId}')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-2 py-1 rounded shadow-sm mr-1 transition">Accept Decision</button>
-                           <button onclick="executeUserDisputePayroll('${row.payrollId}')" class="bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold px-2 py-1 rounded shadow-sm transition">Re-Dispute</button>`;
-          } else if (row.status === "Disputed") {
-            statusBadge = `<span class="bg-rose-50 text-rose-700 font-bold px-2 py-1 rounded text-xs block text-center">⚠ Dispute Under Review</span>
-                           <span class="text-[10px] text-rose-400 block mt-1 italic max-w-[150px] truncate" title="${row.disputeReason}">Reason: ${row.disputeReason}</span>`;
-            actionsHtml = `<button onclick="executeUserAcknowledgePayroll('${row.payrollId}')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-2 py-1 rounded shadow-sm transition">Withdraw & Accept</button>`;
+            statusBadge = `<span class="bg-rose-50 text-rose-700 font-bold px-2 py-1 rounded text-xs block text-center">⚠ Dispute Declined</span>`;
+            actionsHtml = `<button onclick="executeUserAcknowledgePayroll('${row.payrollId}')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-2 py-1 rounded shadow-sm mr-1 transition">Accept</button>`;
           } else {
             statusBadge = `<span class="bg-amber-50 text-amber-700 font-bold px-2 py-1 rounded text-xs">Pending Review</span>`;
-            actionsHtml = `<button onclick="executeUserAcknowledgePayroll('${row.payrollId}')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-2 py-1 rounded shadow-sm mr-1 transition">Acknowledge</button>
+            actionsHtml = `<button onclick="executeUserAcknowledgePayroll('${row.payrollId}')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-2 py-1 rounded shadow-sm mr-1 transition">Accept</button>
                            <button onclick="executeUserDisputePayroll('${row.payrollId}')" class="bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold px-2 py-1 rounded shadow-sm transition">Dispute</button>`;
           }
           tbody.innerHTML += `<tr class="hover:bg-slate-50/50 transition">
@@ -820,19 +874,6 @@
           </tr>`; 
         });
       });
-    }
-
-    function executeAdminDeclineDispute(payId, taskerName) {
-      const feedback = prompt(`Decline payroll dispute filed by ${taskerName}.\nEnter override explanation:`);
-      if (feedback === null) return; if (feedback.trim() === "") { alert("Explanation note required."); return; }
-      callAPI('POST', '', { action: "adminResolveDisputeOverride", payrollId: payId, resolutionMode: "Declined", managementNote: feedback, adjustedAmount: 0 }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
-    }
-
-    function executeAdminSettleAdjustDispute(payId, taskerName, currentNet) {
-      const newAmount = prompt(`Settle & Adjust payroll for ${taskerName}.\nCurrent Net Revenue: ₱${currentNet}\nEnter corrected Net Revenue amount (₱):`);
-      if (newAmount === null || newAmount.trim() === "") return;
-      const note = prompt("Enter resolution summary remark:"); if (note === null) return;
-      callAPI('POST', '', { action: "adminResolveDisputeOverride", payrollId: payId, resolutionMode: "Settled", managementNote: note, adjustedAmount: parseFloat(newAmount) }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
     }
 
     function fetchGlobalAdminLogs() {
@@ -846,6 +887,11 @@
       const dropdown = document.getElementById('filter-tasker'); const savedValue = dropdown.value;
       dropdown.innerHTML = `<option value="ALL">-- Show All Taskers --</option>`;
       absencesArray.forEach(t => { dropdown.innerHTML += `<option value="${t.name}">${t.name} [${t.id}]</option>`; }); dropdown.value = savedValue;
+
+      // Populate Scheduling dropdown override targets
+      const targetDrop = document.getElementById('sched-target-uid');
+      targetDrop.innerHTML = '<option value="">-- Choose Target Tasker --</option>';
+      absencesArray.forEach(t => { targetDrop.innerHTML += `<option value="${t.id}">${t.name} [${t.id}]</option>`; });
     }
 
     function applyGlobalFilters() { if (cachedAdminMasterData) renderFilteredGrids(cachedAdminMasterData); }
@@ -854,20 +900,68 @@
     function renderFilteredGrids(data) {
       const selectedTasker = document.getElementById('filter-tasker').value, fromDateVal = document.getElementById('filter-from-date').value, toDateVal = document.getElementById('filter-to-date').value;
       const fromTime = fromDateVal ? new Date(fromDateVal).setHours(0,0,0,0) : null, toTime = toDateVal ? new Date(toDateVal).setHours(23,59,59,999) : null;
-      const pBody = document.getElementById('admin-attendance-table'), absBody = document.getElementById('admin-absence-table'), lBody = document.getElementById('admin-leave-table'), payBody = document.getElementById('admin-payments-history-table'), explicitAbsBody = document.getElementById('admin-explicit-absents-table'), rdBody = document.getElementById('admin-restday-table');
       
-      pBody.innerHTML = ""; absBody.innerHTML = ""; lBody.innerHTML = ""; payBody.innerHTML = ""; explicitAbsBody.innerHTML = ""; rdBody.innerHTML = "";
+      const pBody = document.getElementById('admin-attendance-table');
+      const absBody = document.getElementById('admin-absence-table');
+      const lBody = document.getElementById('admin-leave-table');
+      const payBody = document.getElementById('admin-payments-history-table');
+      const explicitAbsBody = document.getElementById('admin-explicit-absents-table');
+      const rdBody = document.getElementById('admin-restday-table');
+      const excBody = document.getElementById('admin-exceptions-table');
+      const auditList = document.getElementById('current-schedule-audit-list');
+      
+      pBody.innerHTML = ""; absBody.innerHTML = ""; lBody.innerHTML = ""; payBody.innerHTML = ""; explicitAbsBody.innerHTML = ""; rdBody.innerHTML = ""; excBody.innerHTML = ""; auditList.innerHTML = "";
+
+      // Render Schedule Audit List
+      data.absences.forEach(u => {
+        const ps = u.permanentSchedule;
+        auditList.innerHTML += `<div class="py-2 flex justify-between items-center text-xs">
+          <div>
+            <div class="font-bold text-slate-800">${u.name} <span class="text-slate-400 font-mono">(${u.id})</span></div>
+            <div class="text-[10px] text-slate-500 mt-0.5">Shift: ${ps.shiftStart} - ${ps.shiftEnd} | Lunch: ${ps.lunch || 'None'}</div>
+            <div class="text-[10px] text-indigo-600 font-medium">Breaks: ${ps.break1 || 'N/A'} | ${ps.break2 || 'N/A'} | Meal: ${ps.meal || 'N/A'}</div>
+          </div>
+        </div>`;
+      });
+
+      // Render Exceptions Table
+      let filteredExceptions = data.breakExceptions.filter(row => {
+        if (selectedTasker !== "ALL" && row.user_name !== selectedTasker) return false;
+        return true;
+      });
+      if (filteredExceptions.length === 0) {
+        excBody.innerHTML = `<tr><td colspan="7" class="p-3 text-center text-slate-400">All taskers complied with break schedules.</td></tr>`;
+      } else {
+        filteredExceptions.forEach(row => {
+          let controls = `<span class="text-slate-400 italic font-bold text-xs">${row.status}</span>`;
+          if (row.status === "Pending Approval") {
+            controls = `
+              <button onclick="resolveLateBreakException('${row.id}', 'Approved')" class="bg-emerald-600 text-white font-bold px-2 py-1 rounded text-[10px] mr-1">Approve</button>
+              <button onclick="resolveLateBreakException('${row.id}', 'Declined')" class="bg-rose-600 text-white font-bold px-2 py-1 rounded text-[10px]">Decline</button>
+            `;
+          }
+          excBody.innerHTML += `<tr>
+            <td class="p-3 font-bold text-slate-900">${row.user_name}</td>
+            <td class="p-3 text-slate-600">${row.date}</td>
+            <td class="p-3 font-semibold text-indigo-700">${row.break_type}</td>
+            <td class="p-3 font-medium text-slate-500">${row.scheduled_time}</td>
+            <td class="p-3 font-bold text-rose-600">${row.actual_time}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : row.status === 'Declined' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-800'}">${row.status}</span></td>
+            <td class="p-3 text-center whitespace-nowrap">${controls}</td>
+          </tr>`;
+        });
+      }
 
       let filteredAttendance = data.attendance.filter(row => {
         if (selectedTasker !== "ALL" && row.name !== selectedTasker) return false;
         if (fromTime || toTime) { const rowTime = new Date(row.date.replace(" (Half Day)", "")).getTime(); if (fromTime && rowTime < fromTime) return false; if (toTime && rowTime > toTime) return false; }
         return true;
       });
-      if(filteredAttendance.length === 0) { pBody.innerHTML = `<tr><td colspan="7" class="p-3 text-center text-slate-400">No punch records found matching filter bounds.</td></tr>`; }
+      if(filteredAttendance.length === 0) { pBody.innerHTML = `<tr><td colspan="7" class="p-3 text-center text-slate-400">No records.</td></tr>`; }
       else {
         filteredAttendance.forEach(row => {
-          const bBadge = row.overBreak > 0 ? `<span class="bg-rose-50 text-rose-600 text-xs px-2 py-0.5 rounded font-bold ml-1">+${row.overBreak}m over</span>` : '';
-          const lBadge = row.overLunch > 0 ? `<span class="bg-rose-50 text-rose-600 text-xs px-2 py-0.5 rounded font-bold ml-1">+${row.overLunch}m over</span>` : '';
+          const bBadge = row.overBreak > 0 ? `<span class="bg-rose-50 text-rose-600 text-xs px-2 py-0.5 rounded font-bold ml-1">+${row.overBreak}m</span>` : '';
+          const lBadge = row.overLunch > 0 ? `<span class="bg-rose-50 text-rose-600 text-xs px-2 py-0.5 rounded font-bold ml-1">+${row.overLunch}m</span>` : '';
           pBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 font-medium text-slate-900">${row.name}</td><td class="p-3 text-slate-500">${row.date}</td><td class="p-3 text-emerald-600 font-medium">${row.timeIn}</td><td class="p-3 text-rose-600 font-medium">${row.timeOut}</td><td class="p-3 text-slate-600">${row.breakText} ${bBadge}</td><td class="p-3 text-slate-600">${row.lunchText} ${lBadge}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${row.status.startsWith('On Time') ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}">${row.status}</span></td></tr>`;
         });
       }
@@ -877,92 +971,59 @@
         if (fromTime || toTime) { const rowTime = new Date(row.date).getTime(); if (fromTime && rowTime < fromTime) return false; if (toTime && rowTime > toTime) return false; }
         return true;
       });
-      if (filteredExplicitAbsents.length === 0) { explicitAbsBody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-400">No database absence records found.</td></tr>`; }
+      if (filteredExplicitAbsents.length === 0) { explicitAbsBody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-400">No records found.</td></tr>`; }
       else {
         filteredExplicitAbsents.forEach(row => {
-          explicitAbsBody.innerHTML += `<tr class="border-b border-slate-100 hover:bg-slate-50/50 transition">
-            <td class="p-3 font-mono text-xs text-slate-500">${row.userId}</td><td class="p-3 font-bold text-slate-900">${row.name}</td><td class="p-3 text-rose-600 font-semibold">${row.date}</td><td class="p-3 text-slate-500 italic text-xs">${row.type}</td>
-            <td class="p-3 text-center">
-              <button onclick="executeAdminUntagAbsentLog('${row.absentId}', '${row.name}', '${row.date}')" class="text-[11px] bg-slate-100 text-slate-600 font-bold px-2 py-1 rounded border border-slate-200 transition">Remove Absent</button>
-            </td>
-          </tr>`;
+          explicitAbsBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 text-slate-500">${row.userId}</td><td class="p-3 font-bold">${row.name}</td><td class="p-3 text-rose-600 font-semibold">${row.date}</td><td class="p-3 italic text-xs">${row.type}</td><td class="p-3 text-center"><button onclick="executeAdminUntagAbsentLog('${row.absentId}', '${row.name}', '${row.date}')" class="text-[11px] bg-slate-100 text-slate-600 font-bold px-2 py-1 rounded border transition">Remove</button></td></tr>`;
         });
       }
 
       let filteredPayments = data.payments.filter(row => { return !(selectedTasker !== "ALL" && row.name !== selectedTasker); });
-      if(filteredPayments.length === 0) { payBody.innerHTML = `<tr><td colspan="10" class="p-3 text-center text-slate-400">No payout logs captured matching criteria filters.</td></tr>`; }
+      if(filteredPayments.length === 0) { payBody.innerHTML = `<tr><td colspan="10" class="p-3 text-center text-slate-400">No payout logs.</td></tr>`; }
       else {
         filteredPayments.forEach(row => {
-          let statusBadge = ""; let overrideActionsHtml = "";
-          if (row.status === "Acknowledged" || row.status === "Settled & Adjusted") statusBadge = `<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[11px]">✓ ${row.status}</span>`;
-          else if (row.status === "Disputed") {
-            statusBadge = `<span class="bg-rose-100 text-rose-800 font-extrabold px-2 py-0.5 rounded text-[11px] animate-pulse">⚠ Dispute Filed</span>`;
-            overrideActionsHtml = `<div class="mt-1 flex gap-1 justify-center"><button onclick="executeAdminSettleAdjustDispute('${row.payrollId}', '${row.name}', ${row.net})" class="text-[10px] bg-emerald-600 text-white font-bold px-1.5 py-0.5 rounded shadow-sm">Settle & Adjust</button><button onclick="executeAdminDeclineDispute('${row.payrollId}', '${row.name}')" class="text-[10px] bg-rose-600 text-white font-bold px-1.5 py-0.5 rounded shadow-sm">Decline Dispute</button></div>`;
-          } else if (row.status === "Dispute Declined") statusBadge = `<span class="bg-rose-50 text-rose-600 font-medium px-2 py-0.5 rounded text-[11px]">Dispute Declined</span>`;
-          else statusBadge = `<span class="bg-amber-100 text-amber-800 font-medium px-2 py-0.5 rounded text-[11px]">Unreviewed</span>`;
-
-          payBody.innerHTML += `<tr class="border-b border-slate-100 hover:bg-slate-50/50 transition">
-            <td class="p-3 font-bold text-slate-900">${row.name}</td><td class="p-3 font-mono text-xs text-slate-500">${row.userId}</td><td class="p-3 font-medium text-indigo-700 text-xs">${row.period}</td><td class="p-3 text-slate-600">${row.weeks} wks</td><td class="p-3 text-slate-600">₱${row.gross.toFixed(2)}</td><td class="p-3 text-rose-600">-₱${row.deductions.toFixed(2)}</td><td class="p-3 font-black text-emerald-600">₱${row.net.toFixed(2)}</td><td class="p-3 text-slate-500 italic max-w-xs truncate">${row.remarks}</td>
-            <td class="p-3 text-center whitespace-nowrap">${statusBadge} ${overrideActionsHtml}</td><td class="p-3 text-xs text-slate-600 font-semibold max-w-xs whitespace-pre-wrap break-words">${row.disputeReason || "-"}</td>
-          </tr>`;
+          let statusBadge = row.status === "Acknowledged" || row.status === "Settled & Adjusted" ? `<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[11px]">✓ ${row.status}</span>` : `<span class="bg-amber-100 text-amber-800 font-medium px-2 py-0.5 rounded text-[11px]">Unreviewed</span>`;
+          payBody.innerHTML += `<tr class="border-b border-slate-100 hover:bg-slate-50/50 transition"><td class="p-3 font-bold text-slate-900">${row.name}</td><td class="p-3 font-mono text-xs text-slate-500">${row.userId}</td><td class="p-3 text-indigo-700 text-xs">${row.period}</td><td class="p-3 text-slate-600">${row.weeks} wks</td><td class="p-3">₱${row.gross.toFixed(2)}</td><td class="p-3 text-rose-600">-₱${row.deductions.toFixed(2)}</td><td class="p-3 font-black text-emerald-600">₱${row.net.toFixed(2)}</td><td class="p-3 italic max-w-xs truncate">${row.remarks}</td><td class="p-3 text-center">${statusBadge}</td><td class="p-3 text-xs max-w-xs break-words">${row.disputeReason || "-"}</td></tr>`;
         });
       }
 
       let filteredRestDays = data.restDays.filter(row => {
         if (selectedTasker !== "ALL" && row.name !== selectedTasker) return false;
-        if (fromTime || toTime) { const rowTime = new Date(row.date).getTime(); if (fromTime && rowTime < fromTime) return false; if (toTime && rowTime > toTime) return false; }
         return true;
       });
       if (filteredRestDays.length === 0) {
-        rdBody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-400">Rest day work queue clean.</td></tr>`;
+        rdBody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-400">Queue clean.</td></tr>`;
       } else {
         filteredRestDays.forEach(row => {
-          let controls = `<span class="text-slate-400 italic text-xs">Evaluated (${row.feedback})</span>`;
+          let controls = `<span class="text-slate-400 italic text-xs">Evaluated</span>`;
           if (row.status === "Pending") {
-            controls = `<button onclick="executeAdminMakeRestDayDecision('${row.requestId}', 'Approved')" class="bg-emerald-600 text-white font-bold text-[11px] px-2 py-0.5 rounded shadow-sm mr-1">Approve</button>
-                        <button onclick="executeAdminMakeRestDayDecision('${row.requestId}', 'Denied')" class="bg-rose-600 text-white font-bold text-[11px] px-2 py-0.5 rounded shadow-sm">Deny</button>`;
+            controls = `<button onclick="executeAdminMakeRestDayDecision('${row.requestId}', 'Approved')" class="bg-emerald-600 text-white font-bold text-[11px] px-2 py-0.5 rounded mr-1">Approve</button><button onclick="executeAdminMakeRestDayDecision('${row.requestId}', 'Denied')" class="bg-rose-600 text-white font-bold text-[11px] px-2 py-0.5 rounded">Deny</button>`;
           }
-          rdBody.innerHTML += `<tr class="border-b border-slate-100">
-            <td class="p-3 font-bold text-slate-900">${row.name} <span class="text-slate-400 text-xs font-mono font-normal">(${row.userId})</span></td>
-            <td class="p-3 text-indigo-700 font-medium">${row.date}</td>
-            <td class="p-3 text-slate-600 whitespace-pre-wrap text-xs">${row.comments}</td>
-            <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : row.status === 'Denied' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-800'}">${row.status}</span></td>
-            <td class="p-3 text-center whitespace-nowrap">${controls}</td>
-          </tr>`;
+          rdBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 font-bold text-slate-900">${row.name}</td><td class="p-3 text-indigo-700 font-medium">${row.date}</td><td class="p-3 text-slate-600 text-xs">${row.comments}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}">${row.status}</span></td><td class="p-3 text-center whitespace-nowrap">${controls}</td></tr>`;
         });
       }
 
       data.absences.filter(r => !(selectedTasker !== "ALL" && r.name !== selectedTasker)).forEach(row => {
-        absBody.innerHTML += `<tr class="border-b border-slate-100">
-          <td class="p-3 font-mono text-xs text-slate-500">${row.id}</td><td class="p-3 font-medium text-slate-900">${row.name}</td><td class="p-3 text-slate-500">${row.daysOff}</td><td class="p-3 text-indigo-600">${row.halfDay}</td><td class="p-3 font-black text-sm ${row.absents > 0 ? 'text-rose-600 bg-rose-50/30' : 'text-emerald-600'}">${row.absents} days missed</td>
-          <td class="p-3 text-center space-x-1 whitespace-nowrap">
-            <button onclick="executeAdminTagUserAbsent('${row.id}', '${row.name}')" class="text-xs bg-rose-600 hover:bg-rose-700 text-white font-bold px-2 py-1 rounded transition shadow-sm">Tag Absent</button>
-            <button onclick="executeAdminOverridePassword('${row.id}')" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-2 py-1 rounded transition border border-indigo-200">Reset Pass</button>
-            <button onclick="executeAdminRemoveUser('${row.id}', '${row.name}')" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold px-2 py-1 rounded transition border border-rose-200">Purge</button>
-          </td>
-        </tr>`;
+        absBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 text-slate-500">${row.id}</td><td class="p-3 font-medium text-slate-900">${row.name}</td><td class="p-3 text-slate-500">${row.daysOff}</td><td class="p-3 text-indigo-600">${row.halfDay}</td><td class="p-3 font-black ${row.absents > 0 ? 'text-rose-600 bg-rose-50/30' : 'text-emerald-600'}">${row.absents} days missed</td><td class="p-3 text-center space-x-1 whitespace-nowrap"><button onclick="executeAdminTagUserAbsent('${row.id}', '${row.name}')" class="text-xs bg-rose-600 text-white font-bold px-2 py-1 rounded">Tag Absent</button><button onclick="executeAdminOverridePassword('${row.id}')" class="text-xs bg-indigo-50 text-indigo-700 font-semibold px-2 py-1 rounded border">Reset Pass</button><button onclick="executeAdminRemoveUser('${row.id}', '${row.name}')" class="text-xs bg-rose-50 text-rose-600 font-bold px-2 py-1 rounded border">Purge</button></td></tr>`;
       });
 
       let filteredLeaves = data.leaves.filter(row => {
         if (selectedTasker !== "ALL" && row.name !== selectedTasker) return false;
-        if (fromTime || toTime) { const rowTime = new Date(row.date).getTime(); if (fromTime && rowTime < fromTime) return false; if (toTime && rowTime > toTime) return false; }
         return true;
       });
       if(filteredLeaves.length === 0) { lBody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-400">Leave request clean queue.</td></tr>`; }
       filteredLeaves.forEach(row => {
-        let controls = `<span class="text-slate-400 italic text-xs">Closed Logs (${row.comment})</span>`;
+        let controls = `<span class="text-slate-400 italic text-xs">Closed Logs</span>`;
         if (row.status === "Pending") {
-          controls = `<button onclick="adminExecuteLeave('${row.id}','Approved')" class="bg-emerald-600 text-white font-bold text-xs px-2.5 py-1 rounded shadow-sm mr-1">Approve</button>
-                      <button onclick="adminExecuteLeave('${row.id}','Denied')" class="bg-rose-600 text-white font-bold text-xs px-2.5 py-1 rounded shadow-sm">Deny</button>`;
+          controls = `<button onclick="adminExecuteLeave('${row.id}','Approved')" class="bg-emerald-600 text-white font-bold text-xs px-2.5 py-1 rounded mr-1">Approve</button><button onclick="adminExecuteLeave('${row.id}','Denied')" class="bg-rose-600 text-white font-bold text-xs px-2.5 py-1 rounded">Deny</button>`;
         }
-        lBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 font-medium">${row.name} <span class="text-slate-400 text-xs font-mono">(${row.userId})</span></td><td class="p-3 text-slate-500">${row.date}</td><td class="p-3 text-slate-600">${row.reason}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}">${row.status}</span></td><td class="p-3 text-center">${controls}</td></tr>`;
+        lBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 font-medium">${row.name}</td><td class="p-3 text-slate-500">${row.date}</td><td class="p-3 text-slate-600">${row.reason}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}">${row.status}</span></td><td class="p-3 text-center">${controls}</td></tr>`;
       });
     }
 
     function executeAdminMakeRestDayDecision(reqId, decisionStatus) {
-      const fbNotes = prompt(`Enter official management feedback notes to send back to the Tasker regarding this ${decisionStatus} request:`);
+      const fbNotes = prompt(`Enter management feedback:`);
       if (fbNotes === null) return;
-      
       callAPI('POST', '', { action: "processRestDayAction", requestId: reqId, status: decisionStatus, feedback: fbNotes }, function(res) {
         alert(res.message); fetchGlobalAdminLogs();
       });
@@ -985,7 +1046,6 @@
       clearTimeout(inactivityTimer);
       localStorage.removeItem("olympuz_active_session");
 
-      // Reset login form fields and states
       document.getElementById('email').value = "";
       document.getElementById('password').value = "";
       document.getElementById('otp-code').value = "";
