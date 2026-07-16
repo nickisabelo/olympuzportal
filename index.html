@@ -9,7 +9,6 @@
 </head>
 <body class="bg-slate-50 font-sans text-slate-800">
 
-  <!-- AUTHENTICATION DIALOG -->
   <div id="login-page" class="flex min-h-screen items-center justify-center px-4">
     <div class="w-full max-w-md p-8 bg-white rounded-xl shadow-xl border border-slate-100">
       <div class="text-center mb-8">
@@ -19,7 +18,6 @@
         </p>
       </div>
       
-      <!-- Primary Credentials Block -->
       <div id="credentials-form" class="space-y-4">
         <div>
           <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Corporate Email</label>
@@ -32,7 +30,6 @@
         <button onclick="handleLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg font-bold shadow transition mt-2">Sign In</button>
       </div>
 
-      <!-- Verification OTP Block (Initially Hidden) -->
       <div id="otp-form" class="space-y-4 hidden">
         <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl text-xs text-indigo-950 mb-2">
           <strong>New Device/24hr Verification Required:</strong>
@@ -50,7 +47,6 @@
     </div>
   </div>
 
-  <!-- MAIN DASHBOARD CONTENT GRID -->
   <div id="app-page" class="hidden min-h-screen flex flex-col">
     <header class="bg-indigo-900 text-white px-6 py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 shadow-md">
       <div class="flex flex-col">
@@ -76,7 +72,6 @@
 
       <main class="flex-1 p-6 md:p-8 overflow-y-auto">
         
-        <!-- MODULE: TIME CLOCK -->
         <section id="attendance-sec" class="hidden space-y-6 max-w-4xl">
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-6">
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-100 pb-4 gap-4">
@@ -108,7 +103,6 @@
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100"><h3 class="text-md font-bold text-slate-900 border-b pb-2 mb-3">My Personal Attendance History</h3><div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Logged Date</th><th class="p-3">Clock In</th><th class="p-3">Clock Out</th><th class="p-3">Break Duration</th><th class="p-3">Lunch Duration</th><th class="p-3">Exception Status</th></tr></thead><tbody id="personal-history-table" class="divide-y divide-slate-50"></tbody></table></div></div>
         </section>
 
-        <!-- MODULE: FILE LEAVE -->
         <section id="leave-request-sec" class="hidden space-y-6 max-w-4xl">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4">
@@ -132,7 +126,6 @@
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100"><h3 class="text-md font-bold text-slate-900 border-b pb-2 mb-3">My Personal Leave Queue Ledger</h3><div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Requested Date</th><th class="p-3">Reason Description</th><th class="p-3">Approval Status</th><th class="p-3">Management Comments</th></tr></thead><tbody id="personal-leave-table" class="divide-y divide-slate-50"></tbody></table></div></div>
         </section>
 
-        <!-- NEW MODULE: REST DAY OVERTIME & COVER ABSENT REQUEST PANEL -->
         <section id="restday-request-sec" class="hidden space-y-6 max-w-5xl">
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4 max-w-md">
             <h2 class="text-xl font-bold text-slate-800">📅 Rest Day Work Authorization</h2>
@@ -165,7 +158,6 @@
           </div>
         </section>
 
-        <!-- MODULE: TASK DONE REPORT -->
         <section id="task-report-sec" class="hidden space-y-6 max-w-6xl">
           <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
@@ -193,7 +185,6 @@
           </div>
         </section>
 
-        <!-- MODULE: CREDENTIALS MANAGEMENT -->
         <section id="account-settings-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 max-w-md space-y-4">
           <h2 class="text-xl font-bold text-slate-800 border-b pb-2">⚙️ Manage Account Security</h2>
           <div class="space-y-3">
@@ -205,7 +196,6 @@
           <p id="self-pass-feedback" class="text-center font-bold text-xs p-2 rounded hidden"></p>
         </section>
 
-        <!-- MODULE: ADMIN CONTROL - PAYROLL DISBURSEMENT -->
         <section id="admin-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-6 max-w-2xl">
           <h2 class="text-xl font-bold text-indigo-700 border-b pb-2">Admin Control: Issue Fixed Weekly Payment</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -221,16 +211,13 @@
           <p id="payroll-feedback" class="text-emerald-600 bg-emerald-50 text-xs font-bold p-2 rounded-lg hidden"></p>
         </section>
 
-        <!-- MODULE: TASKER PAYMENTS LEDGER -->
         <section id="user-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4 max-w-7xl">
           <h2 class="text-xl font-bold text-slate-800 border-b pb-2">My Service Payment Ledgers</h2>
           <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Service Period</th><th class="p-3">Weeks Logged</th><th class="p-3">Weekly Rate</th><th class="p-3">Gross Base</th><th class="p-3">Applied Deductions</th><th class="p-3 font-bold text-indigo-700">Net Credited Revenue</th><th class="p-3">Operational Remarks</th><th class="p-3 text-center">Status & Review Actions</th></tr></thead><tbody id="user-payroll-table" class="divide-y divide-slate-50"></tbody></table></div>
         </section>
 
-        <!-- MODULE: SYSTEM ADMINISTRATION PANELS -->
         <section id="admin-sec" class="hidden space-y-8 max-w-6xl">
           
-          <!-- Filtration Matrix Controls -->
           <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 space-y-4">
             <h3 class="text-sm font-bold uppercase tracking-wider text-indigo-900">🔍 Real-Time Ledger Filtration Control</h3>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -246,7 +233,6 @@
             <div class="flex justify-end"><button onclick="clearGlobalFilters()" class="text-xs bg-slate-100 text-slate-600 font-bold px-3 py-1.5 rounded-lg">Reset Filters</button></div>
           </div>
 
-          <!-- TASKER CREATION ENGINE BLOCK -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4">
             <h2 class="text-xl font-bold text-indigo-900">👥 Add New Tasker (With Dynamic Scheduling Targets)</h2>
             <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
@@ -264,7 +250,6 @@
               <div><label class="font-bold text-slate-600">Days Off Allotment</label><input type="text" id="add-u-off" class="w-full p-2 border rounded mt-1 bg-slate-50" value="Saturday, Sunday"></div>
               <div><label class="font-bold text-slate-600">Leave Balance</label><input type="number" id="add-u-leaves" class="w-full p-2 border rounded mt-1 bg-slate-50" value="15"></div>
               
-              <!-- Target break configurations -->
               <div><label class="font-bold text-slate-600 text-rose-600">Lunch Target (Optional)</label><input type="time" id="add-u-lunch" class="w-full p-2 border rounded mt-1 bg-slate-50"></div>
               <div><label class="font-bold text-slate-600 text-rose-600">First Break (Optional)</label><input type="time" id="add-u-break1" class="w-full p-2 border rounded mt-1 bg-slate-50"></div>
               <div><label class="font-bold text-slate-600 text-rose-600">Second Break (Optional)</label><input type="time" id="add-u-break2" class="w-full p-2 border rounded mt-1 bg-slate-50"></div>
@@ -274,12 +259,10 @@
             <p id="admin-create-feedback" class="text-xs font-bold p-2 rounded hidden"></p>
           </div>
 
-          <!-- NEW ADMIN PANEL: SCHEDULING CONTROL STATION -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4">
             <h2 class="text-xl font-bold text-indigo-900 border-b pb-2">📅 Tasker Scheduling Override Command Center</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
               
-              <!-- Override controls -->
               <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
                 <h3 class="text-sm font-bold text-slate-800">Assign Schedule Updates</h3>
                 <div>
@@ -305,7 +288,6 @@
                 </div>
               </div>
 
-              <!-- View current allocations -->
               <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
                 <h3 class="text-sm font-bold text-slate-800">Configured Master Schedules</h3>
                 <div class="overflow-y-auto max-h-[300px] divide-y divide-slate-100" id="current-schedule-audit-list">
@@ -315,7 +297,6 @@
             </div>
           </div>
 
-          <!-- NEW ADMIN PANEL: LATE BREAK EXCEPTION MANAGEMENT QUEUE -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-slate-800 border-b pb-2 mb-3">⚠️ Late Lunch, Break, & Meal Exception Approvals Queue</h2>
             <div class="overflow-x-auto rounded-lg border border-slate-100">
@@ -332,13 +313,11 @@
             </div>
           </div>
 
-          <!-- Attendance Logs Monitor -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-slate-800">Master Attendance & Overage Dashboard</h2>
             <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Name</th><th class="p-3">Date/Type</th><th class="p-3">Clock In</th><th class="p-3">Clock Out</th><th class="p-3">Break Duration</th><th class="p-3">Lunch Duration</th><th class="p-3">Exception Status</th></tr></thead><tbody id="admin-attendance-table" class="divide-y divide-slate-50"></tbody></table></div>
           </div>
 
-          <!-- NEW ADMIN ACTION PORTAL: REST DAY WORK AUTHORIZATION MANAGEMENT OVERRIDES -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-slate-800 border-b pb-2 mb-3">Master Rest Day OT / Absence Coverage Queue</h2>
             <div class="overflow-x-auto rounded-lg border border-slate-100">
@@ -355,26 +334,22 @@
             </div>
           </div>
 
-          <!-- MODULE: ABSENTEE SELECTION & HISTORICAL LEDGER -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4">
             <h2 class="text-xl font-bold text-rose-800">📋 Master Absences Historical Database Registry</h2>
             <p class="text-xs text-slate-400">View registered day omissions inside the database. Admins can permanently remove or undo an absence here.</p>
             <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">User ID</th><th class="p-3">Tasker Name</th><th class="p-3">Date of Absence</th><th class="p-3">Verification Entry Mode</th><th class="p-3 text-center">Actions Control</th></tr></thead><tbody id="admin-explicit-absents-table" class="divide-y divide-slate-50"></tbody></table></div>
           </div>
 
-          <!-- Disbursements Ledger History -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-indigo-900">Master Service Payments Distribution History</h2>
             <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Tasker Name</th><th class="p-3">User ID</th><th class="p-3">Service Period</th><th class="p-3">Weeks</th><th class="p-3">Gross Base</th><th class="p-3">Deductions</th><th class="p-3 font-bold text-indigo-600">Net Distributed</th><th class="p-3">Operational Remarks</th><th class="p-3 font-bold text-center">Review Status</th><th class="p-3 max-w-xs">Dispute Notes / Resolution Log</th></tr></thead><tbody id="admin-payments-history-table" class="divide-y divide-slate-50"></tbody></table></div>
           </div>
 
-          <!-- Leaves Monitor Queue -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-slate-800">Corporate Leave Action & Approval Queue</h2>
             <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Tasker</th><th class="p-3">Target Date</th><th class="p-3">Reason Statement</th><th class="p-3">Current Status</th><th class="p-3 text-center">Actions Ledger Control</th></tr></thead><tbody id="admin-leave-table" class="divide-y divide-slate-50"></tbody></table></div>
           </div>
 
-          <!-- Exception Roster Actions -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-slate-800">Workday Exceptions & Absence Metrics</h2>
             <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">User ID</th><th class="p-3">Tasker Name</th><th class="p-3">Scheduled Days Off</th><th class="p-3 text-indigo-700">Half Day Schedule</th><th class="p-3 font-bold text-rose-600">Total Absences</th><th class="p-3 text-center">Security Overrides & Actions</th></tr></thead><tbody id="admin-absence-table" class="divide-y divide-slate-50"></tbody></table></div>
@@ -528,21 +503,29 @@
       document.getElementById('app-page').classList.remove('hidden');
 
       document.getElementById('user-display').innerText = `${currentUser.name} | ${currentUser.role}`;
-      document.getElementById('sched-shift').innerText = `${currentUser.schedule.shiftStart} to ${currentUser.schedule.shiftEnd}`;
-      document.getElementById('stat-leave-allow').innerText = currentUser.schedule.leaveAllowance;
-      document.getElementById('stat-leave-remain').innerText = `${currentUser.schedule.remainingLeaves} days`;
       
-      if (currentUser.schedule.isHalfDayToday) {
-        document.getElementById('halfday-banner').classList.remove('hidden');
-        document.getElementById('sched-limits').innerText = `Break: ${currentUser.schedule.maxBreak}m | Lunch: N/A (Half Day) | Days Off: ${currentUser.schedule.daysOff}`;
-        document.getElementById('btn-lunch-s').className = 'hidden';
-        document.getElementById('btn-lunch-e').className = 'hidden';
+      if (currentUser.role === 'Admin') {
+        document.getElementById('sched-shift').innerText = "N/A (Admin Duty)";
+        document.getElementById('sched-limits').innerText = "Flexi Hours | Admin Level Permissions Active";
+        document.getElementById('stat-leave-allow').innerText = "N/A";
+        document.getElementById('stat-leave-remain').innerText = "N/A";
+        document.getElementById('admin-dash-btn').classList.remove('hidden');
       } else {
-        document.getElementById('halfday-banner').classList.add('hidden');
-        document.getElementById('sched-limits').innerText = `Break: ${currentUser.schedule.maxBreak}m | Lunch: ${currentUser.schedule.maxLunch}m | Days Off: ${currentUser.schedule.daysOff}`;
+        document.getElementById('sched-shift').innerText = `${currentUser.schedule.shiftStart} to ${currentUser.schedule.shiftEnd}`;
+        document.getElementById('stat-leave-allow').innerText = currentUser.schedule.leaveAllowance;
+        document.getElementById('stat-leave-remain').innerText = `${currentUser.schedule.remainingLeaves} days`;
+        
+        if (currentUser.schedule.isHalfDayToday) {
+          document.getElementById('halfday-banner').classList.remove('hidden');
+          document.getElementById('sched-limits').innerText = `Break: ${currentUser.schedule.maxBreak}m | Lunch: N/A (Half Day) | Days Off: ${currentUser.schedule.daysOff}`;
+          document.getElementById('btn-lunch-s').className = 'hidden';
+          document.getElementById('btn-lunch-e').className = 'hidden';
+        } else {
+          document.getElementById('halfday-banner').classList.add('hidden');
+          document.getElementById('sched-limits').innerText = `Break: ${currentUser.schedule.maxBreak}m | Lunch: ${currentUser.schedule.maxLunch}m | Days Off: ${currentUser.schedule.daysOff}`;
+        }
       }
       
-      if (currentUser.role === 'Admin') document.getElementById('admin-dash-btn').classList.remove('hidden');
       showSection('attendance-sec');
       resetInactivityTracker();
 
@@ -613,7 +596,7 @@
         break1: break1,
         break2: break2,
         meal: meal,
-        date: new Date().toLocaleDateString('en-US') // used for temporary schedules
+        date: new Date().toLocaleDateString('en-US')
       };
 
       callAPI('POST', '', payload, function(res) {
@@ -729,7 +712,7 @@
     }
 
     function executeAdminOverridePassword(targetUid) {
-      const newPass = prompt(`Enter new secure password override value for Tasker [${targetUid}]:`); if (!newPass || newPass.trim() === "") return;
+      const newPass = prompt("Enter override password value:"); if (!newPass || newPass.trim() === "") return;
       callAPI('POST', '', { action: "adminChangePassword", targetUserId: targetUid, newPassword: newPass }, function(res) { alert(res.message); });
     }
 
@@ -844,7 +827,7 @@
     }
 
     function executeUserDisputePayroll(payId) {
-      const reason = prompt("Provide reasons or calculation discrepancies notes:");
+      const reason = prompt("Provide calculation discrepancies notes:");
       if (reason === null) return; if (reason.trim() === "") { alert("Reason required."); return; }
       callAPI('POST', '', { action: "updatePayrollReviewStatus", payrollId: payId, status: "Disputed", disputeReason: reason }, function(res) {
         alert(res.message); fetchPersonalPayslips();
@@ -888,7 +871,6 @@
       dropdown.innerHTML = `<option value="ALL">-- Show All Taskers --</option>`;
       absencesArray.forEach(t => { dropdown.innerHTML += `<option value="${t.name}">${t.name} [${t.id}]</option>`; }); dropdown.value = savedValue;
 
-      // Populate Scheduling dropdown override targets
       const targetDrop = document.getElementById('sched-target-uid');
       targetDrop.innerHTML = '<option value="">-- Choose Target Tasker --</option>';
       absencesArray.forEach(t => { targetDrop.innerHTML += `<option value="${t.id}">${t.name} [${t.id}]</option>`; });
@@ -912,7 +894,6 @@
       
       pBody.innerHTML = ""; absBody.innerHTML = ""; lBody.innerHTML = ""; payBody.innerHTML = ""; explicitAbsBody.innerHTML = ""; rdBody.innerHTML = ""; excBody.innerHTML = ""; auditList.innerHTML = "";
 
-      // Render Schedule Audit List
       data.absences.forEach(u => {
         const ps = u.permanentSchedule;
         auditList.innerHTML += `<div class="py-2 flex justify-between items-center text-xs">
@@ -924,7 +905,6 @@
         </div>`;
       });
 
-      // Render Exceptions Table
       let filteredExceptions = data.breakExceptions.filter(row => {
         if (selectedTasker !== "ALL" && row.user_name !== selectedTasker) return false;
         return true;
