@@ -274,7 +274,7 @@
 
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-slate-800">Corporate Leave Action & Approval Queue</h2>
-            <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Tasker</th><th class="p-3">Target Date</th><th class="p-3">Reason Statement</th><th class="p-3">Current Status</th><th class="p-3 text-center">Actions Ledger Control</th></tr></thead><tbody id="admin-leave-table" class="divide-y divide-slate-50"></tbody></table></div>
+            <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Tasker</th><th class="p-3">Target Date</th><th class="p-3">Reason Statement</th><th class="p-3">Current Status</th><th class="p-3 text-center">Actions Ledger Control</th></tr></thead><tbody id="admin-leave-table" class="divide-y divide-slate-50"></tbody></table></div>
           </div>
 
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -495,7 +495,7 @@
     }
 
     // ==========================================
-    // ADMIN ACTION: REGISTER NEW TASKER
+    // ADMIN ACTION: REGISTER NEW TASKER (CORRECTED)
     // ==========================================
     async function executeAdminCreateUser() {
       // Clean inputs mapped from the actual HTML inputs
@@ -511,11 +511,19 @@
       // Select your correct feedback element card
       const fb = document.getElementById('admin-create-feedback');
 
-      const updateFeedback = (text, className, isHidden) => {
+      const updateFeedback = (text, classString, isHidden) => {
         if (!fb) return;
         fb.innerText = text || '';
+        
+        // RESET styles completely
         fb.className = 'text-xs font-bold p-2 rounded'; 
-        if (className) fb.classList.add(className);
+        
+        // FIX: Split classString by space and add them as individual tokens
+        if (classString) {
+          const classes = classString.split(' ').filter(c => c.trim() !== '');
+          classes.forEach(cls => fb.classList.add(cls));
+        }
+
         if (isHidden) {
           fb.classList.add('hidden');
         } else {
