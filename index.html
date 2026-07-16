@@ -735,11 +735,18 @@
       callAPI('POST', '', { action: "processLeaveAction", requestId: reqId, status: status, comment: comment }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
     }
 
+    // --- GENERIC FIXED UNTAG LOG ---
+    function executeAdminUntagAbsentLog(absentId, taskerName, dateStr) {
+      if(!confirm(`Remove manual absence override for ${taskerName} on ${dateStr}?`)) return;
+      callAPI('POST', '', { action: "adminUntagAbsent", absentId: absentId }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
+    }
+
     function executeAdminOverridePassword(targetUid) {
       const newPass = prompt("Enter override password value:"); if (!newPass || newPass.trim() === "") return;
       callAPI('POST', '', { action: "adminChangePassword", targetUserId: targetUid, newPassword: newPass }, function(res) { alert(res.message); });
     }
 
+    // --- RE-ADDED MISSING UNTAG ABSENT LOOPS ---
     function executeAdminRemoveUser(targetUid, targetName) {
       if (!confirm(`Are you certain you want to remove ${targetName} [${targetUid}]?`)) return;
       callAPI('POST', '', { action: "adminDeleteUser", targetUserId: targetUid }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
