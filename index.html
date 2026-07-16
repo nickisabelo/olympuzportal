@@ -420,6 +420,7 @@
       }, MAX_INACTIVITY_LIMIT);
     }
 
+    // Input handlers to track user actions
     ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(eventName => {
       document.addEventListener(eventName, () => {
         if (currentUser) resetInactivityTracker();
@@ -502,7 +503,7 @@
       document.getElementById('login-page').classList.add('hidden');
       document.getElementById('app-page').classList.remove('hidden');
 
-      document.getElementById('user-display').innerText = `${currentUser.name} | ${currentUser.role}`;
+      document.getElementById('user-display').innerText = currentUser.name + " | " + currentUser.role;
       
       if (currentUser.role === 'Admin') {
         document.getElementById('sched-shift').innerText = "N/A (Admin Duty)";
@@ -511,18 +512,18 @@
         document.getElementById('stat-leave-remain').innerText = "N/A";
         document.getElementById('admin-dash-btn').classList.remove('hidden');
       } else {
-        document.getElementById('sched-shift').innerText = `${currentUser.schedule.shiftStart} to ${currentUser.schedule.shiftEnd}`;
+        document.getElementById('sched-shift').innerText = currentUser.schedule.shiftStart + " to " + currentUser.schedule.shiftEnd;
         document.getElementById('stat-leave-allow').innerText = currentUser.schedule.leaveAllowance;
-        document.getElementById('stat-leave-remain').innerText = `${currentUser.schedule.remainingLeaves} days`;
+        document.getElementById('stat-leave-remain').innerText = currentUser.schedule.remainingLeaves + " days";
         
         if (currentUser.schedule.isHalfDayToday) {
           document.getElementById('halfday-banner').classList.remove('hidden');
-          document.getElementById('sched-limits').innerText = `Break: ${currentUser.schedule.maxBreak}m | Lunch: N/A (Half Day) | Days Off: ${currentUser.schedule.daysOff}`;
+          document.getElementById('sched-limits').innerText = "Break: " + currentUser.schedule.maxBreak + "m | Lunch: N/A (Half Day) | Days Off: " + currentUser.schedule.daysOff;
           document.getElementById('btn-lunch-s').className = 'hidden';
           document.getElementById('btn-lunch-e').className = 'hidden';
         } else {
           document.getElementById('halfday-banner').classList.add('hidden');
-          document.getElementById('sched-limits').innerText = `Break: ${currentUser.schedule.maxBreak}m | Lunch: ${currentUser.schedule.maxLunch}m | Days Off: ${currentUser.schedule.daysOff}`;
+          document.getElementById('sched-limits').innerText = "Break: " + currentUser.schedule.maxBreak + "m | Lunch: " + currentUser.schedule.maxLunch + "m | Days Off: " + currentUser.schedule.daysOff;
         }
       }
       
@@ -542,31 +543,33 @@
 
     function refreshUserTimers() {
       if (!currentUser) return;
-      callAPI('GET', `?action=getLiveUserStats&userId=${currentUser.id}`, null, function(stats) {
-        document.getElementById('stat-hours').innerText = `${stats.clockedHours} hrs`;
-        document.getElementById('stat-break').innerText = `${stats.breakMinutes} mins`;
-        document.getElementById('stat-lunch').innerText = `${stats.lunchMinutes} mins`;
+      callAPI('GET', "?action=getLiveUserStats&userId=" + currentUser.id, null, function(stats) {
+        document.getElementById('stat-hours').innerText = stats.clockedHours + " hrs";
+        document.getElementById('stat-break').innerText = stats.breakMinutes + " mins";
+        document.getElementById('stat-lunch').innerText = stats.lunchMinutes + " mins";
         
-        const histBody = document.getElementById('personal-history-table'); histBody.innerHTML = "";
+        const histBody = document.getElementById('personal-history-table'); 
+        histBody.innerHTML = "";
         stats.history.forEach(row => {
-          histBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 font-medium text-slate-900">${row.date}</td><td class="p-3 text-emerald-600">${row.timeIn}</td><td class="p-3 text-rose-600">${row.timeOut}</td><td class="p-3 text-slate-600">${row.breakText}</td><td class="p-3 text-slate-600">${row.lunchText}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${row.status === 'Late' ? 'bg-rose-50 text-rose-600':'bg-emerald-50 text-emerald-600'}">${row.status}</span></td></tr>`;
+          const badgeClass = row.status === 'Late' ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600';
+          histBody.innerHTML += '<tr class="border-b border-slate-100"><td class="p-3 font-medium text-slate-900">' + row.date + '</td><td class="p-3 text-emerald-600">' + row.timeIn + '</td><td class="p-3 text-rose-600">' + row.timeOut + '</td><td class="p-3 text-slate-600">' + row.breakText + '</td><td class="p-3 text-slate-600">' + row.lunchText + '</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ' + badgeClass + '">' + row.status + '</span></td></tr>';
         });
-        const leaveBody = document.getElementById('personal-leave-table'); leaveBody.innerHTML = "";
+
+        const leaveBody = document.getElementById('personal-leave-table'); 
+        leaveBody.innerHTML = "";
         stats.leaves.forEach(row => {
-          leaveBody.innerHTML += `<tr><td class="p-3 font-medium">${row.date}</td><td class="p-3 text-slate-600">${row.reason}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}">${row.status}</span></td><td class="p-3 text-slate-500 italic">${row.comment}</td></tr>`;
+          const statusClass = row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600';
+          leaveBody.innerHTML += '<tr><td class="p-3 font-medium">' + row.date + '</td><td class="p-3 text-slate-600">' + row.reason + '</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ' + statusClass + '">' + row.status + '</span></td><td class="p-3 text-slate-500 italic">' + row.comment + '</td></tr>';
         });
         
-        const rdBody = document.getElementById('personal-restday-table'); rdBody.innerHTML = "";
+        const rdBody = document.getElementById('personal-restday-table'); 
+        rdBody.innerHTML = "";
         if (stats.restDays.length === 0) {
-          rdBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-slate-400">No Rest Day requests found.</td></tr>`;
+          rdBody.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-slate-400">No Rest Day requests found.</td></tr>';
         } else {
           stats.restDays.forEach(row => {
-            rdBody.innerHTML += `<tr>
-              <td class="p-3 font-medium text-slate-900">${row.date}</td>
-              <td class="p-3 text-slate-600 whitespace-pre-wrap">${row.comments}</td>
-              <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-800'}">${row.status}</span></td>
-              <td class="p-3 text-slate-500 italic">${row.feedback}</td>
-            </tr>`;
+            const rc = row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : (row.status === 'Denied' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-800');
+            rdBody.innerHTML += '<tr><td class="p-3 font-medium text-slate-900">' + row.date + '</td><td class="p-3 text-slate-600 whitespace-pre-wrap">' + row.comments + '</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ' + rc + '">' + row.status + '</span></td><td class="p-3 text-slate-500 italic">' + row.feedback + '</td></tr>';
           });
         }
       });
@@ -607,7 +610,7 @@
 
     // --- EXCEPTION APPROVALS ---
     function resolveLateBreakException(exceptionId, verdict) {
-      const comment = prompt(`Enter optional review notes regarding this decision:`);
+      const comment = prompt("Enter optional review notes regarding this decision:");
       if (comment === null) return;
 
       callAPI('POST', '', {
@@ -669,9 +672,9 @@
       callAPI('GET', '?action=getAllTaskReports', null, function(records) {
         cachedPublicReports = records;
         const filterSelect = document.getElementById('public-filter-tasker'); const currentSelection = filterSelect.value;
-        filterSelect.innerHTML = `<option value="ALL">-- Show Everyone's Reports --</option>`;
+        filterSelect.innerHTML = '<option value="ALL">-- Show Everyone\'s Reports --</option>';
         const uniqueNames = [...new Set(records.map(r => r.name))].sort();
-        uniqueNames.forEach(name => { filterSelect.innerHTML += `<option value="${name}">${name}</option>`; });
+        uniqueNames.forEach(name => { filterSelect.innerHTML += '<option value="' + name + '">' + name + '</option>'; });
         filterSelect.value = currentSelection; renderFilteredPublicReports();
       });
     }
@@ -680,15 +683,9 @@
     function renderFilteredPublicReports() {
       const container = document.getElementById('public-reports-feed'); const selection = document.getElementById('public-filter-tasker').value;
       let items = cachedPublicReports; if (selection !== "ALL") { items = cachedPublicReports.filter(r => r.name === selection); }
-      container.innerHTML = ""; if (items.length === 0) { container.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs">No reports fit criteria.</div>`; return; }
+      container.innerHTML = ""; if (items.length === 0) { container.innerHTML = '<div class="text-center py-8 text-slate-400 text-xs">No reports fit criteria.</div>'; return; }
       items.forEach(row => {
-        container.innerHTML += `<div class="bg-white p-3.5 rounded-lg shadow-sm border border-slate-100 flex flex-col gap-1">
-          <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center text-xs gap-1">
-            <span class="font-bold text-indigo-700">${row.name} <span class="text-slate-400 font-mono font-normal">(${row.userId})</span></span>
-            <div class="flex items-center gap-1.5 flex-wrap"><span class="bg-slate-100 font-semibold px-2 py-0.5 rounded text-slate-500 text-[10px]">Work Date: ${row.date}</span><span class="bg-emerald-50 font-bold px-2 py-0.5 rounded text-emerald-700 text-[10px]">Sent: ${row.timestamp}</span></div>
-          </div>
-          <p class="text-xs text-slate-600 font-medium whitespace-pre-wrap mt-1 leading-relaxed border-t border-slate-50 pt-2">${row.summary}</p>
-        </div>`;
+        container.innerHTML += '<div class="bg-white p-3.5 rounded-lg shadow-sm border border-slate-100 flex flex-col gap-1"><div class="flex flex-col sm:flex-row sm:justify-between sm:items-center text-xs gap-1"><span class="font-bold text-indigo-700">' + row.name + ' <span class="text-slate-400 font-mono font-normal">(' + row.userId + ')</span></span><div class="flex items-center gap-1.5 flex-wrap"><span class="bg-slate-100 font-semibold px-2 py-0.5 rounded text-slate-500 text-[10px]">Work Date: ' + row.date + '</span><span class="bg-emerald-50 font-bold px-2 py-0.5 rounded text-emerald-700 text-[10px]">Sent: ' + row.timestamp + '</span></div></div><p class="text-xs text-slate-600 font-medium whitespace-pre-wrap mt-1 leading-relaxed border-t border-slate-50 pt-2">' + row.summary + '</p></div>';
       });
     }
 
@@ -731,13 +728,12 @@
     }
 
     function adminExecuteLeave(reqId, status) {
-      const comment = prompt(`Provide comments for decision mapping (${status}):`); if(comment === null) return; 
+      const comment = prompt("Provide comments for decision mapping (" + status + "):"); if(comment === null) return; 
       callAPI('POST', '', { action: "processLeaveAction", requestId: reqId, status: status, comment: comment }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
     }
 
-    // --- GENERIC FIXED UNTAG LOG ---
     function executeAdminUntagAbsentLog(absentId, taskerName, dateStr) {
-      if(!confirm(`Remove manual absence override for ${taskerName} on ${dateStr}?`)) return;
+      if(!confirm("Remove manual absence override for " + taskerName + " on " + dateStr + "?")) return;
       callAPI('POST', '', { action: "adminUntagAbsent", absentId: absentId }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
     }
 
@@ -746,17 +742,126 @@
       callAPI('POST', '', { action: "adminChangePassword", targetUserId: targetUid, newPassword: newPass }, function(res) { alert(res.message); });
     }
 
-    // --- RE-ADDED MISSING UNTAG ABSENT LOOPS ---
     function executeAdminRemoveUser(targetUid, targetName) {
-      if (!confirm(`Are you certain you want to remove ${targetName} [${targetUid}]?`)) return;
+      if (!confirm("Are you certain you want to remove " + targetName + " [" + targetUid + "]?")) return;
       callAPI('POST', '', { action: "adminDeleteUser", targetUserId: targetUid }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
     }
 
     function executeAdminTagUserAbsent(targetUid, targetName) {
-      const inputDate = prompt(`Manually tag ${targetName} [${targetUid}] as ABSENT.\nEnter target date (YYYY-MM-DD):`, new Date().toISOString().split('T')[0]);
+      const inputDate = prompt("Manually tag " + targetName + " [" + targetUid + "] as ABSENT.\nEnter target date (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
       if (!inputDate || inputDate.trim() === "") return;
       callAPI('POST', '', { action: "adminTagAbsent", targetUserId: targetUid, targetName: targetName, absentDate: inputDate }, function(res) {
         alert(res.message); if (res.success) fetchGlobalAdminLogs();
+      });
+    }
+
+    function renderFilteredGrids(data) {
+      const selectedTasker = document.getElementById('filter-tasker').value, fromDateVal = document.getElementById('filter-from-date').value, toDateVal = document.getElementById('filter-to-date').value;
+      const fromTime = fromDateVal ? new Date(fromDateVal).setHours(0,0,0,0) : null, toTime = toDateVal ? new Date(toDateVal).setHours(23,59,59,999) : null;
+      
+      const pBody = document.getElementById('admin-attendance-table');
+      const absBody = document.getElementById('admin-absence-table');
+      const lBody = document.getElementById('admin-leave-table');
+      const payBody = document.getElementById('admin-payments-history-table');
+      const explicitAbsBody = document.getElementById('admin-explicit-absents-table');
+      const rdBody = document.getElementById('admin-restday-table');
+      const excBody = document.getElementById('admin-exceptions-table');
+      const auditList = document.getElementById('current-schedule-audit-list');
+      
+      pBody.innerHTML = ""; absBody.innerHTML = ""; lBody.innerHTML = ""; payBody.innerHTML = ""; explicitAbsBody.innerHTML = ""; rdBody.innerHTML = ""; excBody.innerHTML = ""; auditList.innerHTML = "";
+
+      data.absences.forEach(u => {
+        const ps = u.permanentSchedule;
+        auditList.innerHTML += '<div class="py-2 flex justify-between items-center text-xs"><div><div class="font-bold text-slate-800">' + u.name + ' <span class="text-slate-400 font-mono">(' + u.id + ')</span></div><div class="text-[10px] text-slate-500 mt-0.5">Shift: ' + ps.shiftStart + ' - ' + ps.shiftEnd + ' | Lunch: ' + (ps.lunch || 'None') + '</div><div class="text-[10px] text-indigo-600 font-medium">Breaks: ' + (ps.break1 || 'N/A') + ' | ' + (ps.break2 || 'N/A') + ' | Meal: ' + (ps.meal || 'N/A') + '</div></div></div>';
+      });
+
+      let filteredExceptions = data.breakExceptions.filter(row => {
+        if (selectedTasker !== "ALL" && row.user_name !== selectedTasker) return false;
+        return true;
+      });
+      if (filteredExceptions.length === 0) {
+        excBody.innerHTML = '<tr><td colspan="7" class="p-3 text-center text-slate-400">All taskers complied with break schedules.</td></tr>';
+      } else {
+        filteredExceptions.forEach(row => {
+          let controls = '<span class="text-slate-400 italic font-bold text-xs">' + row.status + '</span>';
+          if (row.status === "Pending Approval") {
+            controls = '<button onclick="resolveLateBreakException(\'' + row.id + '\', \'Approved\')" class="bg-emerald-600 text-white font-bold px-2 py-1 rounded text-[10px] mr-1">Approve</button><button onclick="resolveLateBreakException(\'' + row.id + '\', \'Declined\')" class="bg-rose-600 text-white font-bold px-2 py-1 rounded text-[10px]">Decline</button>';
+          }
+          const cs = row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : (row.status === 'Declined' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-800');
+          excBody.innerHTML += '<tr><td class="p-3 font-bold text-slate-900">' + row.user_name + '</td><td class="p-3 text-slate-600">' + row.date + '</td><td class="p-3 font-semibold text-indigo-700">' + row.break_type + '</td><td class="p-3 font-medium text-slate-500">' + row.scheduled_time + '</td><td class="p-3 font-bold text-rose-600">' + row.actual_time + '</td><td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ' + cs + '">' + row.status + '</span></td><td class="p-3 text-center whitespace-nowrap">' + controls + '</td></tr>';
+        });
+      }
+
+      let filteredAttendance = data.attendance.filter(row => {
+        if (selectedTasker !== "ALL" && row.name !== selectedTasker) return false;
+        if (fromTime || toTime) { const rowTime = new Date(row.date.replace(" (Half Day)", "")).getTime(); if (fromTime && rowTime < fromTime) return false; if (toTime && rowTime > toTime) return false; }
+        return true;
+      });
+      if(filteredAttendance.length === 0) { pBody.innerHTML = '<tr><td colspan="7" class="p-3 text-center text-slate-400">No records.</td></tr>'; }
+      else {
+        filteredAttendance.forEach(row => {
+          const bBadge = row.overBreak > 0 ? '<span class="bg-rose-50 text-rose-600 text-xs px-2 py-0.5 rounded font-bold ml-1">+' + row.overBreak + 'm</span>' : '';
+          const lBadge = row.overLunch > 0 ? '<span class="bg-rose-50 text-rose-600 text-xs px-2 py-0.5 rounded font-bold ml-1">+' + row.overLunch + 'm</span>' : '';
+          const statusClass = row.status.startsWith('On Time') ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600';
+          pBody.innerHTML += '<tr class="border-b border-slate-100"><td class="p-3 font-medium text-slate-900">' + row.name + '</td><td class="p-3 text-slate-500">' + row.date + '</td><td class="p-3 text-emerald-600 font-medium">' + row.timeIn + '</td><td class="p-3 text-rose-600 font-medium">' + row.timeOut + '</td><td class="p-3 text-slate-600">' + row.breakText + ' ' + bBadge + '</td><td class="p-3 text-slate-600">' + row.lunchText + ' ' + lBadge + '</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ' + statusClass + '">' + row.status + '</span></td></tr>';
+        });
+      }
+
+      let filteredExplicitAbsents = data.explicitAbsents.filter(row => {
+        if (selectedTasker !== "ALL" && row.name !== selectedTasker) return false;
+        if (fromTime || toTime) { const rowTime = new Date(row.date).getTime(); if (fromTime && rowTime < fromTime) return false; if (toTime && rowTime > toTime) return false; }
+        return true;
+      });
+      if (filteredExplicitAbsents.length === 0) { explicitAbsBody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-slate-400">No records found.</td></tr>'; }
+      else {
+        filteredExplicitAbsents.forEach(row => {
+          explicitAbsBody.innerHTML += '<tr class="border-b border-slate-100"><td class="p-3 text-slate-500">' + row.userId + '</td><td class="p-3 font-bold">' + row.name + '</td><td class="p-3 text-rose-600 font-semibold">' + row.date + '</td><td class="p-3 italic text-xs">' + row.type + '</td><td class="p-3 text-center"><button onclick="executeAdminUntagAbsentLog(\'' + row.absentId + '\', \'' + row.name + '\', \'' + row.date + '\')" class="text-[11px] bg-slate-100 text-slate-600 font-bold px-2 py-1 rounded border transition">Remove</button></td></tr>';
+        });
+      }
+
+      let filteredPayments = data.payments.filter(row => { return !(selectedTasker !== "ALL" && row.name !== selectedTasker); });
+      if(filteredPayments.length === 0) { payBody.innerHTML = '<tr><td colspan="10" class="p-3 text-center text-slate-400">No payout logs.</td></tr>'; }
+      else {
+        filteredPayments.forEach(row => {
+          let statusBadge = row.status === "Acknowledged" || row.status === "Settled & Adjusted" ? '<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[11px]">✓ ' + row.status + '</span>' : '<span class="bg-amber-100 text-amber-800 font-medium px-2 py-0.5 rounded text-[11px]">Unreviewed</span>';
+          payBody.innerHTML += '<tr class="border-b border-slate-100 hover:bg-slate-50/50 transition"><td class="p-3 font-bold text-slate-900">' + row.name + '</td><td class="p-3 font-mono text-xs text-slate-500">' + row.userId + '</td><td class="p-3 text-indigo-700 text-xs">' + row.period + '</td><td class="p-3 text-slate-600">' + row.weeks + ' wks</td><td class="p-3">₱' + row.gross.toFixed(2) + '</td><td class="p-3 text-rose-600">-₱' + row.deductions.toFixed(2) + '</td><td class="p-3 font-black text-emerald-600">₱' + row.net.toFixed(2) + '</td><td class="p-3 italic max-w-xs truncate">' + row.remarks + '</td><td class="p-3 text-center">' + statusBadge + '</td><td class="p-3 text-xs max-w-xs break-words">' + (row.disputeReason || "-") + '</td></tr>';
+        });
+      }
+
+      let filteredRestDays = data.restDays.filter(row => {
+        if (selectedTasker !== "ALL" && row.name !== selectedTasker) return false;
+        return true;
+      });
+      if (filteredRestDays.length === 0) {
+        rdBody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-slate-400">Queue clean.</td></tr>';
+      } else {
+        filteredRestDays.forEach(row => {
+          let controls = '<span class="text-slate-400 italic text-xs">Evaluated</span>';
+          if (row.status === "Pending") {
+            controls = '<button onclick="executeAdminMakeRestDayDecision(\'' + row.requestId + '\', \'Approved\')" class="bg-emerald-600 text-white font-bold text-[11px] px-2 py-0.5 rounded mr-1">Approve</button><button onclick="executeAdminMakeRestDayDecision(\'' + row.requestId + '\', \'Denied\')" class="bg-rose-600 text-white font-bold text-[11px] px-2 py-0.5 rounded">Deny</button>';
+          }
+          const rc = row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600';
+          rdBody.innerHTML += '<tr class="border-b border-slate-100"><td class="p-3 font-bold text-slate-900">' + row.name + '</td><td class="p-3 text-indigo-700 font-medium">' + row.date + '</td><td class="p-3 text-slate-600 text-xs">' + row.comments + '</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ' + rc + '">' + row.status + '</span></td><td class="p-3 text-center whitespace-nowrap">' + controls + '</td></tr>';
+        });
+      }
+
+      data.absences.filter(r => !(selectedTasker !== "ALL" && r.name !== selectedTasker)).forEach(row => {
+        const missClass = row.absents > 0 ? 'text-rose-600 bg-rose-50/30' : 'text-emerald-600';
+        absBody.innerHTML += '<tr class="border-b border-slate-100"><td class="p-3 text-slate-500">' + row.id + '</td><td class="p-3 font-medium text-slate-900">' + row.name + '</td><td class="p-3 text-slate-500">' + row.daysOff + '</td><td class="p-3 text-indigo-600">' + row.halfDay + '</td><td class="p-3 font-black ' + missClass + '">' + row.absents + ' days missed</td><td class="p-3 text-center space-x-1 whitespace-nowrap"><button onclick="executeAdminTagUserAbsent(\'' + row.id + '\', \'' + row.name + '\')" class="text-xs bg-rose-600 text-white font-bold px-2 py-1 rounded">Tag Absent</button><button onclick="executeAdminOverridePassword(\'' + row.id + '\')" class="text-xs bg-indigo-50 text-indigo-700 font-semibold px-2 py-1 rounded border">Reset Pass</button><button onclick="executeAdminRemoveUser(\'' + row.id + '\', \'' + row.name + '\')" class="text-xs bg-rose-50 text-rose-600 font-bold px-2 py-1 rounded border">Purge</button></td></tr>';
+      });
+
+      let filteredLeaves = data.leaves.filter(row => {
+        if (selectedTasker !== "ALL" && row.name !== selectedTasker) return false;
+        return true;
+      });
+      if(filteredLeaves.length === 0) { lBody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-slate-400">Leave request clean queue.</td></tr>'; }
+      filteredLeaves.forEach(row => {
+        let controls = '<span class="text-slate-400 italic text-xs">Closed Logs</span>';
+        if (row.status === "Pending") {
+          controls = '<button onclick="adminExecuteLeave(\'' + row.id + '\',\'Approved\')" class="bg-emerald-600 text-white font-bold text-xs px-2.5 py-1 rounded mr-1">Approve</button><button onclick="adminExecuteLeave(\'' + row.id + '\',\'Denied\')" class="bg-rose-600 text-white font-bold text-xs px-2.5 py-1 rounded">Deny</button>';
+        }
+        const statusClass = row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600';
+        lBody.innerHTML += '<tr class="border-b border-slate-100"><td class="p-3 font-medium">' + row.name + '</td><td class="p-3 text-slate-500">' + row.date + '</td><td class="p-3 text-slate-600">' + row.reason + '</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ' + statusClass + '">' + row.status + '</span></td><td class="p-3 text-center">' + controls + '</td></tr>';
       });
     }
 
@@ -802,7 +907,7 @@
       try {
         updateFeedback("Creating profile inside SQL database...", "bg-amber-50 text-amber-600", false);
 
-        const response = await fetch(`${API_URL}`, {
+        const response = await fetch(API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -866,26 +971,22 @@
     }
 
     function fetchPersonalPayslips() {
-      callAPI('GET', `?action=getUserPayroll&userId=${currentUser.id}`, null, function(records) {
+      callAPI('GET', "?action=getUserPayroll&userId=" + currentUser.id, null, function(records) {
         const tbody = document.getElementById('user-payroll-table'); tbody.innerHTML = "";
-        if(records.length === 0) { tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400">No payout statements.</td></tr>`; return; }
+        if(records.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-400">No payout statements.</td></tr>'; return; }
         records.forEach(row => { 
           let statusBadge = ""; let actionsHtml = "";
           if (row.status === "Acknowledged" || row.status === "Settled & Adjusted") {
-            statusBadge = `<span class="bg-emerald-50 text-emerald-700 font-bold px-2 py-1 rounded text-xs">✓ ${row.status}</span>`;
-            actionsHtml = `<span class="text-slate-400 italic text-xs">Closed</span>`;
+            statusBadge = '<span class="bg-emerald-50 text-emerald-700 font-bold px-2 py-1 rounded text-xs">✓ ' + row.status + '</span>';
+            actionsHtml = '<span class="text-slate-400 italic text-xs">Closed</span>';
           } else if (row.status === "Dispute Declined") {
-            statusBadge = `<span class="bg-rose-50 text-rose-700 font-bold px-2 py-1 rounded text-xs block text-center">⚠ Dispute Declined</span>`;
-            actionsHtml = `<button onclick="executeUserAcknowledgePayroll('${row.payrollId}')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-2 py-1 rounded shadow-sm mr-1 transition">Accept</button>`;
+            statusBadge = '<span class="bg-rose-50 text-rose-700 font-bold px-2 py-1 rounded text-xs block text-center">⚠ Dispute Declined</span>';
+            actionsHtml = '<button onclick="executeUserAcknowledgePayroll(\'' + row.payrollId + '\')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-2 py-1 rounded shadow-sm mr-1 transition">Accept</button>';
           } else {
-            statusBadge = `<span class="bg-amber-50 text-amber-700 font-bold px-2 py-1 rounded text-xs">Pending Review</span>`;
-            actionsHtml = `<button onclick="executeUserAcknowledgePayroll('${row.payrollId}')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-2 py-1 rounded shadow-sm mr-1 transition">Accept</button>
-                           <button onclick="executeUserDisputePayroll('${row.payrollId}')" class="bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold px-2 py-1 rounded shadow-sm transition">Dispute</button>`;
+            statusBadge = '<span class="bg-amber-50 text-amber-700 font-bold px-2 py-1 rounded text-xs">Pending Review</span>';
+            actionsHtml = '<button onclick="executeUserAcknowledgePayroll(\'' + row.payrollId + '\')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-2 py-1 rounded shadow-sm mr-1 transition">Accept</button><button onclick="executeUserDisputePayroll(\'' + row.payrollId + '\')" class="bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold px-2 py-1 rounded shadow-sm transition">Dispute</button>';
           }
-          tbody.innerHTML += `<tr class="hover:bg-slate-50/50 transition">
-            <td class="p-3 font-medium">${row.period}</td><td class="p-3">${row.weeks} wks</td><td class="p-3">₱${row.rate.toFixed(2)}</td><td class="p-3">₱${row.gross.toFixed(2)}</td><td class="p-3 text-rose-600">-₱${row.deductions.toFixed(2)}</td><td class="p-3 font-bold text-emerald-600">₱${row.net.toFixed(2)}</td><td class="p-3 text-slate-500 italic max-w-xs truncate">${row.remarks}</td>
-            <td class="p-3 text-center">${actionsHtml}<div class="mt-1.5">${statusBadge}</div></td>
-          </tr>`; 
+          tbody.innerHTML += '<tr class="hover:bg-slate-50/50 transition"><td class="p-3 font-medium">' + row.period + '</td><td class="p-3">' + row.weeks + ' wks</td><td class="p-3">₱' + row.rate.toFixed(2) + '</td><td class="p-3">₱' + row.gross.toFixed(2) + '</td><td class="p-3 text-rose-600">-₱' + row.deductions.toFixed(2) + '</td><td class="p-3 font-bold text-emerald-600">₱' + row.net.toFixed(2) + '</td><td class="p-3 text-slate-500 italic max-w-xs truncate">' + row.remarks + '</td><td class="p-3 text-center">' + actionsHtml + '<div class="mt-1.5">' + statusBadge + '</div></td></tr>'; 
         });
       });
     }
@@ -899,174 +1000,16 @@
 
     function populateTaskerDropdownOptions(absencesArray) {
       const dropdown = document.getElementById('filter-tasker'); const savedValue = dropdown.value;
-      dropdown.innerHTML = `<option value="ALL">-- Show All Taskers --</option>`;
-      absencesArray.forEach(t => { dropdown.innerHTML += `<option value="${t.name}">${t.name} [${t.id}]</option>`; }); dropdown.value = savedValue;
+      dropdown.innerHTML = '<option value="ALL">-- Show All Taskers --</option>';
+      absencesArray.forEach(t => { dropdown.innerHTML += '<option value="' + t.name + '">' + t.name + ' [' + t.id + ']</option>'; }); dropdown.value = savedValue;
 
       const targetDrop = document.getElementById('sched-target-uid');
       targetDrop.innerHTML = '<option value="">-- Choose Target Tasker --</option>';
-      absencesArray.forEach(t => { targetDrop.innerHTML += `<option value="${t.id}">${t.name} [${t.id}]</option>`; });
+      absencesArray.forEach(t => { targetDrop.innerHTML += '<option value="' + t.id + '">' + t.name + ' [' + t.id + ']</option>'; });
     }
 
     function applyGlobalFilters() { if (cachedAdminMasterData) renderFilteredGrids(cachedAdminMasterData); }
     function clearGlobalFilters() { document.getElementById('filter-tasker').value = "ALL"; document.getElementById('filter-from-date').value = ""; document.getElementById('filter-to-date').value = ""; if (cachedAdminMasterData) renderFilteredGrids(cachedAdminMasterData); }
-
-    function renderFilteredGrids(data) {
-      const selectedTasker = document.getElementById('filter-tasker').value, fromDateVal = document.getElementById('filter-from-date').value, toDateVal = document.getElementById('filter-to-date').value;
-      const fromTime = fromDateVal ? new Date(fromDateVal).setHours(0,0,0,0) : null, toTime = toDateVal ? new Date(toDateVal).setHours(23,59,59,999) : null;
-      
-      const pBody = document.getElementById('admin-attendance-table');
-      const absBody = document.getElementById('admin-absence-table');
-      const lBody = document.getElementById('admin-leave-table');
-      const payBody = document.getElementById('admin-payments-history-table');
-      const explicitAbsBody = document.getElementById('admin-explicit-absents-table');
-      const rdBody = document.getElementById('admin-restday-table');
-      const excBody = document.getElementById('admin-exceptions-table');
-      const auditList = document.getElementById('current-schedule-audit-list');
-      
-      pBody.innerHTML = ""; absBody.innerHTML = ""; lBody.innerHTML = ""; payBody.innerHTML = ""; explicitAbsBody.innerHTML = ""; rdBody.innerHTML = ""; excBody.innerHTML = ""; auditList.innerHTML = "";
-
-      data.absences.forEach(u => {
-        const ps = u.permanentSchedule;
-        auditList.innerHTML += `<div class="py-2 flex justify-between items-center text-xs">
-          <div>
-            <div class="font-bold text-slate-800">${u.name} <span class="text-slate-400 font-mono">(${u.id})</span></div>
-            <div class="text-[10px] text-slate-500 mt-0.5">Shift: ${ps.shiftStart} - ${ps.shiftEnd} | Lunch: ${ps.lunch || 'None'}</div>
-            <div class="text-[10px] text-indigo-600 font-medium">Breaks: ${ps.break1 || 'N/A'} | ${ps.break2 || 'N/A'} | Meal: ${ps.meal || 'N/A'}</div>
-          </div>
-        </div>`;
-      });
-
-      let filteredExceptions = data.breakExceptions.filter(row => {
-        if (selectedTasker !== "ALL" && row.user_name !== selectedTasker) return false;
-        return true;
-      });
-      if (filteredExceptions.length === 0) {
-        excBody.innerHTML = `<tr><td colspan="7" class="p-3 text-center text-slate-400">All taskers complied with break schedules.</td></tr>`;
-      } else {
-        filteredExceptions.forEach(row => {
-          let controls = `<span class="text-slate-400 italic font-bold text-xs">${row.status}</span>`;
-          if (row.status === "Pending Approval") {
-            controls = `
-              <button onclick="resolveLateBreakException('${row.id}', 'Approved')" class="bg-emerald-600 text-white font-bold px-2 py-1 rounded text-[10px] mr-1">Approve</button>
-              <button onclick="resolveLateBreakException('${row.id}', 'Declined')" class="bg-rose-600 text-white font-bold px-2 py-1 rounded text-[10px]">Decline</button>
-            `;
-          }
-          excBody.innerHTML += `<tr>
-            <td class="p-3 font-bold text-slate-900">${row.user_name}</td>
-            <td class="p-3 text-slate-600">${row.date}</td>
-            <td class="p-3 font-semibold text-indigo-700">${row.break_type}</td>
-            <td class="p-3 font-medium text-slate-500">${row.scheduled_time}</td>
-            <td class="p-3 font-bold text-rose-600">${row.actual_time}</td>
-            <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : row.status === 'Declined' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-800'}">${row.status}</span></td>
-            <td class="p-3 text-center whitespace-nowrap">${controls}</td>
-          </tr>`;
-        });
-      }
-
-      let filteredAttendance = data.attendance.filter(row => {
-        if (selectedTasker !== "ALL" && row.name !== selectedTasker) return false;
-        if (fromTime || toTime) { const rowTime = new Date(row.date.replace(" (Half Day)", "")).getTime(); if (fromTime && rowTime < fromTime) return false; if (toTime && rowTime > toTime) return false; }
-        return true;
-      });
-      if(filteredAttendance.length === 0) { pBody.innerHTML = `<tr><td colspan="7" class="p-3 text-center text-slate-400">No records.</td></tr>`; }
-      else {
-        filteredAttendance.forEach(row => {
-          const bBadge = row.overBreak > 0 ? `<span class="bg-rose-50 text-rose-600 text-xs px-2 py-0.5 rounded font-bold ml-1">+${row.overBreak}m</span>` : '';
-          const lBadge = row.overLunch > 0 ? `<span class="bg-rose-50 text-rose-600 text-xs px-2 py-0.5 rounded font-bold ml-1">+${row.overLunch}m</span>` : '';
-          pBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 font-medium text-slate-900">${row.name}</td><td class="p-3 text-slate-500">${row.date}</td><td class="p-3 text-emerald-600 font-medium">${row.timeIn}</td><td class="p-3 text-rose-600 font-medium">${row.timeOut}</td><td class="p-3 text-slate-600">${row.breakText} ${bBadge}</td><td class="p-3 text-slate-600">${row.lunchText} ${lBadge}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${row.status.startsWith('On Time') ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}">${row.status}</span></td></tr>`;
-        });
-      }
-
-      let filteredExplicitAbsents = data.explicitAbsents.filter(row => {
-        if (selectedTasker !== "ALL" && row.name !== selectedTasker) return false;
-        if (fromTime || toTime) { const rowTime = new Date(row.date).getTime(); if (fromTime && rowTime < fromTime) return false; if (toTime && rowTime > toTime) return false; }
-        return true;
-      });
-      if (filteredExplicitAbsents.length === 0) { explicitAbsBody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-400">No records found.</td></tr>`; }
-      else {
-        filteredExplicitAbsents.forEach(row => {
-          explicitAbsBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 text-slate-500">${row.userId}</td><td class="p-3 font-bold">${row.name}</td><td class="p-3 text-rose-600 font-semibold">${row.date}</td><td class="p-3 italic text-xs">${row.type}</td><td class="p-3 text-center"><button onclick="executeAdminUntagAbsentLog('${row.absentId}', '${row.name}', '${row.date}')" class="text-[11px] bg-slate-100 text-slate-600 font-bold px-2 py-1 rounded border transition">Remove</button></td></tr>`;
-        });
-      }
-
-      let filteredPayments = data.payments.filter(row => { return !(selectedTasker !== "ALL" && row.name !== selectedTasker); });
-      if(filteredPayments.length === 0) { payBody.innerHTML = `<tr><td colspan="10" class="p-3 text-center text-slate-400">No payout logs.</td></tr>`; }
-      else {
-        filteredPayments.forEach(row => {
-          let statusBadge = row.status === "Acknowledged" || row.status === "Settled & Adjusted" ? `<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[11px]">✓ ${row.status}</span>` : `<span class="bg-amber-100 text-amber-800 font-medium px-2 py-0.5 rounded text-[11px]">Unreviewed</span>`;
-          payBody.innerHTML += `<tr class="border-b border-slate-100 hover:bg-slate-50/50 transition"><td class="p-3 font-bold text-slate-900">${row.name}</td><td class="p-3 font-mono text-xs text-slate-500">${row.userId}</td><td class="p-3 text-indigo-700 text-xs">${row.period}</td><td class="p-3 text-slate-600">${row.weeks} wks</td><td class="p-3">₱${row.gross.toFixed(2)}</td><td class="p-3 text-rose-600">-₱${row.deductions.toFixed(2)}</td><td class="p-3 font-black text-emerald-600">₱${row.net.toFixed(2)}</td><td class="p-3 italic max-w-xs truncate">${row.remarks}</td><td class="p-3 text-center">${statusBadge}</td><td class="p-3 text-xs max-w-xs break-words">${row.disputeReason || "-"}</td></tr>`;
-        });
-      }
-
-      let filteredRestDays = data.restDays.filter(row => {
-        if (selectedTasker !== "ALL" && row.name !== selectedTasker) return false;
-        return true;
-      });
-      if (filteredRestDays.length === 0) {
-        rdBody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-400">Queue clean.</td></tr>`;
-      } else {
-        filteredRestDays.forEach(row => {
-          let controls = `<span class="text-slate-400 italic text-xs">Evaluated</span>`;
-          if (row.status === "Pending") {
-            controls = `<button onclick="executeAdminMakeRestDayDecision('${row.requestId}', 'Approved')" class="bg-emerald-600 text-white font-bold text-[11px] px-2 py-0.5 rounded mr-1">Approve</button><button onclick="executeAdminMakeRestDayDecision('${row.requestId}', 'Denied')" class="bg-rose-600 text-white font-bold text-[11px] px-2 py-0.5 rounded">Deny</button>`;
-          }
-          rdBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 font-bold text-slate-900">${row.name}</td><td class="p-3 text-indigo-700 font-medium">${row.date}</td><td class="p-3 text-slate-600 text-xs">${row.comments}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}">${row.status}</span></td><td class="p-3 text-center whitespace-nowrap">${controls}</td></tr>`;
-        });
-      }
-
-      data.absences.filter(r => !(selectedTasker !== "ALL" && r.name !== selectedTasker)).forEach(row => {
-        absBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 text-slate-500">${row.id}</td><td class="p-3 font-medium text-slate-900">${row.name}</td><td class="p-3 text-slate-500">${row.daysOff}</td><td class="p-3 text-indigo-600">${row.halfDay}</td><td class="p-3 font-black ${row.absents > 0 ? 'text-rose-600 bg-rose-50/30' : 'text-emerald-600'}">${row.absents} days missed</td><td class="p-3 text-center space-x-1 whitespace-nowrap"><button onclick="executeAdminTagUserAbsent('${row.id}', '${row.name}')" class="text-xs bg-rose-600 text-white font-bold px-2 py-1 rounded">Tag Absent</button><button onclick="executeAdminOverridePassword('${row.id}')" class="text-xs bg-indigo-50 text-indigo-700 font-semibold px-2 py-1 rounded border">Reset Pass</button><button onclick="executeAdminRemoveUser('${row.id}', '${row.name}')" class="text-xs bg-rose-50 text-rose-600 font-bold px-2 py-1 rounded border">Purge</button></td></tr>`;
-      });
-
-      let filteredLeaves = data.leaves.filter(row => {
-        if (selectedTasker !== "ALL" && row.name !== selectedTasker) return false;
-        return true;
-      });
-      if(filteredLeaves.length === 0) { lBody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-400">Leave request clean queue.</td></tr>`; }
-      filteredLeaves.forEach(row => {
-        let controls = `<span class="text-slate-400 italic text-xs">Closed Logs</span>`;
-        if (row.status === "Pending") {
-          controls = `<button onclick="adminExecuteLeave('${row.id}','Approved')" class="bg-emerald-600 text-white font-bold text-xs px-2.5 py-1 rounded mr-1">Approve</button><button onclick="adminExecuteLeave('${row.id}','Denied')" class="bg-rose-600 text-white font-bold text-xs px-2.5 py-1 rounded">Deny</button>`;
-        }
-        lBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 font-medium">${row.name}</td><td class="p-3 text-slate-500">${row.date}</td><td class="p-3 text-slate-600">${row.reason}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}">${row.status}</span></td><td class="p-3 text-center">${controls}</td></tr>`;
-      });
-    }
-
-    function executeAdminMakeRestDayDecision(reqId, decisionStatus) {
-      const fbNotes = prompt(`Enter management feedback:`);
-      if (fbNotes === null) return;
-      callAPI('POST', '', { action: "processRestDayAction", requestId: reqId, status: decisionStatus, feedback: fbNotes }, function(res) {
-        alert(res.message); fetchGlobalAdminLogs();
-      });
-    }
-
-    function showSection(id) {
-      ['attendance-sec', 'leave-request-sec', 'restday-request-sec', 'task-report-sec', 'account-settings-sec', 'admin-payroll-sec', 'user-payroll-sec', 'admin-sec'].forEach(sec => document.getElementById(sec).className = 'hidden');
-      document.getElementById(id).className = id === 'account-settings-sec' ? 'bg-white p-6 rounded-xl shadow-sm border border-slate-100 max-w-md space-y-4' : 'space-y-6';
-      
-      if (id === 'task-report-sec') {
-        document.getElementById('rep-date').value = new Date().toISOString().split('T')[0];
-        document.getElementById('public-filter-tasker').value = "ALL"; loadPublicTaskReportsFeed();
-      }
-      if (id === 'admin-sec') fetchGlobalAdminLogs();
-      if (id === 'attendance-sec' || id === 'leave-request-sec' || id === 'account-settings-sec' || id === 'restday-request-sec') refreshUserTimers();
-    }
-
-    function logout() {
-      currentUser = null;
-      clearTimeout(inactivityTimer);
-      localStorage.removeItem("olympuz_active_session");
-
-      document.getElementById('email').value = "";
-      document.getElementById('password').value = "";
-      document.getElementById('otp-code').value = "";
-      document.getElementById('otp-form').classList.add('hidden');
-      document.getElementById('credentials-form').classList.remove('hidden');
-
-      document.getElementById('app-page').className = 'hidden';
-      document.getElementById('login-page').className = 'flex min-h-screen items-center justify-center';
-      document.getElementById('admin-dash-btn').className = 'hidden';
-    }
   </script>
 </body>
 </html>
