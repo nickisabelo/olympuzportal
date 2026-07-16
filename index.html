@@ -736,6 +736,7 @@
       callAPI('POST', '', { action: "adminUntagAbsent", absentId: absentId }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
     }
 
+    // --- ADMINISTRATIVE PASSWORD RESET OVERRIDE ---
     function executeAdminOverridePassword(targetUid) {
       const newPass = prompt("Enter override password value:"); if (!newPass || newPass.trim() === "") return;
       callAPI('POST', '', { action: "adminChangePassword", targetUserId: targetUid, newPassword: newPass }, function(res) { alert(res.message); });
@@ -921,6 +922,159 @@
     // --- GLOBAL GRAPH FILTERS ---
     function applyGlobalFilters() { if (cachedAdminMasterData) renderFilteredGrids(cachedAdminMasterData); }
     function clearGlobalFilters() { document.getElementById('filter-tasker').value = "ALL"; document.getElementById('filter-from-date').value = ""; document.getElementById('filter-to-date').value = ""; if (cachedAdminMasterData) renderFilteredGrids(cachedAdminMasterData); }
+
+    // ==========================================
+    //  ADDITIONAL UTILITY & NAVIGATION ENGINES
+    // ==========================================
+
+    // Dynamic Role-Based Payment Portal Routing
+    function routePayrollSection() {
+      if (!currentUser) return;
+      if (currentUser.role === 'Admin') {
+        showSection('admin-payroll-sec');
+      } else {
+        showSection('user-payroll-sec');
+        fetchUserPayrollData();
+      }
+    }
+
+    // Retrieve Employee-level Service Payment Ledger
+    function fetchUserPayrollData() {
+      if (!currentUser) return;
+      const tableBody = document.getElementById('user-payroll-table');
+      tableBody.innerHTML = '<tr><td colspan="8" class="p-3 text-center text-slate-400">Loading payout records...</td></tr>';
+      
+      callAPI('GET', "?action=getLiveUserStats&userId=" + currentUser.id, null, function(stats) {
+        tableBody.innerHTML = "";
+        const payments = stats.payments || []; 
+        if (payments.length === 0) {
+          tableBody.innerHTML = '<tr><td colspan="8" class="p-3 text-center text-slate-400">No payment records found.</td></tr>';
+          return;
+        }
+        payments.forEach(row => {
+          const statusBadge = row.status === "Acknowledged" 
+            ? '<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[11px]">✓ Acknowledged</span>' 
+            : '<button onclick="acknowledgePayment(\'' + row.paymentId + '\')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2 py-1 rounded text-[10px]">Acknowledge</button>';
+          
+          tableBody.innerHTML += '<tr class="border-b border-slate-100">' +
+            '<td class="p-3 font-semibold text-slate-800">' + row.period + '</td>' +
+            '<td class="p-3">' + row.weeks + ' wks</td>' +
+            '<td class="p-3">₱' + row.rate.toFixed(2) + '</td>' +
+            '<td class="p-3">₱' + row.gross.toFixed(2) + '</td>' +
+            '<td class="p-3 text-rose-600">-₱' + row.deductions.toFixed(2) + '</td>' +
+            '<td class="p-3 font-black text-indigo-700">₱' + row.net.toFixed(2) + '</td>' +
+            '<td class="p-3 italic text-slate-500">' + (row.remarks || '-') + '</td>' +
+            '<td class="p-3 text-center">' + statusBadge + '</td>' +
+            '</tr>';
+        });
+      });
+    }
+
+    // Employee Payment Acknowledgment action
+    function acknowledgePayment(paymentId) {
+      if (!confirm("Confirm acknowledgment of this payout statement?")) return;
+      callAPI('POST', '', {
+        action: "acknowledgePayment",
+        paymentId: paymentId,
+        userId: currentUser.id
+      }, function(res) {
+        alert(res.message);
+        if (res.success) fetchUserPayrollData();
+      });
+    }
+
+    // Admin Level: Register Profile Submission Form
+    function executeAdminCreateUser() {
+      const fb = document.getElementById('admin-create-feedback');
+      const payload = {
+        action: "registerUser",
+        name: document.getElementById('add-u-name').value,
+        email: document.getElementById('add-u-email').value,
+        password: document.getElementById('add-u-pass').value || "ChangeMe123",
+        role: document.getElementById('add-u-role').value,
+        shiftStart: document.getElementById('add-u-shift-start').value,
+        shiftEnd: document.getElementById('add-u-shift-end').value,
+        daysOff: document.getElementById('add-u-off').value,
+        leaveAllowance: document.getElementById('add-u-leaves').value,
+        lunchTime: document.getElementById('add-u-lunch').value,
+        break1Time: document.getElementById('add-u-break1').value,
+        break2Time: document.getElementById('add-u-break2').value,
+        mealTime: document.getElementById('add-u-meal').value
+      };
+
+      if (!payload.name || !payload.email) {
+        alert("Please compile both Legal Name and Email fields.");
+        return;
+      }
+
+      fb.className = "text-xs font-bold p-2 rounded bg-amber-50 text-amber-800 block";
+      fb.innerText = "Registering user profile line...";
+
+      callAPI('POST', '', payload, function(res) {
+        fb.innerText = res.message;
+        fb.className = res.success 
+          ? "text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800 block" 
+          : "text-xs font-bold p-2 rounded bg-rose-50 text-rose-800 block";
+        
+        if (res.success) {
+          ['add-u-name', 'add-u-email', 'add-u-pass'].forEach(id => document.getElementById(id).value = "");
+          fetchGlobalAdminLogs();
+        }
+      });
+    }
+
+    // Admin Level: Disburse Weekly Payouts
+    function submitPayrollForm() {
+      const fb = document.getElementById('payroll-feedback');
+      const payload = {
+        action: "disbursePayroll",
+        targetUserId: document.getElementById('p-uid').value,
+        targetName: document.getElementById('p-name').value,
+        rate: parseFloat(document.getElementById('p-rate').value),
+        weeks: parseFloat(document.getElementById('p-hours').value),
+        deductions: parseFloat(document.getElementById('p-deduct').value || 0),
+        period: document.getElementById('p-month').value,
+        remarks: document.getElementById('p-remarks').value
+      };
+
+      if (!payload.targetUserId || !payload.rate || !payload.weeks || !payload.period) {
+        alert("Please complete all required payroll configuration inputs.");
+        return;
+      }
+
+      fb.className = "text-xs font-bold p-2 rounded bg-amber-50 text-amber-800 block";
+      fb.innerText = "Disbursing payout entry...";
+
+      callAPI('POST', '', payload, function(res) {
+        fb.innerText = res.message;
+        fb.className = res.success 
+          ? "text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800 block" 
+          : "text-xs font-bold p-2 rounded bg-rose-50 text-rose-800 block";
+        
+        if (res.success) {
+          ['p-uid', 'p-name', 'p-rate', 'p-hours', 'p-deduct', 'p-month', 'p-remarks'].forEach(id => {
+            document.getElementById(id).value = id === 'p-deduct' ? '0' : '';
+          });
+          fetchGlobalAdminLogs();
+        }
+      });
+    }
+
+    // Admin Level: Review Rest Day Authorizations
+    function executeAdminMakeRestDayDecision(requestId, status) {
+      const notes = prompt("Provide operational feedback notes for " + status + " status mapping:");
+      if (notes === null) return;
+
+      callAPI('POST', '', {
+        action: "processRestDayAction",
+        requestId: requestId,
+        status: status,
+        feedback: notes
+      }, function(res) {
+        alert(res.message);
+        if (res.success) fetchGlobalAdminLogs();
+      });
+    }
   </script>
 </body>
 </html>
