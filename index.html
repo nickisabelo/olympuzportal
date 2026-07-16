@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Olympuz Operations Portal</title>
-  <link class="w-full" rel="icon" type="image/png" href="Logo New.png">
+  <link rel="icon" type="image/png" href="Logo New.png">
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 <body class="bg-slate-50 font-sans text-slate-800">
@@ -754,7 +754,7 @@
       });
     }
 
-    // --- RE-ADDED MISSING CORE WORKSPACE CONTROLS ---
+    // --- MAIN MODULE COUPLING CORES ---
     function showSection(id) {
       var modules = ['attendance-sec', 'leave-request-sec', 'restday-request-sec', 'task-report-sec', 'account-settings-sec', 'admin-payroll-sec', 'user-payroll-sec', 'admin-sec'];
       modules.forEach(function(sec) { 
@@ -789,6 +789,23 @@
       document.getElementById('app-page').className = 'hidden';
       document.getElementById('login-page').className = 'flex min-h-screen items-center justify-center';
       document.getElementById('admin-dash-btn').className = 'hidden';
+    }
+
+    function fetchGlobalAdminLogs() {
+      callAPI('GET', '?action=getAdminDashboardData', null, function(data) {
+        if (!data || data.error) { alert(data ? data.error : 'Connection error'); return; }
+        cachedAdminMasterData = data; populateTaskerDropdownOptions(data.absences); renderFilteredGrids(data);
+      });
+    }
+
+    function populateTaskerDropdownOptions(absencesArray) {
+      const dropdown = document.getElementById('filter-tasker'); const savedValue = dropdown.value;
+      dropdown.innerHTML = '<option value="ALL">-- Show All Taskers --</option>';
+      absencesArray.forEach(t => { dropdown.innerHTML += '<option value="' + t.name + '">' + t.name + ' [' + t.id + ']</option>'; }); dropdown.value = savedValue;
+
+      const targetDrop = document.getElementById('sched-target-uid');
+      targetDrop.innerHTML = '<option value="">-- Choose Target Tasker --</option>';
+      absencesArray.forEach(t => { targetDrop.innerHTML += '<option value="' + t.id + '">' + t.name + ' [' + t.id + ']</option>'; });
     }
 
     function renderFilteredGrids(data) {
@@ -901,9 +918,7 @@
       });
     }
 
-    // ==========================================
-    // ADMIN ACTION: REGISTER NEW TASKER (SUPPLEMENTAL)
-    // ==========================================
+    // --- GLOBAL GRAPH FILTERS ---
     function applyGlobalFilters() { if (cachedAdminMasterData) renderFilteredGrids(cachedAdminMasterData); }
     function clearGlobalFilters() { document.getElementById('filter-tasker').value = "ALL"; document.getElementById('filter-from-date').value = ""; document.getElementById('filter-to-date').value = ""; if (cachedAdminMasterData) renderFilteredGrids(cachedAdminMasterData); }
   </script>
