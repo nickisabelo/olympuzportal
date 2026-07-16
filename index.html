@@ -240,7 +240,7 @@
               <div><label class="font-bold text-slate-600">Email Address</label><input type="email" id="add-u-email" class="w-full p-2 border rounded mt-1 bg-slate-50"></div>
               <div><label class="font-bold text-slate-600">Initial Password</label><input type="text" id="add-u-pass" class="w-full p-2 border rounded mt-1 bg-slate-50" placeholder="ChangeMe123"></div>
               <div><label class="font-bold text-slate-600">Permission Role</label>
-                <select id="add-u-role" class="w-full p-2 border rounded mt-1 bg-slate-50 font-bold text-indigo-700">
+                <select id="add-u-role" onchange="toggleFormScheduleVisibility()" class="w-full p-2 border rounded mt-1 bg-slate-50 font-bold text-indigo-700">
                   <option value="Employee">Employee (Standard Tasker)</option>
                   <option value="Admin">Admin (Full Workspace Override)</option>
                 </select>
@@ -564,7 +564,7 @@
             rdBody.innerHTML += `<tr>
               <td class="p-3 font-medium text-slate-900">${row.date}</td>
               <td class="p-3 text-slate-600 whitespace-pre-wrap">${row.comments}</td>
-              <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : row.status === 'Denied' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-800'}">${row.status}</span></td>
+              <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-800'}">${row.status}</span></td>
               <td class="p-3 text-slate-500 italic">${row.feedback}</td>
             </tr>`;
           });
@@ -618,6 +618,30 @@
       }, function(res) {
         alert(res.message);
         fetchGlobalAdminLogs();
+      });
+    }
+
+    function toggleFormScheduleVisibility() {
+      const role = document.getElementById('add-u-role').value;
+      const ids = ['add-u-shift-start', 'add-u-shift-end', 'add-u-off', 'add-u-lunch', 'add-u-break1', 'add-u-break2', 'add-u-meal'];
+      
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const parent = el.closest('div');
+        if (!parent) return;
+        
+        if (role === 'Admin') {
+          parent.style.opacity = '0.35';
+          el.disabled = true;
+          el.value = ""; 
+        } else {
+          parent.style.opacity = '1';
+          el.disabled = false;
+          if (id === 'add-u-shift-start') el.value = "09:00";
+          if (id === 'add-u-shift-end') el.value = "18:00";
+          if (id === 'add-u-off') el.value = "Saturday, Sunday";
+        }
       });
     }
 
@@ -763,13 +787,13 @@
 
       updateFeedback('', '', true);
 
-      if (!name || !email || !pass || !shiftStart || !shiftEnd || !offDays) {
+      if (!name || !email || !pass) {
         updateFeedback("Please supply all mandatory fields.", "bg-red-50 text-red-600", false);
         return;
       }
 
       try {
-        updateFeedback("Creating tasker profile inside SQL database...", "bg-amber-50 text-amber-600", false);
+        updateFeedback("Creating profile inside SQL database...", "bg-amber-50 text-amber-600", false);
 
         const response = await fetch(`${API_URL}`, {
           method: 'POST',
