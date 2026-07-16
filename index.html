@@ -524,17 +524,20 @@
       const shift = document.getElementById('add-u-shift').value, offDays = document.getElementById('add-u-off').value, halfDay = document.getElementById('add-u-halfday').value, allowance = document.getElementById('add-u-leaves').value, fb = document.getElementById('add-admin-create-feedback');
       
       // Fixed default settings parameter injection mappings references down line
-      if (fb) fb.classList.add('hidden'); if(!name || !email || !pass || !shift || !offDays) { alert("Please supply all mandatory fields."); return; }
-      const parts = shift.split('-'); if(parts.length !== 2) { alert("Invalid Shift Window formatting structure. Use format HH:MM-HH:MM"); return; }
-      
-      const payload = { action: "adminCreateUser", newUserData: { name: name, email: email, password: pass, role: role }, defaultSettings: { shiftStart: parts[0], shiftEnd: parts[1], maxBreak: 15, maxLunch: 60, daysOff: offDays, halfDayConfig: halfDay, leaveAllowance: allowance } };
-      fb.className = "text-xs font-bold p-2 rounded bg-amber-50 text-amber-800"; fb.innerText = "Registering tasker profile line..."; fb.classList.remove('hidden');
-      
-      callAPI('POST', '', payload, function(res) {
-        fb.innerText = res.message; fb.className = res.success ? "text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800" : "text-xs font-bold p-2 rounded bg-rose-50 text-rose-800";
-        if (res.success) { ['add-u-name', 'add-u-email', 'add-u-pass', 'add-u-halfday'].forEach(id => document.getElementById(id).value = ""); fetchGlobalAdminLogs(); }
-      });
+     // Safely hide feedback if it exists
+if (fb) fb.classList.add('hidden'); 
+
+if(!name || !email || !pass || !shift || !offDays) {
+    if (fb) {
+        fb.className = "error-message"; // This was line 531!
+        fb.innerText = "Please supply all mandatory fields.";
+        fb.classList.remove('hidden');
+    } else {
+        // Fallback to a standard browser alert if the feedback box isn't in your HTML
+        alert("Please supply all mandatory fields.");
     }
+    return; 
+}
 
     function routePayrollSection() { if (currentUser.role === 'Admin') showSection('admin-payroll-sec'); else { showSection('user-payroll-sec'); fetchPersonalPayslips(); } }
     function submitPayrollForm() {
