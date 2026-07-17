@@ -62,6 +62,7 @@
     <div class="flex flex-1 flex-col md:flex-row">
       <nav class="w-full md:w-64 bg-white p-4 shadow-sm border-r border-slate-100 space-y-1 flex md:flex-col flex-row overflow-x-auto">
         <button onclick="showSection('attendance-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">🕒 Time Tracker</button>
+        <button onclick="showSection('global-feed-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition text-emerald-700">🌐 Workspace Status Feed</button>
         <button onclick="showSection('leave-request-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">📇 Leave Request</button>
         <button onclick="showSection('restday-request-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">📅 RD OT / Cover Absent</button>
         <button onclick="showSection('task-report-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">📝 Task Done Report</button>
@@ -85,6 +86,13 @@
                 <div>Max Allotment: <span id="sched-limits" class="font-bold text-indigo-700">-</span></div>
               </div>
             </div>
+
+            <!-- DIGITAL LIVE TIMER BANNER -->
+            <div id="live-timer-banner" class="hidden bg-slate-900 text-white p-4 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-2 shadow-inner font-mono">
+              <span class="text-xs tracking-wider uppercase font-sans text-slate-400 font-bold" id="live-timer-label">⏱️ ACTIVE SESSION TIMER:</span>
+              <span class="text-3xl font-black tracking-widest text-emerald-400 animate-pulse" id="live-digital-clock">00:00:00</span>
+            </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center"><div class="text-xs text-slate-500 font-bold uppercase tracking-wider">Net Clocked Time</div><div id="stat-hours" class="text-3xl font-black text-indigo-600 mt-1">0.00 hrs</div></div>
               <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center"><div class="text-xs text-slate-500 font-bold uppercase tracking-wider">Break Duration</div><div id="stat-break" class="text-3xl font-black text-amber-600 mt-1">0 mins</div></div>
@@ -101,6 +109,37 @@
             <p id="attendance-feedback" class="text-center font-bold text-sm p-3 rounded-lg hidden"></p>
           </div>
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100"><h3 class="text-md font-bold text-slate-900 border-b pb-2 mb-3">My Personal Attendance History</h3><div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Logged Date</th><th class="p-3">Clock In</th><th class="p-3">Clock Out</th><th class="p-3">Break Duration</th><th class="p-3">Lunch Duration</th><th class="p-3">Exception Status</th></tr></thead><tbody id="personal-history-table" class="divide-y divide-slate-50"></tbody></table></div></div>
+        </section>
+
+        <!-- GLOBAL TEAM STATUS FEED PANEL -->
+        <section id="global-feed-sec" class="hidden space-y-6 max-w-6xl">
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-100 pb-4 mb-4">
+              <div>
+                <h2 class="text-xl font-bold text-slate-800">🌐 Workspace Status Board Feed</h2>
+                <p class="text-xs text-slate-400">View real-time tracking operations and calculated hours remaining for all active taskers.</p>
+              </div>
+              <button onclick="loadGlobalStatusFeed()" class="text-xs font-bold bg-indigo-50 border border-indigo-200 text-indigo-700 px-3 py-1.5 rounded-lg mt-2 sm:mt-0">🔄 Refresh Feed</button>
+            </div>
+            <div class="overflow-x-auto rounded-lg border border-slate-100">
+              <table class="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold text-xs uppercase">
+                    <th class="p-3">Tasker Profile</th>
+                    <th class="p-3">Clock In</th>
+                    <th class="p-3">Lunch State</th>
+                    <th class="p-3">Break State</th>
+                    <th class="p-3">Clock Out</th>
+                    <th class="p-3">Target Shift Remaining</th>
+                    <th class="p-3 font-bold text-center">Exception Status</th>
+                  </tr>
+                </thead>
+                <tbody id="global-feed-table" class="divide-y divide-slate-100 text-xs font-medium text-slate-700">
+                  <tr><td colspan="7" class="p-4 text-center text-slate-400">Loading synchronization grids...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </section>
 
         <section id="leave-request-sec" class="hidden space-y-6 max-w-4xl">
@@ -373,6 +412,9 @@
     let inactivityTimer = null;
     const MAX_INACTIVITY_LIMIT = 30 * 60 * 1000; // 30 minutes in milliseconds
 
+    // Running Interface Timer Reference
+    let liveTimerTickerInterval = null;
+
     // Device ID Setup
     let deviceId = localStorage.getItem("olympuz_device_id");
     if (!deviceId) {
@@ -498,14 +540,13 @@
       document.getElementById('login-err').classList.add('hidden');
     }
 
-    // Universal Status Style Mapper helper function
     function getStatusBadgeStyle(statusText) {
       if (!statusText) return 'bg-slate-50 text-slate-500';
       const normalized = statusText.trim().toLowerCase();
       
       if (normalized.startsWith('on time') || normalized === 'completed') {
         return 'bg-emerald-50 text-emerald-600';
-      } else if (normalized === 'undertime' || normalized === 'late' || normalized.includes('over break') || normalized.includes('over lunch')) {
+      } else if (normalized === 'undertime' || normalized === 'late' || normalized.includes('over break') || normalized.includes('over lunch') || normalized === 'absent') {
         return 'bg-rose-50 text-rose-600';
       } else {
         return 'bg-amber-50 text-amber-600';
@@ -536,7 +577,7 @@
           document.getElementById('btn-lunch-e').className = 'hidden';
         } else {
           document.getElementById('halfday-banner').classList.add('hidden');
-          document.getElementById('sched-limits').innerText = "Break: " + currentUser.schedule.maxBreak + "m | Lunch: + " + currentUser.schedule.maxLunch + "m | Days Off: " + currentUser.schedule.daysOff;
+          document.getElementById('sched-limits').innerText = "Break: " + currentUser.schedule.maxBreak + "m | Lunch: " + currentUser.schedule.maxLunch + "m | Days Off: " + currentUser.schedule.daysOff;
         }
       }
       
@@ -545,6 +586,10 @@
 
       setInterval(refreshUserTimers, 30000);
       setInterval(function() {
+        const feedSec = document.getElementById('global-feed-sec');
+        if (feedSec && !feedSec.classList.contains('hidden')) loadGlobalStatusFeed();
+      }, 15000);
+      setInterval(function() {
         const reportSection = document.getElementById('task-report-sec');
         if (reportSection && !reportSection.classList.contains('hidden')) loadPublicTaskReportsFeed();
       }, 60000);
@@ -552,6 +597,48 @@
         const adminSection = document.getElementById('admin-sec');
         if (currentUser.role === 'Admin' && adminSection && !adminSection.classList.contains('hidden')) fetchGlobalAdminLogs();
       }, 45000);
+
+      // Launch the real-time active UI ticker
+      initializeRealtimeTicker();
+    }
+
+    // Live Digital Ticker Engine
+    function initializeRealtimeTicker() {
+      if (liveTimerTickerInterval) clearInterval(liveTimerTickerInterval);
+      
+      const banner = document.getElementById('live-timer-banner');
+      const label = document.getElementById('live-timer-label');
+      const textClock = document.getElementById('live-digital-clock');
+
+      liveTimerTickerInterval = setInterval(() => {
+        const checkView = document.getElementById('attendance-sec');
+        if (!currentUser || !checkView || checkView.classList.contains('hidden')) return;
+
+        const currentType = banner.getAttribute('data-active-type') || 'NONE';
+        const rawStamp = banner.getAttribute('data-active-stamp');
+
+        if (currentType === 'NONE' || !rawStamp) {
+          banner.classList.add('hidden');
+          return;
+        }
+
+        banner.classList.remove('hidden');
+        label.innerText = `⏱️ CURRENT LIVE ${currentType} RUNNING CLOCK:`;
+
+        const parsedDelta = Date.now() - new Date(rawStamp).getTime();
+        if (isNaN(parsedDelta) || parsedDelta < 0) {
+          textClock.innerText = "00:00:00";
+          return;
+        }
+
+        const totalSecs = Math.floor(parsedDelta / 1000);
+        const displaySecs = totalSecs % 60;
+        const displayMins = Math.floor(totalSecs / 60) % 60;
+        const displayHrs = Math.floor(totalSecs / 3600);
+
+        textClock.innerText = 
+          `${displayHrs.toString().padStart(2, '0')}:${displayMins.toString().padStart(2, '0')}:${displaySecs.toString().padStart(2, '0')}`;
+      }, 1000);
     }
 
     function refreshUserTimers() {
@@ -561,6 +648,16 @@
         document.getElementById('stat-break').innerText = stats.breakMinutes + " mins";
         document.getElementById('stat-lunch').innerText = stats.lunchMinutes + " mins";
         
+        // Cache session status inside frontend attributes to bind the running live clock element
+        const banner = document.getElementById('live-timer-banner');
+        if (stats.currentSessionType && stats.currentSessionType !== 'NONE') {
+          banner.setAttribute('data-active-type', stats.currentSessionType);
+          banner.setAttribute('data-active-stamp', stats.currentSessionStart);
+        } else {
+          banner.setAttribute('data-active-type', 'NONE');
+          banner.removeAttribute('data-active-stamp');
+        }
+
         const histBody = document.getElementById('personal-history-table'); 
         histBody.innerHTML = "";
         stats.history.forEach(row => {
@@ -585,6 +682,36 @@
             rdBody.innerHTML += '<tr><td class="p-3 font-medium text-slate-900">' + row.date + '</td><td class="p-3 text-slate-600 whitespace-pre-wrap">' + row.comments + '</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ' + rc + '">' + row.status + '</span></td><td class="p-3 text-slate-500 italic">' + row.feedback + '</td></tr>';
           });
         }
+      });
+    }
+
+    // Fetch and Populate the Universal Coworker Status Board Feed
+    function loadGlobalStatusFeed() {
+      const feedBody = document.getElementById('global-feed-table');
+      callAPI('GET', '?action=getWorkspaceStatusFeed', null, function(records) {
+        if (!records || records.length === 0) {
+          feedBody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-400">No workstation entries logged yet today.</td></tr>';
+          return;
+        }
+        feedBody.innerHTML = "";
+        records.forEach(row => {
+          const statusStyle = getStatusBadgeStyle(row.status);
+          
+          let remainingStr = row.remainingShiftTime;
+          if (row.isLiveTracking && remainingStr !== "00:00:00" && remainingStr !== "Shift Target Met") {
+            remainingStr = `<span class="text-indigo-600 font-bold tracking-wider animate-pulse">${remainingStr}</span>`;
+          }
+
+          feedBody.innerHTML += `<tr class="border-b border-slate-100 hover:bg-slate-50/50 transition">
+            <td class="p-3 font-bold text-slate-900">${row.name}</td>
+            <td class="p-3 text-emerald-600 font-mono">${row.timeIn}</td>
+            <td class="p-3 text-slate-600 font-mono">${row.lunchText}</td>
+            <td class="p-3 text-slate-600 font-mono">${row.breakText}</td>
+            <td class="p-3 text-rose-600 font-mono">${row.timeOut}</td>
+            <td class="p-3 font-mono text-slate-500">${remainingStr}</td>
+            <td class="p-3 text-center"><span class="px-2 py-0.5 rounded text-[11px] font-bold ${statusStyle}">${row.status}</span></td>
+          </tr>`;
+        });
       });
     }
 
@@ -666,8 +793,6 @@
       const comments = document.getElementById('rd-comments').value;
       const fb = document.getElementById('rd-feedback-msg');
       
-      fb.classList.add('hidden');
-      if (!targetDate || !comments.trim()) { alert("Please compile all parameters."); return; }
       fb.className = "text-center text-xs font-bold p-2 rounded bg-amber-50 text-amber-800"; fb.innerText = "Transmitting request..."; fb.classList.remove('hidden');
       
       callAPI('POST', '', { action: "submitRestDayRequest", userId: currentUser.id, userName: currentUser.name, targetDate: targetDate, comments: comments }, function(res) {
@@ -755,6 +880,7 @@
       callAPI('POST', '', { action: "adminChangePassword", targetUserId: targetUid, newPassword: newPass }, function(res) { alert(res.message); });
     }
 
+    // --- WORKSPACE PURGE OPERATORS ---
     function executeAdminRemoveUser(targetUid, targetName) {
       if (!confirm("Are you certain you want to remove " + targetName + " [" + targetUid + "]?")) return;
       callAPI('POST', '', { action: "adminDeleteUser", targetUserId: targetUid }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
@@ -770,7 +896,7 @@
 
     // --- MAIN MODULE COUPLING CORES ---
     function showSection(id) {
-      var modules = ['attendance-sec', 'leave-request-sec', 'restday-request-sec', 'task-report-sec', 'account-settings-sec', 'admin-payroll-sec', 'user-payroll-sec', 'admin-sec'];
+      var modules = ['attendance-sec', 'global-feed-sec', 'leave-request-sec', 'restday-request-sec', 'task-report-sec', 'account-settings-sec', 'admin-payroll-sec', 'user-payroll-sec', 'admin-sec'];
       modules.forEach(function(sec) { 
         var el = document.getElementById(sec);
         if(el) el.className = 'hidden'; 
@@ -785,6 +911,7 @@
         document.getElementById('rep-date').value = new Date().toISOString().split('T')[0];
         document.getElementById('public-filter-tasker').value = "ALL"; loadPublicTaskReportsFeed();
       }
+      if (id === 'global-feed-sec') loadGlobalStatusFeed();
       if (id === 'admin-sec') fetchGlobalAdminLogs();
       if (id === 'attendance-sec' || id === 'leave-request-sec' || id === 'account-settings-sec' || id === 'restday-request-sec') refreshUserTimers();
     }
@@ -792,6 +919,7 @@
     function logout() {
       currentUser = null;
       clearTimeout(inactivityTimer);
+      if (liveTimerTickerInterval) clearInterval(liveTimerTickerInterval);
       localStorage.removeItem("olympuz_active_session");
 
       document.getElementById('email').value = "";
@@ -932,14 +1060,6 @@
       });
     }
 
-    // --- GLOBAL GRAPH FILTERS ---
-    function applyGlobalFilters() { if (cachedAdminMasterData) renderFilteredGrids(cachedAdminMasterData); }
-    function clearGlobalFilters() { document.getElementById('filter-tasker').value = "ALL"; document.getElementById('filter-from-date').value = ""; document.getElementById('filter-to-date').value = ""; if (cachedAdminMasterData) renderFilteredGrids(cachedAdminMasterData); }
-
-    // ==========================================
-    //  ADDITIONAL UTILITY & NAVIGATION ENGINES
-    // ==========================================
-
     function routePayrollSection() {
       if (!currentUser) return;
       if (currentUser.role === 'Admin') {
@@ -955,17 +1075,16 @@
       const tableBody = document.getElementById('user-payroll-table');
       tableBody.innerHTML = '<tr><td colspan="8" class="p-3 text-center text-slate-400">Loading payout records...</td></tr>';
       
-      callAPI('GET', "?action=getLiveUserStats&userId=" + currentUser.id, null, function(stats) {
+      callAPI('GET', "?action=getUserPayroll&userId=" + currentUser.id, null, function(payments) {
         tableBody.innerHTML = "";
-        const payments = stats.payments || []; 
-        if (payments.length === 0) {
+        if (!payments || payments.length === 0) {
           tableBody.innerHTML = '<tr><td colspan="8" class="p-3 text-center text-slate-400">No payment records found.</td></tr>';
           return;
         }
         payments.forEach(row => {
           const statusBadge = row.status === "Acknowledged" 
             ? '<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[11px]">✓ Acknowledged</span>' 
-            : '<button onclick="acknowledgePayment(\'' + row.paymentId + '\')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2 py-1 rounded text-[10px]">Acknowledge</button>';
+            : '<button onclick="acknowledgePayment(\'' + row.payrollId + '\')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2 py-1 rounded text-[10px]">Acknowledge</button>';
           
           tableBody.innerHTML += '<tr class="border-b border-slate-100">' +
             '<td class="p-3 font-semibold text-slate-800">' + row.period + '</td>' +
