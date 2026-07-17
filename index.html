@@ -498,6 +498,20 @@
       document.getElementById('login-err').classList.add('hidden');
     }
 
+    // Universal Status Style Mapper helper function
+    function getStatusBadgeStyle(statusText) {
+      if (!statusText) return 'bg-slate-50 text-slate-500';
+      const normalized = statusText.trim().toLowerCase();
+      
+      if (normalized.startsWith('on time') || normalized === 'completed') {
+        return 'bg-emerald-50 text-emerald-600';
+      } else if (normalized === 'undertime' || normalized === 'late' || normalized.includes('over break') || normalized.includes('over lunch')) {
+        return 'bg-rose-50 text-rose-600';
+      } else {
+        return 'bg-amber-50 text-amber-600';
+      }
+    }
+
     function bootPortalSession() {
       document.getElementById('login-page').classList.add('hidden');
       document.getElementById('app-page').classList.remove('hidden');
@@ -522,7 +536,7 @@
           document.getElementById('btn-lunch-e').className = 'hidden';
         } else {
           document.getElementById('halfday-banner').classList.add('hidden');
-          document.getElementById('sched-limits').innerText = "Break: " + currentUser.schedule.maxBreak + "m | Lunch: " + currentUser.schedule.maxLunch + "m | Days Off: " + currentUser.schedule.daysOff;
+          document.getElementById('sched-limits').innerText = "Break: " + currentUser.schedule.maxBreak + "m | Lunch: + " + currentUser.schedule.maxLunch + "m | Days Off: " + currentUser.schedule.daysOff;
         }
       }
       
@@ -550,7 +564,7 @@
         const histBody = document.getElementById('personal-history-table'); 
         histBody.innerHTML = "";
         stats.history.forEach(row => {
-          const badgeClass = row.status === 'Late' ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600';
+          const badgeClass = getStatusBadgeStyle(row.status);
           histBody.innerHTML += '<tr class="border-b border-slate-100"><td class="p-3 font-medium text-slate-900">' + row.date + '</td><td class="p-3 text-emerald-600">' + row.timeIn + '</td><td class="p-3 text-rose-600">' + row.timeOut + '</td><td class="p-3 text-slate-600">' + row.breakText + '</td><td class="p-3 text-slate-600">' + row.lunchText + '</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ' + badgeClass + '">' + row.status + '</span></td></tr>';
         });
 
@@ -736,7 +750,6 @@
       callAPI('POST', '', { action: "adminUntagAbsent", absentId: absentId }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
     }
 
-    // --- ADMINISTRATIVE PASSWORD RESET OVERRIDE ---
     function executeAdminOverridePassword(targetUid) {
       const newPass = prompt("Enter override password value:"); if (!newPass || newPass.trim() === "") return;
       callAPI('POST', '', { action: "adminChangePassword", targetUserId: targetUid, newPassword: newPass }, function(res) { alert(res.message); });
@@ -856,7 +869,7 @@
         filteredAttendance.forEach(row => {
           const bBadge = row.overBreak > 0 ? '<span class="bg-rose-50 text-rose-600 text-xs px-2 py-0.5 rounded font-bold ml-1">+' + row.overBreak + 'm</span>' : '';
           const lBadge = row.overLunch > 0 ? '<span class="bg-rose-50 text-rose-600 text-xs px-2 py-0.5 rounded font-bold ml-1">+' + row.overLunch + 'm</span>' : '';
-          const statusClass = row.status.startsWith('On Time') ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600';
+          const statusClass = getStatusBadgeStyle(row.status);
           pBody.innerHTML += '<tr class="border-b border-slate-100"><td class="p-3 font-medium text-slate-900">' + row.name + '</td><td class="p-3 text-slate-500">' + row.date + '</td><td class="p-3 text-emerald-600 font-medium">' + row.timeIn + '</td><td class="p-3 text-rose-600 font-medium">' + row.timeOut + '</td><td class="p-3 text-slate-600">' + row.breakText + ' ' + bBadge + '</td><td class="p-3 text-slate-600">' + row.lunchText + ' ' + lBadge + '</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ' + statusClass + '">' + row.status + '</span></td></tr>';
         });
       }
@@ -927,7 +940,6 @@
     //  ADDITIONAL UTILITY & NAVIGATION ENGINES
     // ==========================================
 
-    // Dynamic Role-Based Payment Portal Routing
     function routePayrollSection() {
       if (!currentUser) return;
       if (currentUser.role === 'Admin') {
@@ -938,7 +950,6 @@
       }
     }
 
-    // Retrieve Employee-level Service Payment Ledger
     function fetchUserPayrollData() {
       if (!currentUser) return;
       const tableBody = document.getElementById('user-payroll-table');
@@ -970,7 +981,6 @@
       });
     }
 
-    // Employee Payment Acknowledgment action
     function acknowledgePayment(paymentId) {
       if (!confirm("Confirm acknowledgment of this payout statement?")) return;
       callAPI('POST', '', {
@@ -983,7 +993,6 @@
       });
     }
 
-    // Admin Level: Register Profile Submission Form
     function executeAdminCreateUser() {
       const fb = document.getElementById('admin-create-feedback');
       const payload = {
@@ -1023,7 +1032,6 @@
       });
     }
 
-    // Admin Level: Disburse Weekly Payouts
     function submitPayrollForm() {
       const fb = document.getElementById('payroll-feedback');
       const payload = {
@@ -1060,7 +1068,6 @@
       });
     }
 
-    // Admin Level: Review Rest Day Authorizations
     function executeAdminMakeRestDayDecision(requestId, status) {
       const notes = prompt("Provide operational feedback notes for " + status + " status mapping:");
       if (notes === null) return;
