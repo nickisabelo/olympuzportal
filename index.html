@@ -175,7 +175,6 @@
           <p id="self-pass-feedback" class="text-center font-bold text-xs p-2 rounded hidden"></p>
         </section>
 
-        <!-- MODULE: ADMIN CONTROL - PAYROLL DISBURSEMENT -->
         <section id="admin-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-6 max-w-2xl">
           <h2 class="text-xl font-bold text-indigo-700 border-b pb-2">Admin Control: Issue Fixed Weekly Payment</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -185,8 +184,6 @@
             <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Number of Service Weeks</label><input id="p-hours" type="number" step="0.1" class="w-full p-2 border border-slate-200 text-sm rounded-lg"></div>
             <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Prerogative Deductions (₱)</label><input id="p-deduct" type="number" class="w-full p-2 border border-slate-200 text-sm rounded-lg" value="0"></div>
             <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Service Billing Period</label><input id="p-month" type="text" class="w-full p-2 border border-slate-200 text-sm rounded-lg" placeholder="Week 1 - July 2026"></div>
-            
-            <!-- Added Payment Mode and File Attachment Selectors -->
             <div>
               <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Payment Mode Matrix</label>
               <select id="p-mode" class="w-full p-2 border border-slate-200 text-sm rounded-lg bg-slate-50 font-bold text-indigo-900">
@@ -198,28 +195,19 @@
               <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Upload Receipt Screenshot</label>
               <input type="file" id="p-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
             </div>
-
             <div class="sm:col-span-2"><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Service Remarks</label><input id="p-remarks" type="text" class="w-full p-2 border border-slate-200 text-sm rounded-lg" placeholder="Notes..."></div>
           </div>
           <button onclick="submitPayrollForm()" class="bg-indigo-600 text-white px-5 py-2.5 text-sm rounded-lg font-bold shadow hover:bg-indigo-700 transition">Disburse Service Payment</button>
           <p id="payroll-feedback" class="text-emerald-600 bg-emerald-50 text-xs font-bold p-2 rounded-lg hidden"></p>
         </section>
 
-        <!-- USER PAYMENTS LEDGER -->
         <section id="user-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4 max-w-7xl">
           <h2 class="text-xl font-bold text-slate-800 border-b pb-2">My Service Payment Ledgers</h2>
           <div class="overflow-x-auto rounded-lg border border-slate-100">
             <table class="w-full text-left border-collapse text-sm">
               <thead>
                 <tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold">
-                  <th class="p-3">Service Period</th>
-                  <th class="p-3">Weeks Logged</th>
-                  <th class="p-3">Mode</th>
-                  <th class="p-3">Gross Base</th>
-                  <th class="p-3">Deductions</th>
-                  <th class="p-3 font-bold text-indigo-700">Net Credited</th>
-                  <th class="p-3">Receipt Document</th>
-                  <th class="p-3 text-center">Status Actions</th>
+                  <th class="p-3">Service Period</th><th class="p-3">Weeks Logged</th><th class="p-3">Mode</th><th class="p-3">Gross Base</th><th class="p-3">Deductions</th><th class="p-3 font-bold text-indigo-700">Net Credited</th><th class="p-3">Receipt Document</th><th class="p-3 text-center">Status Actions</th>
                 </tr>
               </thead>
               <tbody id="user-payroll-table" class="divide-y divide-slate-50"></tbody>
@@ -229,7 +217,7 @@
 
         <section id="admin-sec" class="hidden space-y-8 max-w-6xl">
           <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 space-y-4">
-            <h3 class="text-sm font-bold uppercase tracking-wider text-indigo-900">🔍 Real-Time Ledger Filtration Control</h3>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-indigo-900">🔍 Real-Time Ledger Filtration Control</h2>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div><label class="block text-xs font-bold text-slate-500 mb-1">Target Tasker</label><select id="filter-tasker" onchange="applyGlobalFilters()" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-slate-50"><option value="ALL">-- Show All Taskers --</option></select></div>
               <div><label class="block text-xs font-bold text-slate-500 mb-1">From Date</label><input type="date" id="filter-from-date" onchange="applyGlobalFilters()" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-slate-50"></div>
@@ -489,12 +477,15 @@
       }, 1000);
     }
 
+    // Fixed background sync parser with array level validation guard matrices
     function refreshUserTimers() {
       if (!currentUser) return;
       callAPI('GET', "?action=getLiveUserStats&userId=" + currentUser.id, null, function(stats) {
-        document.getElementById('stat-hours').innerText = stats.clockedHours + " hrs";
-        document.getElementById('stat-break').innerText = stats.breakMinutes + " mins";
-        document.getElementById('stat-lunch').innerText = stats.lunchMinutes + " mins";
+        if (!stats || stats.error || stats.success === false) return; // Prevent crashes on backend error payloads
+
+        document.getElementById('stat-hours').innerText = (stats.clockedHours || "0.00") + " hrs";
+        document.getElementById('stat-break').innerText = (stats.breakMinutes || 0) + " mins";
+        document.getElementById('stat-lunch').innerText = (stats.lunchMinutes || 0) + " mins";
         
         const banner = document.getElementById('live-timer-banner');
         if (stats.currentSessionType && stats.currentSessionType !== 'NONE') {
@@ -503,21 +494,22 @@
         } else { banner.setAttribute('data-active-type', 'NONE'); banner.removeAttribute('data-active-stamp'); }
 
         const histBody = document.getElementById('personal-history-table'); histBody.innerHTML = "";
-        stats.history.forEach(row => {
+        (stats.history || []).forEach(row => {
           const badgeClass = getStatusBadgeStyle(row.status);
           histBody.innerHTML += '<tr class="border-b border-slate-100"><td class="p-3 font-medium text-slate-900">' + row.date + '</td><td class="p-3 text-emerald-600">' + row.timeIn + '</td><td class="p-3 text-rose-600">' + row.timeOut + '</td><td class="p-3 text-slate-600">' + row.breakText + '</td><td class="p-3 text-slate-600">' + row.lunchText + '</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ' + badgeClass + '">' + row.status + '</span></td></tr>';
         });
 
         const leaveBody = document.getElementById('personal-leave-table'); leaveBody.innerHTML = "";
-        stats.leaves.forEach(row => {
+        (stats.leaves || []).forEach(row => {
           const statusClass = row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600';
           leaveBody.innerHTML += '<tr><td class="p-3 font-medium">' + row.date + '</td><td class="p-3 text-slate-600">' + row.reason + '</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ' + statusClass + '">' + row.status + '</span></td><td class="p-3 text-slate-500 italic">' + row.comment + '</td></tr>';
         });
         
         const rdBody = document.getElementById('personal-restday-table'); rdBody.innerHTML = "";
-        if (stats.restDays.length === 0) { rdBody.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-slate-400">No Rest Day requests found.</td></tr>'; }
+        const restDayArray = stats.restDays || [];
+        if (restDayArray.length === 0) { rdBody.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-slate-400">No Rest Day requests found.</td></tr>'; }
         else {
-          stats.restDays.forEach(row => {
+          restDayArray.forEach(row => {
             const rc = row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : (row.status === 'Denied' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-800');
             rdBody.innerHTML += '<tr><td class="p-3 font-medium text-slate-900">' + row.date + '</td><td class="p-3 text-slate-600 whitespace-pre-wrap">' + row.comments + '</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ' + rc + '">' + row.status + '</span></td><td class="p-3 text-slate-500 italic">' + row.feedback + '</td></tr>';
           });
@@ -622,9 +614,9 @@
 
     function loadPublicTaskReportsFeed() {
       callAPI('GET', '?action=getAllTaskReports', null, function(records) {
-        cachedPublicReports = records; const filterSelect = document.getElementById('public-filter-tasker'), currentSelection = filterSelect.value;
+        cachedPublicReports = records || []; const filterSelect = document.getElementById('public-filter-tasker'), currentSelection = filterSelect.value;
         filterSelect.innerHTML = '<option value="ALL">-- Show Everyone\'s Reports --</option>';
-        const uniqueNames = [...new Set(records.map(r => r.name))].sort();
+        const uniqueNames = [...new Set((records || []).map(r => r.name))].sort();
         uniqueNames.forEach(name => { filterSelect.innerHTML += '<option value="' + name + '">' + name + '</option>'; });
         filterSelect.value = currentSelection; renderFilteredPublicReports();
       });
@@ -650,7 +642,6 @@
       });
     }
 
-    // Modal display generator matrix tool for taskers to load full screen proof screenshot vouchers
     function openImagePreviewOverlayModal(base64Data) {
       if (!base64Data) { alert("No receipt screenshot attached to this service transaction record line."); return; }
       const newWin = window.open();
@@ -692,6 +683,7 @@
       callAPI('POST', '', { action: "adminUntagAbsent", absentId: absentId }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
     }
 
+    // Admin configuration overrides
     function executeAdminOverridePassword(targetUid) {
       const newPass = prompt("Enter explicit password string:"); if (!newPass || newPass.trim() === "") return;
       callAPI('POST', '', { action: "adminChangePassword", targetUserId: targetUid, newPassword: newPass }, function(res) { alert(res.message); });
@@ -858,8 +850,8 @@
             statusBadge = '<div class="flex flex-col gap-1 items-center"><span class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded text-[11px]">❌ Dispute Rejected</span>' +
                           '<button onclick="acknowledgePayment(\'' + row.payrollId + '\')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2 py-1 rounded text-[10px]">Acknowledge</button></div>';
           } else {
-            statusBadge = '<div class="flex gap-1 justify-center"><button onclick="acknowledgePayment(\'' + row.payrollId + '\')" class="bg-emerald-600 text-white font-bold px-2 py-1 rounded text-[10px]">Acknowledge</button>' +
-                          '<button onclick="disputePayment(\'' + row.payrollId + '\')" class="bg-rose-600 text-white font-bold px-2 py-1 rounded text-[10px]">Dispute</button></div>';
+            statusBadge = '<div class="flex gap-1 justify-center"><button onclick="acknowledgePayment(\'' + row.payrollId + '\')" class="bg-emerald-600 text-white font-bold px-2 py-1 rounded text-[10px] transition">Acknowledge</button>' +
+                          '<button onclick="disputePayment(\'' + row.payrollId + '\')" class="bg-rose-600 text-white font-bold px-2 py-1 rounded text-[10px] transition">Dispute</button></div>';
           }
 
           let receiptBtn = row.receiptImage 
@@ -917,7 +909,6 @@
       });
     }
 
-    // Handles screenshot parsing and transfers to backend
     function submitPayrollForm() {
       const fb = document.getElementById('payroll-feedback');
       const fileInput = document.getElementById('p-file');
