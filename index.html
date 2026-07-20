@@ -219,7 +219,6 @@
               <div><label class="font-bold text-slate-600">Days Off Allotment</label><input type="text" id="add-u-off" class="w-full p-2 border rounded mt-1 bg-slate-50" value="Saturday, Sunday"></div>
               <div><label class="font-bold text-slate-600">Leave Balance</label><input type="number" id="add-u-leaves" class="w-full p-2 border rounded mt-1 bg-slate-50" value="15"></div>
               
-              <!-- Updated Dynamic Duration Fields -->
               <div><label class="font-bold text-slate-600 text-rose-600">Quick Break Total (Mins)</label><input type="number" id="add-u-max-break" class="w-full p-2 border rounded mt-1 bg-slate-50" value="15"></div>
               <div><label class="font-bold text-slate-600 text-rose-600">Meal Break Total (Mins)</label><input type="number" id="add-u-max-meal" class="w-full p-2 border rounded mt-1 bg-slate-50" value="60"></div>
             </div>
@@ -297,7 +296,6 @@
     let currentUser = null, cachedAdminMasterData = null, cachedPublicReports = [], inactivityTimer = null, liveTimerTickerInterval = null;
     const MAX_INACTIVITY_LIMIT = 30 * 60 * 1000;
     
-    // Global variable to keep the feed data fresh so the ticker can manipulate it.
     window.cachedGlobalFeed = [];
 
     let deviceId = localStorage.getItem("olympuz_device_id");
@@ -681,15 +679,15 @@
     function fetchGlobalAdminLogs() {
       callAPI('GET', '?action=getAdminDashboardData', null, function(data) {
         if (!data || data.error) { return; }
-        cachedAdminMasterData = data; populateTaskerDropdownOptions(data.absences); renderFilteredGrids(data);
+        cachedAdminMasterData = data; populateTaskerDropdownOptions(data.absences || []); renderFilteredGrids(data);
       });
     }
 
     function populateTaskerDropdownOptions(absencesArray) {
       const dropdown = document.getElementById('filter-tasker'), savedValue = dropdown.value; dropdown.innerHTML = '<option value="ALL">-- Show All Taskers --</option>';
-      absencesArray.forEach(t => { dropdown.innerHTML += '<option value="' + t.name + '">' + t.name + ' [' + t.id + ']</option>'; }); dropdown.value = savedValue;
+      (absencesArray || []).forEach(t => { dropdown.innerHTML += '<option value="' + t.name + '">' + t.name + ' [' + t.id + ']</option>'; }); dropdown.value = savedValue;
       const targetDrop = document.getElementById('sched-target-uid'); targetDrop.innerHTML = '<option value="">-- Choose Target Tasker --</option>';
-      absencesArray.forEach(t => { targetDrop.innerHTML += '<option value="' + t.id + '">' + t.name + ' [' + t.id + ']</option>'; });
+      (absencesArray || []).forEach(t => { targetDrop.innerHTML += '<option value="' + t.id + '">' + t.name + ' [' + t.id + ']</option>'; });
     }
 
     function renderFilteredGrids(data) {
