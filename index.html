@@ -55,7 +55,7 @@
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-100 pb-4 gap-4">
               <div><h2 class="text-xl font-bold text-slate-800">Time Clock Operations <span id="halfday-banner" class="hidden text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-black ml-2">Half Day Active</span></h2><p class="text-xs text-slate-500">Log punch timestamps and view daily break metrics.</p></div>
               <div class="bg-indigo-50 border border-indigo-100 p-3 rounded-xl text-xs space-y-1 text-indigo-950">
-                <div><strong>Schedule Matrix (5 Days + Half-day):</strong></div>
+                <div><strong>Schedule Matrix:</strong></div>
                 <div>Shift Window: <span id="sched-shift" class="font-bold text-indigo-700">-</span></div>
                 <div>Max Allotment: <span id="sched-limits" class="font-bold text-indigo-700">-</span></div>
               </div>
@@ -134,7 +134,7 @@
             <h2 class="text-xl font-bold text-slate-800">📅 Rest Day Work Authorization</h2>
             <p class="text-xs text-slate-400">File a specific schedule request line to map Overtime hours or cover structural absence gaps.</p>
             <div><label class="block text-xs font-bold text-slate-500 mb-1">Target Rest Day Date</label><input type="date" id="rd-date" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50"></div>
-            <div><label class="block text-xs font-bold text-slate-500 mb-1">Justification Comments & Purpose</label><textarea id="rd-comments" rows="3" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="Specify if OT requests or covering an absent log window date..."></textarea></div>
+            <div><label class="block text-xs font-bold text-slate-500 mb-1">Justification Comments & Purpose</label><textarea id="rd-comments" rows="3" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="Specify details..."></textarea></div>
             <button onclick="submitRestDayForm()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg font-bold text-sm shadow transition">File Authorization Request</button>
             <p id="rd-feedback-msg" class="text-center font-bold text-xs p-2 rounded hidden"></p>
           </div>
@@ -340,6 +340,7 @@
     const MAX_INACTIVITY_LIMIT = 30 * 60 * 1000;
     
     window.cachedGlobalFeed = [];
+    window.serverTimeOffset = 0; // Sync anchor for absolute realtime feed accuracy
 
     let deviceId = localStorage.getItem("olympuz_device_id");
     if (!deviceId) {
@@ -532,9 +533,10 @@
     }
 
     function loadGlobalStatusFeed() {
-      callAPI('GET', '?action=getWorkspaceStatusFeed', null, function(records) {
-        if (records && !records.error) {
-          window.cachedGlobalFeed = records;
+      callAPI('GET', '?action=getWorkspaceStatusFeed', null, function(data) {
+        if (data && data.serverTime && data.feed && !data.error) {
+          window.cachedGlobalFeed = data.feed;
+          window.serverTimeOffset = Date.now() - data.serverTime;
           renderLiveGlobalFeed();
         }
       });
@@ -551,14 +553,12 @@
       window.cachedGlobalFeed.forEach(row => {
         const statusStyle = getStatusBadgeStyle(row.status);
         let loggedStr = "00:00:00";
-        let remainingStr = row.remainingShiftTime;
+        let remainingStr = "00:00:00";
         
-        if (row.isLiveTracking && row.timeIn && row.timeIn !== "-") {
-          const exactLoginISO = `${row.date}T${row.timeIn}:00+08:00`;
-          const rawLoginMs = new Date(exactLoginISO).getTime();
-
+        if (row.isLiveTracking && row.rawLoginMs) {
+          const syncedNow = Date.now() - window.serverTimeOffset;
           const runningDeductionsMs = ((row.acc_break || 0) + (row.acc_lunch || 0)) * 60000;
-          const netWorkedMs = Math.max(0, Date.now() - rawLoginMs - runningDeductionsMs);
+          const netWorkedMs = Math.max(0, syncedNow - row.rawLoginMs - runningDeductionsMs);
           
           const lSecs = Math.floor((netWorkedMs / 1000) % 60);
           const lMins = Math.floor((netWorkedMs / (1000 * 60)) % 60);
@@ -578,6 +578,13 @@
           }
         } else if (row.timeOut !== "-") {
            loggedStr = row.staticLoggedTime || "-";
+           if (row.targetLimitMs) remainingStr = "Completed";
+        } else {
+           if (row.targetLimitMs) {
+              const rHrs = Math.floor(row.targetLimitMs / 3600000);
+              const rMins = Math.floor((row.targetLimitMs / 60000) % 60);
+              remainingStr = `${rHrs.toString().padStart(2, '0')}:${rMins.toString().padStart(2, '0')}:00`;
+           }
         }
 
         html += `<tr class="border-b border-slate-100 hover:bg-slate-50/50 transition">
@@ -596,8 +603,7 @@
 
     function submitScheduleAdjustment(isPermanent) {
       const targetUserId = document.getElementById('sched-target-uid').value, shiftStart = document.getElementById('sched-shift-start').value, shiftEnd = document.getElementById('sched-shift-end').value;
-      const maxMeal = document.getElementById('sched-max-meal').value, maxBreak = document.getElementById('sched-max-break').value;
-      const isHalfDay = document.getElementById('sched-half-day').value;
+      const maxMeal = document.getElementById('sched-max-meal').value, maxBreak = document.getElementById('sched-max-break').value, isHalfDay = document.getElementById('sched-half-day').value;
       if (!targetUserId || !shiftStart || !shiftEnd || !maxMeal || !maxBreak) { alert("Please complete required scheduling selections."); return; }
       callAPI('POST', '', { action: isPermanent ? "updatePermanentSchedule" : "updateDailyScheduleAdjustment", targetUserId: targetUserId, shiftStart: shiftStart, shiftEnd: shiftEnd, maxBreak: maxBreak, maxMeal: maxMeal, isHalfDay: isHalfDay, date: new Date().toLocaleDateString('en-US') }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
     }
@@ -737,7 +743,9 @@
     function fetchGlobalAdminLogs() {
       callAPI('GET', '?action=getAdminDashboardData', null, function(data) {
         if (!data || data.error || data.success === false) { return; }
-        cachedAdminMasterData = data; populateTaskerDropdownOptions(data.absences || []); renderFilteredGrids(data);
+        cachedAdminMasterData = data; 
+        if (data.serverTime) window.serverTimeOffset = Date.now() - data.serverTime;
+        populateTaskerDropdownOptions(data.absences || []); renderFilteredGrids(data);
       });
     }
 
