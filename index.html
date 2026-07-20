@@ -134,7 +134,7 @@
             <h2 class="text-xl font-bold text-slate-800">📅 Rest Day Work Authorization</h2>
             <p class="text-xs text-slate-400">File a specific schedule request line to map Overtime hours or cover structural absence gaps.</p>
             <div><label class="block text-xs font-bold text-slate-500 mb-1">Target Rest Day Date</label><input type="date" id="rd-date" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50"></div>
-            <div><label class="block text-xs font-bold text-slate-500 mb-1">Justification Comments & Purpose</label><textarea id="rd-comments" rows="3" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="Specify details..."></textarea></div>
+            <div><label class="block text-xs font-bold text-slate-500 mb-1">Justification Comments & Purpose</label><textarea id="rd-comments" rows="3" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="Specify if OT requests or covering an absent log window date..."></textarea></div>
             <button onclick="submitRestDayForm()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg font-bold text-sm shadow transition">File Authorization Request</button>
             <p id="rd-feedback-msg" class="text-center font-bold text-xs p-2 rounded hidden"></p>
           </div>
@@ -241,6 +241,13 @@
               
               <div><label class="font-bold text-slate-600 text-rose-600">Quick Break Total (Mins)</label><input type="number" id="add-u-max-break" class="w-full p-2 border rounded mt-1 bg-slate-50" value="15"></div>
               <div><label class="font-bold text-slate-600 text-rose-600">Meal Break Total (Mins)</label><input type="number" id="add-u-max-meal" class="w-full p-2 border rounded mt-1 bg-slate-50" value="60"></div>
+              
+              <div>
+                <label class="font-bold text-slate-600 text-emerald-600">Half Day Setting</label>
+                <select id="add-u-half" class="w-full p-2 border rounded mt-1 bg-slate-50 font-bold">
+                  <option value="">None</option><option value="Monday">Monday</option><option value="Tuesday">Tuesday</option><option value="Wednesday">Wednesday</option><option value="Thursday">Thursday</option><option value="Friday">Friday</option><option value="Saturday">Saturday</option><option value="Sunday">Sunday</option>
+                </select>
+              </div>
             </div>
             <button onclick="executeAdminCreateUser()" class="bg-indigo-600 text-white font-bold text-xs px-4 py-2 rounded shadow hover:bg-indigo-700 transition mt-2">Register Tasker Profile</button>
             <p id="admin-create-feedback" class="text-xs font-bold p-2 rounded hidden mt-2"></p>
@@ -259,6 +266,13 @@
                 <div class="grid grid-cols-2 gap-2">
                   <div><label class="font-bold text-slate-600 text-rose-600">Quick Break Max (Mins)</label><input type="number" id="sched-max-break" class="w-full p-2 border rounded mt-1 bg-white" value="15"></div>
                   <div><label class="font-bold text-slate-600 text-rose-600">Meal Break Max (Mins)</label><input type="number" id="sched-max-meal" class="w-full p-2 border rounded mt-1 bg-white" value="60"></div>
+                </div>
+                <div>
+                  <label class="font-bold text-slate-600 text-emerald-600">Is Half Day?</label>
+                  <select id="sched-half-day" class="w-full p-2 border rounded mt-1 bg-white font-bold">
+                    <option value="false">No (Regular Shift)</option>
+                    <option value="true">Yes (Half Day)</option>
+                  </select>
                 </div>
                 <div class="pt-2 flex gap-2">
                   <button onclick="submitScheduleAdjustment(true)" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded transition">Save Permanently</button>
@@ -340,7 +354,7 @@
       if (token) headers['Authorization'] = 'Bearer ' + token;
       let config = { method: method, headers: headers };
       if (payload) config.body = JSON.stringify(payload);
-      fetch(API_URL + urlParams, config).then(res => res.json()).then(data => callback(data)).catch(err => { alert("Sync Error:\n" + err); });
+      fetch(API_URL + urlParams, config).then(res => res.json()).then(data => callback(data)).catch(err => { console.log(err); });
     }
 
     window.onload = function() {
@@ -412,8 +426,9 @@
     function getStatusBadgeStyle(statusText) {
       if (!statusText) return 'bg-slate-50 text-slate-500';
       const normalized = statusText.trim().toLowerCase();
-      if (normalized.startsWith('on time') || normalized === 'completed') return 'bg-emerald-50 text-emerald-600';
+      if (normalized.startsWith('on time') || normalized === 'completed' || normalized === 'rest day ot') return 'bg-emerald-50 text-emerald-600';
       if (normalized === 'undertime' || normalized === 'late' || normalized.includes('over break') || normalized.includes('over lunch') || normalized === 'absent') return 'bg-rose-50 text-rose-600';
+      if (normalized === 'on leave' || normalized === 'day off') return 'bg-indigo-50 text-indigo-600';
       return 'bg-amber-50 text-amber-600';
     }
 
@@ -477,11 +492,10 @@
       }, 1000);
     }
 
-    // Fixed background sync parser with array level validation guard matrices
     function refreshUserTimers() {
       if (!currentUser) return;
       callAPI('GET', "?action=getLiveUserStats&userId=" + currentUser.id, null, function(stats) {
-        if (!stats || stats.error || stats.success === false) return; // Prevent crashes on backend error payloads
+        if (!stats || stats.error || stats.success === false) return; 
 
         document.getElementById('stat-hours').innerText = (stats.clockedHours || "0.00") + " hrs";
         document.getElementById('stat-break').innerText = (stats.breakMinutes || 0) + " mins";
@@ -539,9 +553,12 @@
         let loggedStr = "00:00:00";
         let remainingStr = row.remainingShiftTime;
         
-        if (row.isLiveTracking && row.rawLoginMs) {
+        if (row.isLiveTracking && row.timeIn && row.timeIn !== "-") {
+          const exactLoginISO = `${row.date}T${row.timeIn}:00+08:00`;
+          const rawLoginMs = new Date(exactLoginISO).getTime();
+
           const runningDeductionsMs = ((row.acc_break || 0) + (row.acc_lunch || 0)) * 60000;
-          const netWorkedMs = Math.max(0, Date.now() - row.rawLoginMs - runningDeductionsMs);
+          const netWorkedMs = Math.max(0, Date.now() - rawLoginMs - runningDeductionsMs);
           
           const lSecs = Math.floor((netWorkedMs / 1000) % 60);
           const lMins = Math.floor((netWorkedMs / (1000 * 60)) % 60);
@@ -580,13 +597,14 @@
     function submitScheduleAdjustment(isPermanent) {
       const targetUserId = document.getElementById('sched-target-uid').value, shiftStart = document.getElementById('sched-shift-start').value, shiftEnd = document.getElementById('sched-shift-end').value;
       const maxMeal = document.getElementById('sched-max-meal').value, maxBreak = document.getElementById('sched-max-break').value;
+      const isHalfDay = document.getElementById('sched-half-day').value;
       if (!targetUserId || !shiftStart || !shiftEnd || !maxMeal || !maxBreak) { alert("Please complete required scheduling selections."); return; }
-      callAPI('POST', '', { action: isPermanent ? "updatePermanentSchedule" : "updateDailyScheduleAdjustment", targetUserId: targetUserId, shiftStart: shiftStart, shiftEnd: shiftEnd, maxBreak: maxBreak, maxMeal: maxMeal, date: new Date().toLocaleDateString('en-US') }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
+      callAPI('POST', '', { action: isPermanent ? "updatePermanentSchedule" : "updateDailyScheduleAdjustment", targetUserId: targetUserId, shiftStart: shiftStart, shiftEnd: shiftEnd, maxBreak: maxBreak, maxMeal: maxMeal, isHalfDay: isHalfDay, date: new Date().toLocaleDateString('en-US') }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
     }
 
     function toggleFormScheduleVisibility() {
       const role = document.getElementById('add-u-role').value;
-      const ids = ['add-u-shift-start', 'add-u-shift-end', 'add-u-off', 'add-u-max-break', 'add-u-max-meal'];
+      const ids = ['add-u-shift-start', 'add-u-shift-end', 'add-u-off', 'add-u-max-break', 'add-u-max-meal', 'add-u-half'];
       ids.forEach(id => {
         const el = document.getElementById(id); if (!el) return;
         const parent = el.closest('div'); if (!parent) return;
@@ -598,6 +616,7 @@
           if (id === 'add-u-off') el.value = "Saturday, Sunday"; 
           if (id === 'add-u-max-break') el.value = "15";
           if (id === 'add-u-max-meal') el.value = "60";
+          if (id === 'add-u-half') el.value = "";
         }
       });
     }
@@ -683,7 +702,6 @@
       callAPI('POST', '', { action: "adminUntagAbsent", absentId: absentId }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
     }
 
-    // Admin configuration overrides
     function executeAdminOverridePassword(targetUid) {
       const newPass = prompt("Enter explicit password string:"); if (!newPass || newPass.trim() === "") return;
       callAPI('POST', '', { action: "adminChangePassword", targetUserId: targetUid, newPassword: newPass }, function(res) { alert(res.message); });
@@ -718,7 +736,7 @@
 
     function fetchGlobalAdminLogs() {
       callAPI('GET', '?action=getAdminDashboardData', null, function(data) {
-        if (!data || data.error) { return; }
+        if (!data || data.error || data.success === false) { return; }
         cachedAdminMasterData = data; populateTaskerDropdownOptions(data.absences || []); renderFilteredGrids(data);
       });
     }
@@ -742,7 +760,7 @@
 
       (data.absences || []).forEach(u => {
         const ps = u.permanentSchedule;
-        auditList.innerHTML += '<div class="py-2 flex justify-between items-center text-xs"><div><div class="font-bold text-slate-800">' + u.name + ' <span class="text-slate-400 font-mono">(' + u.id + ')</span></div><div class="text-[10px] text-slate-500 mt-0.5">Shift: ' + ps.shiftStart + ' - ' + ps.shiftEnd + '</div><div class="text-[10px] text-indigo-600 font-medium">Max Q-Break: ' + ps.maxBreak + 'm | Max Meal: ' + ps.maxMeal + 'm</div></div></div>';
+        auditList.innerHTML += '<div class="py-2 flex justify-between items-center text-xs"><div><div class="font-bold text-slate-800">' + u.name + ' <span class="text-slate-400 font-mono">(' + u.id + ')</span></div><div class="text-[10px] text-slate-500 mt-0.5">Shift: ' + ps.shiftStart + ' - ' + ps.shiftEnd + ' | Half-Day: ' + (ps.halfDay || "None") + '</div><div class="text-[10px] text-indigo-600 font-medium">Max Q-Break: ' + ps.maxBreak + 'm | Max Meal: ' + ps.maxMeal + 'm</div></div></div>';
       });
 
       let filteredAttendance = (data.attendance || []).filter(row => {
@@ -837,7 +855,7 @@
       tableBody.innerHTML = '<tr><td colspan="8" class="p-3 text-center text-slate-400">Loading payout records...</td></tr>';
       callAPI('GET', "?action=getUserPayroll&userId=" + currentUser.id, null, function(payments) {
         tableBody.innerHTML = "";
-        if (!payments || payments.length === 0) { tableBody.innerHTML = '<tr><td colspan="8" class="p-3 text-center text-slate-400">No payment records found.</td></tr>'; return; }
+        if (!payments || payments.error || payments.length === 0) { tableBody.innerHTML = '<tr><td colspan="8" class="p-3 text-center text-slate-400">No payment records found.</td></tr>'; return; }
         payments.forEach(row => {
           let statusBadge = "";
           if (row.status === "Acknowledged" || row.status === "Settled & Adjusted") {
@@ -899,7 +917,8 @@
         daysOff: document.getElementById('add-u-off').value,
         leaveAllowance: document.getElementById('add-u-leaves').value,
         maxBreak: document.getElementById('add-u-max-break').value,
-        maxMeal: document.getElementById('add-u-max-meal').value
+        maxMeal: document.getElementById('add-u-max-meal').value,
+        halfDay: document.getElementById('add-u-half').value
       };
       if (!payload.name || !payload.email) { alert("Please compile both Legal Name and Email fields."); return; }
       fb.className = "text-xs font-bold p-2 rounded bg-amber-50 text-amber-800 block mt-2"; fb.innerText = "Registering user profile line...";
@@ -947,9 +966,9 @@
 
     function submitScheduleAdjustment(isPermanent) {
       const targetUserId = document.getElementById('sched-target-uid').value, shiftStart = document.getElementById('sched-shift-start').value, shiftEnd = document.getElementById('sched-shift-end').value;
-      const maxMeal = document.getElementById('sched-max-meal').value, maxBreak = document.getElementById('sched-max-break').value;
+      const maxMeal = document.getElementById('sched-max-meal').value, maxBreak = document.getElementById('sched-max-break').value, isHalfDay = document.getElementById('sched-half-day').value;
       if (!targetUserId || !shiftStart || !shiftEnd || !maxMeal || !maxBreak) { alert("Please complete required scheduling selections."); return; }
-      callAPI('POST', '', { action: isPermanent ? "updatePermanentSchedule" : "updateDailyScheduleAdjustment", targetUserId: targetUserId, shiftStart: shiftStart, shiftEnd: shiftEnd, maxBreak: maxBreak, maxMeal: maxMeal, date: new Date().toLocaleDateString('en-US') }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
+      callAPI('POST', '', { action: isPermanent ? "updatePermanentSchedule" : "updateDailyScheduleAdjustment", targetUserId: targetUserId, shiftStart: shiftStart, shiftEnd: shiftEnd, maxBreak: maxBreak, maxMeal: maxMeal, isHalfDay: isHalfDay, date: new Date().toLocaleDateString('en-US') }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
     }
 
     function applyGlobalFilters() { if (cachedAdminMasterData) renderFilteredGrids(cachedAdminMasterData); }
