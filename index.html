@@ -1075,14 +1075,15 @@
 
     function submitScheduleAdjustment(isPermanent) {
       const targetUserId = document.getElementById('sched-target-uid').value, shiftStart = document.getElementById('sched-shift-start').value, shiftEnd = document.getElementById('sched-shift-end').value;
-      const maxMeal = document.getElementById('sched-max-meal').value, maxBreak = document.getElementById('sched-max-break').value, isHalfDay = document.getElementById('sched-half-day').value;
+      const maxMeal = document.getElementById('sched-max-meal').value, maxBreak = document.getElementById('sched-max-break').value;
+      const isHalfDay = document.getElementById('sched-half-day').value, halfDayHrs = document.getElementById('sched-half-hrs').value;
       if (!targetUserId || !shiftStart || !shiftEnd || !maxMeal || !maxBreak) { alert("Please complete required scheduling selections."); return; }
-      callAPI('POST', '', { action: isPermanent ? "updatePermanentSchedule" : "updateDailyScheduleAdjustment", targetUserId: targetUserId, shiftStart: shiftStart, shiftEnd: shiftEnd, maxBreak: maxBreak, maxMeal: maxMeal, isHalfDay: isHalfDay, date: new Date().toLocaleDateString('en-US') }, function(res) { alert(res.message || res.error || "Updated"); fetchGlobalAdminLogs(); });
+      callAPI('POST', '', { action: isPermanent ? "updatePermanentSchedule" : "updateDailyScheduleAdjustment", targetUserId: targetUserId, shiftStart: shiftStart, shiftEnd: shiftEnd, maxBreak: maxBreak, maxMeal: maxMeal, isHalfDay: isHalfDay, halfDayHours: halfDayHrs, date: new Date().toLocaleDateString('en-US') }, function(res) { alert(res.message || res.error || "Updated"); fetchGlobalAdminLogs(); });
     }
 
     function toggleFormScheduleVisibility() {
       const role = document.getElementById('add-u-role').value;
-      const ids = ['add-u-shift-start', 'add-u-shift-end', 'add-u-off', 'add-u-max-break', 'add-u-max-meal', 'add-u-half'];
+      const ids = ['add-u-shift-start', 'add-u-shift-end', 'add-u-off', 'add-u-max-break', 'add-u-max-meal', 'add-u-half', 'add-u-half-hrs'];
       ids.forEach(id => {
         const el = document.getElementById(id); if (!el) return;
         const parent = el.closest('div'); if (!parent) return;
@@ -1095,6 +1096,7 @@
           if (id === 'add-u-max-break') el.value = "15";
           if (id === 'add-u-max-meal') el.value = "60";
           if (id === 'add-u-half') el.value = "";
+          if (id === 'add-u-half-hrs') el.value = "4";
         }
       });
     }
@@ -1206,7 +1208,7 @@
       
       if (id === 'task-report-sec') { document.getElementById('rep-date').value = new Date().toISOString().split('T')[0]; document.getElementById('public-filter-tasker').value = "ALL"; loadPublicTaskReportsFeed(); }
       if (id === 'referral-report-sec') loadReferralReportsFeed();
-      if (id === 'feedback-submit-sec') loadGlobalStatusFeed(); // This guarantees the dropdown is populated!
+      if (id === 'feedback-submit-sec') loadGlobalStatusFeed(); 
       if (id === 'global-feed-sec') loadGlobalStatusFeed();
       if (id === 'admin-sec') fetchGlobalAdminLogs();
       if (id === 'attendance-sec' || id === 'leave-request-sec' || id === 'ca-request-sec' || id === 'coaching-sec' || id === 'account-settings-sec' || id === 'restday-request-sec') refreshUserTimers();
@@ -1354,7 +1356,7 @@
       else {
         filteredFeedback.forEach(row => {
           let fbAttach = row.attachment ? `<button onclick="openImagePreviewOverlayModal('${row.attachment}')" class="text-amber-700 hover:underline font-bold text-xs">View Proof</button>` : `<span class="text-slate-400 italic text-xs">None</span>`;
-          fbBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 text-slate-500 text-xs">${row.timestamp}</td><td class="p-3 text-slate-600 text-xs font-mono">Hidden (ID: ${row.reporter_id})</td><td class="p-3 font-bold text-slate-900">${row.target_user_name}</td><td class="p-3"><span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-[11px] font-bold">${row.category}</span></td><td class="p-3 text-slate-600 text-xs max-w-sm break-words whitespace-pre-wrap">${row.reason}</td><td class="p-3 text-center">${fbAttach}</td></tr>`;
+          fbBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 text-slate-500 text-xs">${row.timestamp}</td><td class="p-3 text-indigo-700 text-xs font-bold">${row.reporter_name} <span class="text-slate-400 font-mono font-normal">(${row.reporter_id})</span></td><td class="p-3 font-bold text-slate-900">${row.target_user_name}</td><td class="p-3"><span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-[11px] font-bold">${row.category}</span></td><td class="p-3 text-slate-600 text-xs max-w-sm break-words whitespace-pre-wrap">${row.reason}</td><td class="p-3 text-center">${fbAttach}</td></tr>`;
         });
       }
 
