@@ -702,12 +702,12 @@
       
       pBody.innerHTML = ""; absBody.innerHTML = ""; lBody.innerHTML = ""; payBody.innerHTML = ""; explicitAbsBody.innerHTML = ""; rdBody.innerHTML = ""; auditList.innerHTML = "";
 
-      data.absences.forEach(u => {
+      (data.absences || []).forEach(u => {
         const ps = u.permanentSchedule;
         auditList.innerHTML += '<div class="py-2 flex justify-between items-center text-xs"><div><div class="font-bold text-slate-800">' + u.name + ' <span class="text-slate-400 font-mono">(' + u.id + ')</span></div><div class="text-[10px] text-slate-500 mt-0.5">Shift: ' + ps.shiftStart + ' - ' + ps.shiftEnd + '</div><div class="text-[10px] text-indigo-600 font-medium">Max Q-Break: ' + ps.maxBreak + 'm | Max Meal: ' + ps.maxMeal + 'm</div></div></div>';
       });
 
-      let filteredAttendance = data.attendance.filter(row => {
+      let filteredAttendance = (data.attendance || []).filter(row => {
         if (selectedTasker !== "ALL" && row.name !== selectedTasker) return false;
         if (fromTime || toTime) { const rowTime = new Date(row.date.replace(" (Half Day)", "")).getTime(); if (fromTime && rowTime < fromTime) return false; if (toTime && rowTime > toTime) return false; }
         return true;
@@ -722,7 +722,7 @@
         });
       }
 
-      let filteredExplicitAbsents = data.explicitAbsents.filter(row => {
+      let filteredExplicitAbsents = (data.explicitAbsents || []).filter(row => {
         if (selectedTasker !== "ALL" && row.name !== selectedTasker) return false;
         if (fromTime || toTime) { const rowTime = new Date(row.date).getTime(); if (fromTime && rowTime < fromTime) return false; if (toTime && rowTime > toTime) return false; }
         return true;
@@ -734,7 +734,7 @@
         });
       }
 
-      let filteredPayments = data.payments.filter(row => { return !(selectedTasker !== "ALL" && row.name !== selectedTasker); });
+      let filteredPayments = (data.payments || []).filter(row => { return !(selectedTasker !== "ALL" && row.name !== selectedTasker); });
       if(filteredPayments.length === 0) { payBody.innerHTML = '<tr><td colspan="10" class="p-3 text-center text-slate-400">No payouts.</td></tr>'; }
       else {
         filteredPayments.forEach(row => {
@@ -743,7 +743,7 @@
         });
       }
 
-      let filteredRestDays = data.restDays.filter(row => { return !(selectedTasker !== "ALL" && row.name !== selectedTasker); });
+      let filteredRestDays = (data.restDays || []).filter(row => { return !(selectedTasker !== "ALL" && row.name !== selectedTasker); });
       if (filteredRestDays.length === 0) { rdBody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-slate-400">Queue clean.</td></tr>'; }
       else {
         filteredRestDays.forEach(row => {
@@ -754,12 +754,12 @@
         });
       }
 
-      data.absences.filter(r => !(selectedTasker !== "ALL" && r.name !== selectedTasker)).forEach(row => {
+      (data.absences || []).filter(r => !(selectedTasker !== "ALL" && r.name !== selectedTasker)).forEach(row => {
         const missClass = row.absents > 0 ? 'text-rose-600 bg-rose-50/30' : 'text-emerald-600';
         absBody.innerHTML += '<tr class="border-b border-slate-100"><td class="p-3 text-slate-500">' + row.id + '</td><td class="p-3 font-medium text-slate-900">' + row.name + '</td><td class="p-3 text-slate-500">' + row.daysOff + '</td><td class="p-3 text-indigo-600">' + row.halfDay + '</td><td class="p-3 font-black ' + missClass + '">' + row.absents + ' days missed</td><td class="p-3 text-center space-x-1 whitespace-nowrap"><button onclick="executeAdminTagUserAbsent(\'' + row.id + '\', \'' + row.name + '\')" class="text-xs bg-rose-600 text-white font-bold px-2 py-1 rounded">Tag Absent</button><button onclick="executeAdminOverridePassword(\'' + row.id + '\')" class="text-xs bg-indigo-50 text-indigo-700 font-semibold px-2 py-1 rounded border">Reset Pass</button><button onclick="executeAdminRemoveUser(\'' + row.id + '\', \'' + row.name + '\')" class="text-xs bg-rose-50 text-rose-600 font-bold px-2 py-1 rounded border">Purge</button></td></tr>';
       });
 
-      let filteredLeaves = data.leaves.filter(row => { return !(selectedTasker !== "ALL" && row.name !== selectedTasker); });
+      let filteredLeaves = (data.leaves || []).filter(row => { return !(selectedTasker !== "ALL" && row.name !== selectedTasker); });
       if(filteredLeaves.length === 0) { lBody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-slate-400">Clean queue.</td></tr>'; }
       filteredLeaves.forEach(row => {
         let controls = '<span class="text-slate-400 italic text-xs">Closed Logs</span>';
