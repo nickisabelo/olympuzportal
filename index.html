@@ -55,7 +55,7 @@
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-100 pb-4 gap-4">
               <div><h2 class="text-xl font-bold text-slate-800">Time Clock Operations <span id="halfday-banner" class="hidden text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-black ml-2">Half Day Active</span></h2><p class="text-xs text-slate-500">Log punch timestamps and view daily break metrics.</p></div>
               <div class="bg-indigo-50 border border-indigo-100 p-3 rounded-xl text-xs space-y-1 text-indigo-950">
-                <div><strong>Schedule Matrix:</strong></div>
+                <div><strong>Schedule Matrix (5 Days + Half-day):</strong></div>
                 <div>Shift Window: <span id="sched-shift" class="font-bold text-indigo-700">-</span></div>
                 <div>Max Allotment: <span id="sched-limits" class="font-bold text-indigo-700">-</span></div>
               </div>
@@ -134,7 +134,7 @@
             <h2 class="text-xl font-bold text-slate-800">📅 Rest Day Work Authorization</h2>
             <p class="text-xs text-slate-400">File a specific schedule request line to map Overtime hours or cover structural absence gaps.</p>
             <div><label class="block text-xs font-bold text-slate-500 mb-1">Target Rest Day Date</label><input type="date" id="rd-date" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50"></div>
-            <div><label class="block text-xs font-bold text-slate-500 mb-1">Justification Comments & Purpose</label><textarea id="rd-comments" rows="3" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="Specify details..."></textarea></div>
+            <div><label class="block text-xs font-bold text-slate-500 mb-1">Justification Comments & Purpose</label><textarea id="rd-comments" rows="3" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="Specify if OT requests or covering an absent log window date..."></textarea></div>
             <button onclick="submitRestDayForm()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg font-bold text-sm shadow transition">File Authorization Request</button>
             <p id="rd-feedback-msg" class="text-center font-bold text-xs p-2 rounded hidden"></p>
           </div>
@@ -175,6 +175,7 @@
           <p id="self-pass-feedback" class="text-center font-bold text-xs p-2 rounded hidden"></p>
         </section>
 
+        <!-- MODULE: ADMIN CONTROL - PAYROLL DISBURSEMENT -->
         <section id="admin-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-6 max-w-2xl">
           <h2 class="text-xl font-bold text-indigo-700 border-b pb-2">Admin Control: Issue Fixed Weekly Payment</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -184,6 +185,8 @@
             <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Number of Service Weeks</label><input id="p-hours" type="number" step="0.1" class="w-full p-2 border border-slate-200 text-sm rounded-lg"></div>
             <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Prerogative Deductions (₱)</label><input id="p-deduct" type="number" class="w-full p-2 border border-slate-200 text-sm rounded-lg" value="0"></div>
             <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Service Billing Period</label><input id="p-month" type="text" class="w-full p-2 border border-slate-200 text-sm rounded-lg" placeholder="Week 1 - July 2026"></div>
+            
+            <!-- Payment Mode and File Attachment Selectors -->
             <div>
               <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Payment Mode Matrix</label>
               <select id="p-mode" class="w-full p-2 border border-slate-200 text-sm rounded-lg bg-slate-50 font-bold text-indigo-900">
@@ -195,19 +198,28 @@
               <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Upload Receipt Screenshot</label>
               <input type="file" id="p-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
             </div>
+
             <div class="sm:col-span-2"><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Service Remarks</label><input id="p-remarks" type="text" class="w-full p-2 border border-slate-200 text-sm rounded-lg" placeholder="Notes..."></div>
           </div>
           <button onclick="submitPayrollForm()" class="bg-indigo-600 text-white px-5 py-2.5 text-sm rounded-lg font-bold shadow hover:bg-indigo-700 transition">Disburse Service Payment</button>
           <p id="payroll-feedback" class="text-emerald-600 bg-emerald-50 text-xs font-bold p-2 rounded-lg hidden"></p>
         </section>
 
+        <!-- USER PAYMENTS LEDGER -->
         <section id="user-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4 max-w-7xl">
           <h2 class="text-xl font-bold text-slate-800 border-b pb-2">My Service Payment Ledgers</h2>
           <div class="overflow-x-auto rounded-lg border border-slate-100">
             <table class="w-full text-left border-collapse text-sm">
               <thead>
                 <tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold">
-                  <th class="p-3">Service Period</th><th class="p-3">Weeks Logged</th><th class="p-3">Mode</th><th class="p-3">Gross Base</th><th class="p-3">Deductions</th><th class="p-3 font-bold text-indigo-700">Net Credited</th><th class="p-3">Receipt Document</th><th class="p-3 text-center">Status Actions</th>
+                  <th class="p-3">Service Period</th>
+                  <th class="p-3">Weeks Logged</th>
+                  <th class="p-3">Mode</th>
+                  <th class="p-3">Gross Base</th>
+                  <th class="p-3">Deductions</th>
+                  <th class="p-3 font-bold text-indigo-700">Net Credited</th>
+                  <th class="p-3">Receipt Document</th>
+                  <th class="p-3 text-center">Status Actions</th>
                 </tr>
               </thead>
               <tbody id="user-payroll-table" class="divide-y divide-slate-50"></tbody>
@@ -217,7 +229,7 @@
 
         <section id="admin-sec" class="hidden space-y-8 max-w-6xl">
           <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 space-y-4">
-            <h2 class="text-sm font-bold uppercase tracking-wider text-indigo-900">🔍 Real-Time Ledger Filtration Control</h2>
+            <h3 class="text-sm font-bold uppercase tracking-wider text-indigo-900">🔍 Real-Time Ledger Filtration Control</h3>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div><label class="block text-xs font-bold text-slate-500 mb-1">Target Tasker</label><select id="filter-tasker" onchange="applyGlobalFilters()" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-slate-50"><option value="ALL">-- Show All Taskers --</option></select></div>
               <div><label class="block text-xs font-bold text-slate-500 mb-1">From Date</label><input type="date" id="filter-from-date" onchange="applyGlobalFilters()" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-slate-50"></div>
@@ -239,6 +251,7 @@
               <div><label class="font-bold text-slate-600">Days Off Allotment</label><input type="text" id="add-u-off" class="w-full p-2 border rounded mt-1 bg-slate-50" value="Saturday, Sunday"></div>
               <div><label class="font-bold text-slate-600">Leave Balance</label><input type="number" id="add-u-leaves" class="w-full p-2 border rounded mt-1 bg-slate-50" value="15"></div>
               
+              <!-- Updated Dynamic Duration Fields -->
               <div><label class="font-bold text-slate-600 text-rose-600">Quick Break Total (Mins)</label><input type="number" id="add-u-max-break" class="w-full p-2 border rounded mt-1 bg-slate-50" value="15"></div>
               <div><label class="font-bold text-slate-600 text-rose-600">Meal Break Total (Mins)</label><input type="number" id="add-u-max-meal" class="w-full p-2 border rounded mt-1 bg-slate-50" value="60"></div>
               
@@ -340,7 +353,7 @@
     const MAX_INACTIVITY_LIMIT = 30 * 60 * 1000;
     
     window.cachedGlobalFeed = [];
-    window.serverTimeOffset = 0; // Sync anchor for absolute realtime feed accuracy
+    window.serverTimeOffset = 0;
 
     let deviceId = localStorage.getItem("olympuz_device_id");
     if (!deviceId) {
@@ -532,11 +545,14 @@
       });
     }
 
+    // Safely handles the incoming payload object to ensure the frontend extracts the feed array
     function loadGlobalStatusFeed() {
       callAPI('GET', '?action=getWorkspaceStatusFeed', null, function(data) {
-        if (data && data.serverTime && data.feed && !data.error) {
-          window.cachedGlobalFeed = data.feed;
-          window.serverTimeOffset = Date.now() - data.serverTime;
+        if (data && !data.error) {
+          window.cachedGlobalFeed = data.feed || [];
+          if (data.serverTime) {
+            window.serverTimeOffset = Date.now() - data.serverTime;
+          }
           renderLiveGlobalFeed();
         }
       });
@@ -544,7 +560,9 @@
 
     function renderLiveGlobalFeed() {
       const feedBody = document.getElementById('global-feed-table');
-      if (!window.cachedGlobalFeed || window.cachedGlobalFeed.length === 0) {
+      
+      // Secondary safety check to absolutely guarantee we never trigger `.forEach()` on undefined data
+      if (!Array.isArray(window.cachedGlobalFeed) || window.cachedGlobalFeed.length === 0) {
         feedBody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-400">No logs today.</td></tr>';
         return;
       }
