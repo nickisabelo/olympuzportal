@@ -9,58 +9,31 @@
 </head>
 <body class="bg-slate-50 font-sans text-slate-800">
 
-  <!-- AUTHENTICATION DIALOG -->
   <div id="login-page" class="flex min-h-screen items-center justify-center px-4">
     <div class="w-full max-w-md p-8 bg-white rounded-xl shadow-xl border border-slate-100">
       <div class="text-center mb-8">
         <h2 class="text-4xl font-black tracking-tight text-indigo-700 uppercase">Olympuz</h2>
-        <p class="text-xs text-slate-500 mt-1 font-medium tracking-wide">
-          powered by <span class="text-slate-700 font-semibold">Edward Belacse Career Consultancy Services</span>
-        </p>
+        <p class="text-xs text-slate-500 mt-1 font-medium tracking-wide">powered by <span class="text-slate-700 font-semibold">Edward Belacse Career Consultancy Services</span></p>
       </div>
-      
-      <!-- Primary Credentials Block -->
       <div id="credentials-form" class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Corporate Email</label>
-          <input type="email" id="email" class="w-full p-3 border border-slate-200 rounded-lg text-sm">
-        </div>
-        <div>
-          <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Password</label>
-          <input type="password" id="password" class="w-full p-3 border border-slate-200 rounded-lg text-sm">
-        </div>
+        <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">Corporate Email</label><input type="email" id="email" class="w-full p-3 border border-slate-200 rounded-lg text-sm"></div>
+        <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">Password</label><input type="password" id="password" class="w-full p-3 border border-slate-200 rounded-lg text-sm"></div>
         <button onclick="handleLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg font-bold shadow transition mt-2">Sign In</button>
       </div>
-
-      <!-- Verification OTP Block -->
       <div id="otp-form" class="space-y-4 hidden">
-        <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl text-xs text-indigo-950 mb-2">
-          <strong>New Device/24hr Verification Required:</strong>
-          <p class="mt-1 text-indigo-800">We sent a 6-digit verification code to your email inbox. Please type it in below to authorize this access session.</p>
-        </div>
-        <div>
-          <label class="block text-xs font-bold uppercase text-slate-600 mb-1">6-Digit Verification Code</label>
-          <input type="text" id="otp-code" maxlength="6" placeholder="000000" class="w-full p-3 border border-slate-200 rounded-lg text-center tracking-widest font-mono text-xl">
-        </div>
+        <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl text-xs text-indigo-950 mb-2"><strong>New Device/24hr Verification Required:</strong><p class="mt-1 text-indigo-800">We sent a 6-digit verification code to your email inbox. Please type it in below to authorize this access session.</p></div>
+        <div><label class="block text-xs font-bold uppercase text-slate-600 mb-1">6-Digit Verification Code</label><input type="text" id="otp-code" maxlength="6" placeholder="000000" class="w-full p-3 border border-slate-200 rounded-lg text-center tracking-widest font-mono text-xl"></div>
         <button onclick="handleVerifyOTP()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white p-3 rounded-lg font-bold shadow transition">Verify Code & Enter</button>
         <button onclick="cancelOTPFlow()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 p-2 rounded-lg text-xs font-semibold mt-1">Back to Login</button>
       </div>
-
       <p id="login-err" class="text-red-500 text-xs font-semibold mt-4 text-center hidden bg-red-50 p-2 rounded"></p>
     </div>
   </div>
 
-  <!-- MAIN DASHBOARD CONTENT GRID -->
   <div id="app-page" class="hidden min-h-screen flex flex-col">
     <header class="bg-indigo-900 text-white px-6 py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 shadow-md">
-      <div class="flex flex-col">
-        <span class="text-2xl font-black tracking-wider uppercase">Olympuz</span>
-        <span class="text-[10px] text-indigo-200 font-medium tracking-wider -mt-1">powered by Edward Belacse Career Consultancy Services</span>
-      </div>
-      <div class="flex items-center gap-4 self-end sm:self-auto">
-        <span id="user-display" class="bg-indigo-800 text-xs font-semibold px-3 py-1.5 rounded-full border border-indigo-700"></span>
-        <button onclick="logout()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition">Logout</button>
-      </div>
+      <div class="flex flex-col"><span class="text-2xl font-black tracking-wider uppercase">Olympuz</span><span class="text-[10px] text-indigo-200 font-medium tracking-wider -mt-1">powered by Edward Belacse Career Consultancy Services</span></div>
+      <div class="flex items-center gap-4 self-end sm:self-auto"><span id="user-display" class="bg-indigo-800 text-xs font-semibold px-3 py-1.5 rounded-full border border-indigo-700"></span><button onclick="logout()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition">Logout</button></div>
     </header>
 
     <div class="flex flex-1 flex-col md:flex-row">
@@ -77,14 +50,10 @@
 
       <main class="flex-1 p-6 md:p-8 overflow-y-auto">
         
-        <!-- MODULE: TIME CLOCK -->
         <section id="attendance-sec" class="hidden space-y-6 max-w-4xl">
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-6">
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-100 pb-4 gap-4">
-              <div>
-                <h2 class="text-xl font-bold text-slate-800">Time Clock Operations <span id="halfday-banner" class="hidden text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-black ml-2">Half Day Active</span></h2>
-                <p class="text-xs text-slate-500">Log punch timestamps and view daily break metrics.</p>
-              </div>
+              <div><h2 class="text-xl font-bold text-slate-800">Time Clock Operations <span id="halfday-banner" class="hidden text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-black ml-2">Half Day Active</span></h2><p class="text-xs text-slate-500">Log punch timestamps and view daily break metrics.</p></div>
               <div class="bg-indigo-50 border border-indigo-100 p-3 rounded-xl text-xs space-y-1 text-indigo-950">
                 <div><strong>Schedule Matrix (5 Days + Half-day):</strong></div>
                 <div>Shift Window: <span id="sched-shift" class="font-bold text-indigo-700">-</span></div>
@@ -92,7 +61,6 @@
               </div>
             </div>
 
-            <!-- DIGITAL LIVE TIMER BANNER -->
             <div id="live-timer-banner" class="hidden bg-slate-900 text-white p-4 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-2 shadow-inner font-mono">
               <span class="text-xs tracking-wider uppercase font-sans text-slate-400 font-bold" id="live-timer-label">⏱️ ACTIVE SESSION TIMER:</span>
               <span class="text-3xl font-black tracking-widest text-emerald-400 animate-pulse" id="live-digital-clock">00:00:00</span>
@@ -100,30 +68,26 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center"><div class="text-xs text-slate-500 font-bold uppercase tracking-wider">Net Clocked Time</div><div id="stat-hours" class="text-3xl font-black text-indigo-600 mt-1">0.00 hrs</div></div>
-              <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center"><div class="text-xs text-slate-500 font-bold uppercase tracking-wider">Break Duration</div><div id="stat-break" class="text-3xl font-black text-amber-600 mt-1">0 mins</div></div>
-              <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center"><div class="text-xs text-slate-500 font-bold uppercase tracking-wider">Lunch Duration</div><div id="stat-lunch" class="text-3xl font-black text-orange-600 mt-1">0 mins</div></div>
+              <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center"><div class="text-xs text-slate-500 font-bold uppercase tracking-wider">Quick Break Duration</div><div id="stat-break" class="text-3xl font-black text-amber-600 mt-1">0 mins</div></div>
+              <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center"><div class="text-xs text-slate-500 font-bold uppercase tracking-wider">Meal Break Duration</div><div id="stat-lunch" class="text-3xl font-black text-orange-600 mt-1">0 mins</div></div>
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-2">
               <button onclick="triggerAttendance('Time In')" class="bg-emerald-600 text-white p-4 rounded-xl font-bold text-sm hover:bg-emerald-700 transition">Clock In</button>
-              <button onclick="triggerAttendance('Break Start')" class="bg-amber-500 text-white p-4 rounded-xl font-bold text-sm hover:bg-amber-600 transition">Break Out</button>
-              <button onclick="triggerAttendance('Break End')" class="bg-amber-600 text-white p-4 rounded-xl font-bold text-sm hover:bg-amber-700 transition">Break Return</button>
-              <button id="btn-lunch-s" onclick="triggerAttendance('Lunch Start')" class="bg-orange-500 text-white p-4 rounded-xl font-bold text-sm hover:bg-orange-600 transition block">Lunch Out</button>
-              <button id="btn-lunch-e" onclick="triggerAttendance('Lunch End')" class="bg-orange-600 text-white p-4 rounded-xl font-bold text-sm hover:bg-orange-700 transition block">Lunch Return</button>
+              <button onclick="triggerAttendance('Break Start')" class="bg-amber-500 text-white p-4 rounded-xl font-bold text-sm hover:bg-amber-600 transition">Quick Break</button>
+              <button onclick="triggerAttendance('Break End')" class="bg-amber-600 text-white p-4 rounded-xl font-bold text-sm hover:bg-amber-700 transition">Quick Break Return</button>
+              <button id="btn-lunch-s" onclick="triggerAttendance('Lunch Start')" class="bg-orange-500 text-white p-4 rounded-xl font-bold text-sm hover:bg-orange-600 transition block">Meal Break</button>
+              <button id="btn-lunch-e" onclick="triggerAttendance('Lunch End')" class="bg-orange-600 text-white p-4 rounded-xl font-bold text-sm hover:bg-orange-700 transition block">Meal Break Return</button>
               <button onclick="triggerAttendance('Time Out')" class="bg-rose-600 text-white p-4 rounded-xl font-bold text-sm hover:bg-rose-700 transition">Clock Out</button>
             </div>
             <p id="attendance-feedback" class="text-center font-bold text-sm p-3 rounded-lg hidden"></p>
           </div>
-          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100"><h3 class="text-md font-bold text-slate-900 border-b pb-2 mb-3">My Personal Attendance History</h3><div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Logged Date</th><th class="p-3">Clock In</th><th class="p-3">Clock Out</th><th class="p-3">Break Duration</th><th class="p-3">Lunch Duration</th><th class="p-3">Exception Status</th></tr></thead><tbody id="personal-history-table" class="divide-y divide-slate-50"></tbody></table></div></div>
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100"><h3 class="text-md font-bold text-slate-900 border-b pb-2 mb-3">My Personal Attendance History</h3><div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Logged Date</th><th class="p-3">Clock In</th><th class="p-3">Clock Out</th><th class="p-3">Q-Break Duration</th><th class="p-3">Meal Duration</th><th class="p-3">Exception Status</th></tr></thead><tbody id="personal-history-table" class="divide-y divide-slate-50"></tbody></table></div></div>
         </section>
 
-        <!-- GLOBAL TEAM STATUS FEED PANEL -->
         <section id="global-feed-sec" class="hidden space-y-6 max-w-6xl">
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-100 pb-4 mb-4">
-              <div>
-                <h2 class="text-xl font-bold text-slate-800">🌐 Workspace Status Board Feed</h2>
-                <p class="text-xs text-slate-400">View real-time tracking operations and calculated hours remaining for all active taskers.</p>
-              </div>
+              <div><h2 class="text-xl font-bold text-slate-800">🌐 Workspace Status Board Feed</h2><p class="text-xs text-slate-400">View real-time tracking operations and calculated hours remaining for all active taskers.</p></div>
               <button onclick="loadGlobalStatusFeed()" class="text-xs font-bold bg-indigo-50 border border-indigo-200 text-indigo-700 px-3 py-1.5 rounded-lg mt-2 sm:mt-0">🔄 Refresh Feed</button>
             </div>
             <div class="overflow-x-auto rounded-lg border border-slate-100">
@@ -132,22 +96,22 @@
                   <tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold text-xs uppercase">
                     <th class="p-3">Tasker Profile</th>
                     <th class="p-3">Clock In</th>
-                    <th class="p-3">Lunch State</th>
-                    <th class="p-3">Break State</th>
-                    <th class="p-3">Clock Out</th>
+                    <th class="p-3">Time Logged In (Live)</th>
                     <th class="p-3">Target Shift Remaining</th>
+                    <th class="p-3">Meal State</th>
+                    <th class="p-3">Q-Break State</th>
+                    <th class="p-3">Clock Out</th>
                     <th class="p-3 font-bold text-center">Exception Status</th>
                   </tr>
                 </thead>
                 <tbody id="global-feed-table" class="divide-y divide-slate-100 text-xs font-medium text-slate-700">
-                  <tr><td colspan="7" class="p-4 text-center text-slate-400">Loading synchronization grids...</td></tr>
+                  <tr><td colspan="8" class="p-4 text-center text-slate-400">Loading synchronization grids...</td></tr>
                 </tbody>
               </table>
             </div>
           </div>
         </section>
 
-        <!-- MODULE: LEAVE REQUEST -->
         <section id="leave-request-sec" class="hidden space-y-6 max-w-4xl">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4">
@@ -158,64 +122,32 @@
               <p id="leave-feedback" class="text-center font-bold text-xs bg-indigo-50 text-indigo-800 p-2 rounded hidden"></p>
             </div>
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col justify-between text-center">
-              <div>
-                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wide">Yearly Allotted Balance</h3>
-                <div id="stat-leave-allow" class="text-6xl font-black text-indigo-700 mt-4">0</div>
-              </div>
-              <div class="border-t border-slate-100 pt-4 mt-4">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wide">Remaining Leaves</h3>
-                <div id="stat-leave-remain" class="text-3xl font-black text-emerald-600 mt-1">0 days</div>
-              </div>
+              <div><h3 class="text-sm font-bold text-slate-400 uppercase tracking-wide">Yearly Allotted Balance</h3><div id="stat-leave-allow" class="text-6xl font-black text-indigo-700 mt-4">0</div></div>
+              <div class="border-t border-slate-100 pt-4 mt-4"><h3 class="text-xs font-bold text-slate-400 uppercase tracking-wide">Remaining Leaves</h3><div id="stat-leave-remain" class="text-3xl font-black text-emerald-600 mt-1">0 days</div></div>
             </div>
           </div>
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100"><h3 class="text-md font-bold text-slate-900 border-b pb-2 mb-3">My Personal Leave Queue Ledger</h3><div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Requested Date</th><th class="p-3">Reason Description</th><th class="p-3">Approval Status</th><th class="p-3">Management Comments</th></tr></thead><tbody id="personal-leave-table" class="divide-y divide-slate-50"></tbody></table></div></div>
         </section>
 
-        <!-- REST DAY OVERTIME PANEL -->
         <section id="restday-request-sec" class="hidden space-y-6 max-w-5xl">
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4 max-w-md">
             <h2 class="text-xl font-bold text-slate-800">📅 Rest Day Work Authorization</h2>
-            <p class="text-xs text-slate-400">File a specific schedule request line to map Overtime hours or cover structural absence gaps on your assigned days off.</p>
-            <div>
-              <label class="block text-xs font-bold text-slate-500 mb-1">Target Rest Day Date</label>
-              <input type="date" id="rd-date" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-500 mb-1">Justification Comments & Purpose</label>
-              <textarea id="rd-comments" rows="3" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="Specify if OT requests or covering an absent log window date..."></textarea>
-            </div>
+            <p class="text-xs text-slate-400">File a specific schedule request line to map Overtime hours or cover structural absence gaps.</p>
+            <div><label class="block text-xs font-bold text-slate-500 mb-1">Target Rest Day Date</label><input type="date" id="rd-date" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50"></div>
+            <div><label class="block text-xs font-bold text-slate-500 mb-1">Justification Comments & Purpose</label><textarea id="rd-comments" rows="3" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="Specify if OT requests or covering an absent log window date..."></textarea></div>
             <button onclick="submitRestDayForm()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg font-bold text-sm shadow transition">File Authorization Request</button>
             <p id="rd-feedback-msg" class="text-center font-bold text-xs p-2 rounded hidden"></p>
           </div>
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h3 class="text-md font-bold text-slate-900 border-b pb-2 mb-3">My Rest Day Authorization Queue History</h3>
-            <div class="overflow-x-auto rounded-lg border border-slate-100">
-              <table class="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold">
-                    <th class="p-3">Target Date</th><th class="p-3">Justification Purpose Statement</th><th class="p-3">Status</th><th class="p-3">Management Review Notes</th>
-                  </tr>
-                </thead>
-                <tbody id="personal-restday-table" class="divide-y divide-slate-50">
-                  <tr><td colspan="4" class="p-3 text-center text-slate-400">Awaiting records connection matrix loop line sync...</td></tr>
-                </tbody>
-              </table>
-            </div>
+            <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Target Date</th><th class="p-3">Justification Purpose Statement</th><th class="p-3">Status</th><th class="p-3">Management Review Notes</th></tr></thead><tbody id="personal-restday-table" class="divide-y divide-slate-50"></tbody></table></div>
           </div>
         </section>
 
-        <!-- TASK DONE REPORT -->
         <section id="task-report-sec" class="hidden space-y-6 max-w-6xl">
           <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-              <h3 class="text-sm font-bold text-slate-800">🎯 Task Filter Control Panel</h3>
-              <p class="text-[11px] text-slate-400">Everyone can sort and screen work logs by individual tasker profiles.</p>
-            </div>
-            <div class="w-full sm:w-64">
-              <select id="public-filter-tasker" onchange="applyPublicReportFilter()" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-slate-50 font-semibold text-indigo-900">
-                <option value="ALL">-- Show Everyone's Reports --</option>
-              </select>
-            </div>
+            <div><h3 class="text-sm font-bold text-slate-800">🎯 Task Filter Control Panel</h3><p class="text-[11px] text-slate-400">Everyone can sort and screen work logs by individual tasker profiles.</p></div>
+            <div class="w-full sm:w-64"><select id="public-filter-tasker" onchange="applyPublicReportFilter()" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-slate-50 font-semibold text-indigo-900"><option value="ALL">-- Show Everyone's Reports --</option></select></div>
           </div>
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4 h-fit">
@@ -232,7 +164,6 @@
           </div>
         </section>
 
-        <!-- SECURITY AND CREDENTIALS -->
         <section id="account-settings-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 max-w-md space-y-4">
           <h2 class="text-xl font-bold text-slate-800 border-b pb-2">⚙️ Manage Account Security</h2>
           <div class="space-y-3">
@@ -244,7 +175,6 @@
           <p id="self-pass-feedback" class="text-center font-bold text-xs p-2 rounded hidden"></p>
         </section>
 
-        <!-- MODULE: ADMIN CONTROL - PAYROLL DISBURSEMENT -->
         <section id="admin-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-6 max-w-2xl">
           <h2 class="text-xl font-bold text-indigo-700 border-b pb-2">Admin Control: Issue Fixed Weekly Payment</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -260,24 +190,16 @@
           <p id="payroll-feedback" class="text-emerald-600 bg-emerald-50 text-xs font-bold p-2 rounded-lg hidden"></p>
         </section>
 
-        <!-- USER PAYMENTS LEDGER -->
         <section id="user-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4 max-w-7xl">
           <h2 class="text-xl font-bold text-slate-800 border-b pb-2">My Service Payment Ledgers</h2>
           <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Service Period</th><th class="p-3">Weeks Logged</th><th class="p-3">Weekly Rate</th><th class="p-3">Gross Base</th><th class="p-3">Applied Deductions</th><th class="p-3 font-bold text-indigo-700">Net Credited Revenue</th><th class="p-3">Operational Remarks</th><th class="p-3 text-center">Status & Review Actions</th></tr></thead><tbody id="user-payroll-table" class="divide-y divide-slate-50"></tbody></table></div>
         </section>
 
-        <!-- SYSTEM GLOBAL MANAGEMENT PANELS -->
         <section id="admin-sec" class="hidden space-y-8 max-w-6xl">
-          
           <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 space-y-4">
             <h3 class="text-sm font-bold uppercase tracking-wider text-indigo-900">🔍 Real-Time Ledger Filtration Control</h3>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">Target Tasker</label>
-                <select id="filter-tasker" onchange="applyGlobalFilters()" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-slate-50">
-                  <option value="ALL">-- Show All Taskers --</option>
-                </select>
-              </div>
+              <div><label class="block text-xs font-bold text-slate-500 mb-1">Target Tasker</label><select id="filter-tasker" onchange="applyGlobalFilters()" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-slate-50"><option value="ALL">-- Show All Taskers --</option></select></div>
               <div><label class="block text-xs font-bold text-slate-500 mb-1">From Date</label><input type="date" id="filter-from-date" onchange="applyGlobalFilters()" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-slate-50"></div>
               <div><label class="block text-xs font-bold text-slate-500 mb-1">To Date</label><input type="date" id="filter-to-date" onchange="applyGlobalFilters()" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-slate-50"></div>
             </div>
@@ -290,23 +212,19 @@
               <div><label class="font-bold text-slate-600">Full Legal Name</label><input type="text" id="add-u-name" class="w-full p-2 border rounded mt-1 bg-slate-50"></div>
               <div><label class="font-bold text-slate-600">Email Address</label><input type="email" id="add-u-email" class="w-full p-2 border rounded mt-1 bg-slate-50"></div>
               <div><label class="font-bold text-slate-600">Initial Password</label><input type="text" id="add-u-pass" class="w-full p-2 border rounded mt-1 bg-slate-50" placeholder="ChangeMe123"></div>
-              <div><label class="font-bold text-slate-600">Permission Role</label>
-                <select id="add-u-role" onchange="toggleFormScheduleVisibility()" class="w-full p-2 border rounded mt-1 bg-slate-50 font-bold text-indigo-700">
-                  <option value="Employee">Employee (Standard Tasker)</option>
-                  <option value="Admin">Admin (Full Workspace Override)</option>
-                </select>
-              </div>
+              <div><label class="font-bold text-slate-600">Permission Role</label><select id="add-u-role" onchange="toggleFormScheduleVisibility()" class="w-full p-2 border rounded mt-1 bg-slate-50 font-bold text-indigo-700"><option value="Employee">Employee (Standard Tasker)</option><option value="Admin">Admin (Full Workspace Override)</option></select></div>
+              
               <div><label class="font-bold text-slate-600">Shift Window Start</label><input type="time" id="add-u-shift-start" class="w-full p-2 border rounded mt-1 bg-slate-50" value="09:00"></div>
               <div><label class="font-bold text-slate-600">Shift Window End</label><input type="time" id="add-u-shift-end" class="w-full p-2 border rounded mt-1 bg-slate-50" value="18:00"></div>
               <div><label class="font-bold text-slate-600">Days Off Allotment</label><input type="text" id="add-u-off" class="w-full p-2 border rounded mt-1 bg-slate-50" value="Saturday, Sunday"></div>
               <div><label class="font-bold text-slate-600">Leave Balance</label><input type="number" id="add-u-leaves" class="w-full p-2 border rounded mt-1 bg-slate-50" value="15"></div>
-              <div><label class="font-bold text-slate-600 text-rose-600">Lunch Target (Optional)</label><input type="time" id="add-u-lunch" class="w-full p-2 border rounded mt-1 bg-slate-50"></div>
-              <div><label class="font-bold text-slate-600 text-rose-600">First Break (Optional)</label><input type="time" id="add-u-break1" class="w-full p-2 border rounded mt-1 bg-slate-50"></div>
-              <div><label class="font-bold text-slate-600 text-rose-600">Second Break (Optional)</label><input type="time" id="add-u-break2" class="w-full p-2 border rounded mt-1 bg-slate-50"></div>
-              <div><label class="font-bold text-slate-600 text-rose-600">Meal Break (Optional)</label><input type="time" id="add-u-meal" class="w-full p-2 border rounded mt-1 bg-slate-50"></div>
+              
+              <!-- Updated Dynamic Duration Fields -->
+              <div><label class="font-bold text-slate-600 text-rose-600">Quick Break Total (Mins)</label><input type="number" id="add-u-max-break" class="w-full p-2 border rounded mt-1 bg-slate-50" value="15"></div>
+              <div><label class="font-bold text-slate-600 text-rose-600">Meal Break Total (Mins)</label><input type="number" id="add-u-max-meal" class="w-full p-2 border rounded mt-1 bg-slate-50" value="60"></div>
             </div>
-            <button onclick="executeAdminCreateUser()" class="bg-indigo-600 text-white font-bold text-xs px-4 py-2 rounded shadow hover:bg-indigo-700 transition">Register Tasker Profile</button>
-            <p id="admin-create-feedback" class="text-xs font-bold p-2 rounded hidden"></p>
+            <button onclick="executeAdminCreateUser()" class="bg-indigo-600 text-white font-bold text-xs px-4 py-2 rounded shadow hover:bg-indigo-700 transition mt-2">Register Tasker Profile</button>
+            <p id="admin-create-feedback" class="text-xs font-bold p-2 rounded hidden mt-2"></p>
           </div>
 
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4">
@@ -314,25 +232,18 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
               <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
                 <h3 class="text-sm font-bold text-slate-800">Assign Schedule Updates</h3>
-                <div>
-                  <label class="font-bold text-slate-600">Select Tasker Target</label>
-                  <select id="sched-target-uid" class="w-full p-2 border rounded mt-1 bg-white"></select>
-                </div>
+                <div><label class="font-bold text-slate-600">Select Tasker Target</label><select id="sched-target-uid" class="w-full p-2 border rounded mt-1 bg-white"></select></div>
                 <div class="grid grid-cols-2 gap-2">
                   <div><label class="font-bold text-slate-600">Shift Start</label><input type="time" id="sched-shift-start" class="w-full p-2 border rounded mt-1 bg-white"></div>
                   <div><label class="font-bold text-slate-600">Shift End</label><input type="time" id="sched-shift-end" class="w-full p-2 border rounded mt-1 bg-white"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
-                  <div><label class="font-bold text-slate-600">Lunch Time</label><input type="time" id="sched-lunch" class="w-full p-2 border rounded mt-1 bg-white"></div>
-                  <div><label class="font-bold text-slate-600">First Break</label><input type="time" id="sched-break1" class="w-full p-2 border rounded mt-1 bg-white"></div>
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                  <div><label class="font-bold text-slate-600">Second Break</label><input type="time" id="sched-break2" class="w-full p-2 border rounded mt-1 bg-white"></div>
-                  <div><label class="font-bold text-slate-600">Meal Break</label><input type="time" id="sched-meal" class="w-full p-2 border rounded mt-1 bg-white"></div>
+                  <div><label class="font-bold text-slate-600 text-rose-600">Quick Break Max (Mins)</label><input type="number" id="sched-max-break" class="w-full p-2 border rounded mt-1 bg-white" value="15"></div>
+                  <div><label class="font-bold text-slate-600 text-rose-600">Meal Break Max (Mins)</label><input type="number" id="sched-max-meal" class="w-full p-2 border rounded mt-1 bg-white" value="60"></div>
                 </div>
                 <div class="pt-2 flex gap-2">
-                  <button onclick="submitScheduleAdjustment(true)" class="flex-1 bg-indigo-600 text-white font-bold py-2 rounded">Save Permanently</button>
-                  <button onclick="submitScheduleAdjustment(false)" class="flex-1 bg-amber-500 text-white font-bold py-2 rounded">For Today Only</button>
+                  <button onclick="submitScheduleAdjustment(true)" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded transition">Save Permanently</button>
+                  <button onclick="submitScheduleAdjustment(false)" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 rounded transition">For Today Only</button>
                 </div>
               </div>
               <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
@@ -345,24 +256,8 @@
           </div>
 
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-            <h2 class="text-xl font-bold text-slate-800 border-b pb-2 mb-3">⚠️ Late Lunch, Break, & Meal Exception Approvals Queue</h2>
-            <div class="overflow-x-auto rounded-lg border border-slate-100">
-              <table class="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold">
-                    <th class="p-3">Tasker Name</th><th class="p-3">Date</th><th class="p-3">Break Type</th><th class="p-3">Scheduled</th><th class="p-3">Actual Out</th><th class="p-3 font-bold">Status</th><th class="p-3 text-center">Decisions Console</th>
-                  </tr>
-                </thead>
-                <tbody id="admin-exceptions-table" class="divide-y divide-slate-50">
-                  <tr><td colspan="7" class="p-3 text-center text-slate-400">No late break warnings currently registered.</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-            <h2 class="text-xl font-bold text-slate-800">Master Attendance & Overage Dashboard</h2>
-            <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Name</th><th class="p-3">Date/Type</th><th class="p-3">Clock In</th><th class="p-3">Clock Out</th><th class="p-3">Break Duration</th><th class="p-3">Lunch Duration</th><th class="p-3">Exception Status</th></tr></thead><tbody id="admin-attendance-table" class="divide-y divide-slate-50"></tbody></table></div>
+            <h2 class="text-xl font-bold text-slate-800 border-b pb-2 mb-3">Master Attendance & Overage Dashboard</h2>
+            <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Name</th><th class="p-3">Date/Type</th><th class="p-3">Clock In</th><th class="p-3">Clock Out</th><th class="p-3">Q-Break Duration</th><th class="p-3">Meal Duration</th><th class="p-3">Exception Status</th></tr></thead><tbody id="admin-attendance-table" class="divide-y divide-slate-50"></tbody></table></div>
           </div>
 
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -401,6 +296,9 @@
 
     let currentUser = null, cachedAdminMasterData = null, cachedPublicReports = [], inactivityTimer = null, liveTimerTickerInterval = null;
     const MAX_INACTIVITY_LIMIT = 30 * 60 * 1000;
+    
+    // Global variable to keep the feed data fresh so the ticker can manipulate it.
+    window.cachedGlobalFeed = [];
 
     let deviceId = localStorage.getItem("olympuz_device_id");
     if (!deviceId) {
@@ -409,13 +307,10 @@
     }
     let tempLoginEmail = "";
 
-    // Upgraded Core Network Request Handler with Authorization Header Auto-binding
     function callAPI(method, urlParams, payload, callback) {
       let token = localStorage.getItem("olympuz_token");
-      let headers = { 'Content-Type': 'text/plain;charset=utf-8' };
-      if (token) {
-        headers['Authorization'] = 'Bearer ' + token;
-      }
+      let headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = 'Bearer ' + token;
       let config = { method: method, headers: headers };
       if (payload) config.body = JSON.stringify(payload);
       fetch(API_URL + urlParams, config).then(res => res.json()).then(data => callback(data)).catch(err => { alert("Sync Error:\n" + err); });
@@ -464,7 +359,7 @@
             currentUser = response.user; 
             bootPortalSession(); 
           }
-        } else { errBox.innerText = response.message; errBox.classList.remove('hidden'); }
+        } else { errBox.innerText = response.message || "Login failed."; errBox.classList.remove('hidden'); }
       });
     }
 
@@ -512,12 +407,12 @@
         document.getElementById('stat-leave-remain').innerText = currentUser.schedule.remainingLeaves + " days";
         if (currentUser.schedule.isHalfDayToday) {
           document.getElementById('halfday-banner').classList.remove('hidden');
-          document.getElementById('sched-limits').innerText = "Break: " + currentUser.schedule.maxBreak + "m | Lunch: N/A";
+          document.getElementById('sched-limits').innerText = "Q-Break: " + currentUser.schedule.maxBreak + "m | Meal: N/A";
           document.getElementById('btn-lunch-s').className = 'hidden';
           document.getElementById('btn-lunch-e').className = 'hidden';
         } else {
           document.getElementById('halfday-banner').classList.add('hidden');
-          document.getElementById('sched-limits').innerText = "Break: " + currentUser.schedule.maxBreak + "m | Lunch: " + currentUser.schedule.maxLunch + "m";
+          document.getElementById('sched-limits').innerText = "Q-Break: " + currentUser.schedule.maxBreak + "m | Meal: " + currentUser.schedule.maxLunch + "m";
         }
       }
       showSection('attendance-sec');
@@ -534,15 +429,24 @@
       const banner = document.getElementById('live-timer-banner'), label = document.getElementById('live-timer-label'), textClock = document.getElementById('live-digital-clock');
       liveTimerTickerInterval = setInterval(() => {
         const checkView = document.getElementById('attendance-sec');
-        if (!currentUser || !checkView || checkView.classList.contains('hidden')) return;
-        const currentType = banner.getAttribute('data-active-type') || 'NONE', rawStamp = banner.getAttribute('data-active-stamp');
-        if (currentType === 'NONE' || !rawStamp) { banner.classList.add('hidden'); return; }
-        banner.classList.remove('hidden');
-        label.innerText = `⏱️ CURRENT LIVE ${currentType} RUNNING CLOCK:`;
-        const parsedDelta = Date.now() - new Date(rawStamp).getTime();
-        if (isNaN(parsedDelta) || parsedDelta < 0) { textClock.innerText = "00:00:00"; return; }
-        const totalSecs = Math.floor(parsedDelta / 1000), displaySecs = totalSecs % 60, displayMins = Math.floor(totalSecs / 60) % 60, displayHrs = Math.floor(totalSecs / 3600);
-        textClock.innerText = `${displayHrs.toString().padStart(2, '0')}:${displayMins.toString().padStart(2, '0')}:${displaySecs.toString().padStart(2, '0')}`;
+        if (currentUser && checkView && !checkView.classList.contains('hidden')) {
+          const currentType = banner.getAttribute('data-active-type') || 'NONE', rawStamp = banner.getAttribute('data-active-stamp');
+          if (currentType === 'NONE' || !rawStamp) { banner.classList.add('hidden'); } 
+          else {
+            banner.classList.remove('hidden');
+            label.innerText = `⏱️ CURRENT LIVE ${currentType} RUNNING CLOCK:`;
+            const parsedDelta = Date.now() - new Date(rawStamp).getTime();
+            if (isNaN(parsedDelta) || parsedDelta < 0) { textClock.innerText = "00:00:00"; }
+            else {
+              const totalSecs = Math.floor(parsedDelta / 1000), displaySecs = totalSecs % 60, displayMins = Math.floor(totalSecs / 60) % 60, displayHrs = Math.floor(totalSecs / 3600);
+              textClock.innerText = `${displayHrs.toString().padStart(2, '0')}:${displayMins.toString().padStart(2, '0')}:${displaySecs.toString().padStart(2, '0')}`;
+            }
+          }
+        }
+        const feedView = document.getElementById('global-feed-sec');
+        if (currentUser && feedView && !feedView.classList.contains('hidden') && window.cachedGlobalFeed) {
+          renderLiveGlobalFeed();
+        }
       }, 1000);
     }
 
@@ -583,41 +487,87 @@
     }
 
     function loadGlobalStatusFeed() {
-      const feedBody = document.getElementById('global-feed-table');
       callAPI('GET', '?action=getWorkspaceStatusFeed', null, function(records) {
-        if (!records || records.length === 0) { feedBody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-400">No logs today.</td></tr>'; return; }
-        feedBody.innerHTML = "";
-        records.forEach(row => {
-          const statusStyle = getStatusBadgeStyle(row.status);
-          let remainingStr = row.remainingShiftTime;
-          if (row.isLiveTracking && remainingStr !== "00:00:00" && remainingStr !== "Shift Target Met") {
-            remainingStr = `<span class="text-indigo-600 font-bold tracking-wider animate-pulse">${remainingStr}</span>`;
-          }
-          feedBody.innerHTML += `<tr class="border-b border-slate-100 hover:bg-slate-50/50 transition"><td class="p-3 font-bold text-slate-900">${row.name}</td><td class="p-3 text-emerald-600 font-mono">${row.timeIn}</td><td class="p-3 text-slate-600 font-mono">${row.lunchText}</td><td class="p-3 text-slate-600 font-mono">${row.breakText}</td><td class="p-3 text-rose-600 font-mono">${row.timeOut}</td><td class="p-3 font-mono text-slate-500">${remainingStr}</td><td class="p-3 text-center"><span class="px-2 py-0.5 rounded text-[11px] font-bold ${statusStyle}">${row.status}</span></td></tr>`;
-        });
+        if (records && !records.error) {
+          window.cachedGlobalFeed = records;
+          renderLiveGlobalFeed();
+        }
       });
+    }
+
+    function renderLiveGlobalFeed() {
+      const feedBody = document.getElementById('global-feed-table');
+      if (!window.cachedGlobalFeed || window.cachedGlobalFeed.length === 0) {
+        feedBody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-400">No logs today.</td></tr>';
+        return;
+      }
+      
+      let html = "";
+      window.cachedGlobalFeed.forEach(row => {
+        const statusStyle = getStatusBadgeStyle(row.status);
+        let loggedStr = "00:00:00";
+        let remainingStr = row.remainingShiftTime;
+        
+        if (row.isLiveTracking && row.rawLoginMs) {
+          const runningDeductionsMs = ((row.acc_break || 0) + (row.acc_lunch || 0)) * 60000;
+          const netWorkedMs = Math.max(0, Date.now() - row.rawLoginMs - runningDeductionsMs);
+          
+          const lSecs = Math.floor((netWorkedMs / 1000) % 60);
+          const lMins = Math.floor((netWorkedMs / (1000 * 60)) % 60);
+          const lHrs = Math.floor(netWorkedMs / (1000 * 60 * 60));
+          loggedStr = `<span class="text-indigo-600 font-bold">${lHrs.toString().padStart(2, '0')}:${lMins.toString().padStart(2, '0')}:${lSecs.toString().padStart(2, '0')}</span>`;
+          
+          if (row.targetLimitMs) {
+            const deltaMs = row.targetLimitMs - netWorkedMs;
+            if (deltaMs <= 0) {
+              remainingStr = "Shift Target Met";
+            } else {
+              const rSecs = Math.floor((deltaMs / 1000) % 60);
+              const rMins = Math.floor((deltaMs / (1000 * 60)) % 60);
+              const rHrs = Math.floor(deltaMs / (1000 * 60 * 60));
+              remainingStr = `<span class="text-emerald-600 font-bold animate-pulse">${rHrs.toString().padStart(2, '0')}:${rMins.toString().padStart(2, '0')}:${rSecs.toString().padStart(2, '0')}</span>`;
+            }
+          }
+        } else if (row.timeOut !== "-") {
+           loggedStr = row.staticLoggedTime || "-";
+        }
+
+        html += `<tr class="border-b border-slate-100 hover:bg-slate-50/50 transition">
+          <td class="p-3 font-bold text-slate-900">${row.name}</td>
+          <td class="p-3 text-emerald-600 font-mono">${row.timeIn}</td>
+          <td class="p-3 font-mono text-slate-700">${loggedStr}</td>
+          <td class="p-3 font-mono text-slate-700">${remainingStr}</td>
+          <td class="p-3 text-slate-600 font-mono">${row.lunchText}</td>
+          <td class="p-3 text-slate-600 font-mono">${row.breakText}</td>
+          <td class="p-3 text-rose-600 font-mono">${row.timeOut}</td>
+          <td class="p-3 text-center"><span class="px-2 py-0.5 rounded text-[11px] font-bold ${statusStyle}">${row.status}</span></td>
+        </tr>`;
+      });
+      feedBody.innerHTML = html;
     }
 
     function submitScheduleAdjustment(isPermanent) {
       const targetUserId = document.getElementById('sched-target-uid').value, shiftStart = document.getElementById('sched-shift-start').value, shiftEnd = document.getElementById('sched-shift-end').value;
-      const lunch = document.getElementById('sched-lunch').value, break1 = document.getElementById('sched-break1').value, break2 = document.getElementById('sched-break2').value, meal = document.getElementById('sched-meal').value;
-      if (!targetUserId || !shiftStart || !shiftEnd) { alert("Please complete required scheduling selections."); return; }
-      callAPI('POST', '', { action: isPermanent ? "updatePermanentSchedule" : "updateDailyScheduleAdjustment", targetUserId: targetUserId, shiftStart: shiftStart, shiftEnd: shiftEnd, lunch: lunch, break1: break1, break2: break2, meal: meal, date: new Date().toLocaleDateString('en-US') }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
-    }
-
-    function resolveLateBreakException(exceptionId, verdict) {
-      const comment = prompt("Notes:"); if (comment === null) return;
-      callAPI('POST', '', { action: "resolveBreakException", exceptionId: exceptionId, status: verdict, comment: comment }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
+      const maxMeal = document.getElementById('sched-max-meal').value, maxBreak = document.getElementById('sched-max-break').value;
+      if (!targetUserId || !shiftStart || !shiftEnd || !maxMeal || !maxBreak) { alert("Please complete required scheduling selections."); return; }
+      callAPI('POST', '', { action: isPermanent ? "updatePermanentSchedule" : "updateDailyScheduleAdjustment", targetUserId: targetUserId, shiftStart: shiftStart, shiftEnd: shiftEnd, maxBreak: maxBreak, maxMeal: maxMeal, date: new Date().toLocaleDateString('en-US') }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
     }
 
     function toggleFormScheduleVisibility() {
       const role = document.getElementById('add-u-role').value;
-      const ids = ['add-u-shift-start', 'add-u-shift-end', 'add-u-off', 'add-u-lunch', 'add-u-break1', 'add-u-break2', 'add-u-meal'];
+      const ids = ['add-u-shift-start', 'add-u-shift-end', 'add-u-off', 'add-u-max-break', 'add-u-max-meal'];
       ids.forEach(id => {
         const el = document.getElementById(id); if (!el) return;
         const parent = el.closest('div'); if (!parent) return;
         if (role === 'Admin') { parent.style.opacity = '0.35'; el.disabled = true; el.value = ""; } 
-        else { parent.style.opacity = '1'; el.disabled = false; if (id === 'add-u-shift-start') el.value = "09:00"; if (id === 'add-u-shift-end') el.value = "18:00"; if (id === 'add-u-off') el.value = "Saturday, Sunday"; }
+        else { 
+          parent.style.opacity = '1'; el.disabled = false; 
+          if (id === 'add-u-shift-start') el.value = "09:00"; 
+          if (id === 'add-u-shift-end') el.value = "18:00"; 
+          if (id === 'add-u-off') el.value = "Saturday, Sunday"; 
+          if (id === 'add-u-max-break') el.value = "15";
+          if (id === 'add-u-max-meal') el.value = "60";
+        }
       });
     }
 
@@ -696,7 +646,6 @@
       callAPI('POST', '', { action: "adminUntagAbsent", absentId: absentId }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
     }
 
-    // Admin configuration overrides
     function executeAdminOverridePassword(targetUid) {
       const newPass = prompt("Enter explicit password string:"); if (!newPass || newPass.trim() === "") return;
       callAPI('POST', '', { action: "adminChangePassword", targetUserId: targetUid, newPassword: newPass }, function(res) { alert(res.message); });
@@ -749,25 +698,14 @@
       
       const pBody = document.getElementById('admin-attendance-table'), absBody = document.getElementById('admin-absence-table'), lBody = document.getElementById('admin-leave-table');
       const payBody = document.getElementById('admin-payments-history-table'), explicitAbsBody = document.getElementById('admin-explicit-absents-table'), rdBody = document.getElementById('admin-restday-table');
-      const excBody = document.getElementById('admin-exceptions-table'), auditList = document.getElementById('current-schedule-audit-list');
+      const auditList = document.getElementById('current-schedule-audit-list');
       
-      pBody.innerHTML = ""; absBody.innerHTML = ""; lBody.innerHTML = ""; payBody.innerHTML = ""; explicitAbsBody.innerHTML = ""; rdBody.innerHTML = ""; excBody.innerHTML = ""; auditList.innerHTML = "";
+      pBody.innerHTML = ""; absBody.innerHTML = ""; lBody.innerHTML = ""; payBody.innerHTML = ""; explicitAbsBody.innerHTML = ""; rdBody.innerHTML = ""; auditList.innerHTML = "";
 
       data.absences.forEach(u => {
         const ps = u.permanentSchedule;
-        auditList.innerHTML += '<div class="py-2 flex justify-between items-center text-xs"><div><div class="font-bold text-slate-800">' + u.name + ' <span class="text-slate-400 font-mono">(' + u.id + ')</span></div><div class="text-[10px] text-slate-500 mt-0.5">Shift: ' + ps.shiftStart + ' - ' + ps.shiftEnd + ' | Lunch: ' + (ps.lunch || 'None') + '</div><div class="text-[10px] text-indigo-600 font-medium">Breaks: ' + (ps.break1 || 'N/A') + ' | ' + (ps.break2 || 'N/A') + ' | Meal: ' + (ps.meal || 'N/A') + '</div></div></div>';
+        auditList.innerHTML += '<div class="py-2 flex justify-between items-center text-xs"><div><div class="font-bold text-slate-800">' + u.name + ' <span class="text-slate-400 font-mono">(' + u.id + ')</span></div><div class="text-[10px] text-slate-500 mt-0.5">Shift: ' + ps.shiftStart + ' - ' + ps.shiftEnd + '</div><div class="text-[10px] text-indigo-600 font-medium">Max Q-Break: ' + ps.maxBreak + 'm | Max Meal: ' + ps.maxMeal + 'm</div></div></div>';
       });
-
-      let filteredExceptions = data.breakExceptions.filter(row => { return !(selectedTasker !== "ALL" && row.user_name !== selectedTasker); });
-      if (filteredExceptions.length === 0) { excBody.innerHTML = '<tr><td colspan="7" class="p-3 text-center text-slate-400">All taskers complied.</td></tr>'; }
-      else {
-        filteredExceptions.forEach(row => {
-          let controls = '<span class="text-slate-400 italic font-bold text-xs">' + row.status + '</span>';
-          if (row.status === "Pending Approval") { controls = '<button onclick="resolveLateBreakException(\'' + row.id + '\', \'Approved\')" class="bg-emerald-600 text-white font-bold px-2 py-0.5 rounded text-[10px] mr-1">Approve</button><button onclick="resolveLateBreakException(\'' + row.id + '\', \'Declined\')" class="bg-rose-600 text-white font-bold px-2 py-0.5 rounded text-[10px]">Decline</button>'; }
-          const cs = row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : (row.status === 'Declined' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-800');
-          excBody.innerHTML += '<tr><td class="p-3 font-bold text-slate-900">' + row.user_name + '</td><td class="p-3 text-slate-600">' + row.date + '</td><td class="p-3 font-semibold text-indigo-700">' + row.break_type + '</td><td class="p-3 font-medium text-slate-500">' + row.scheduled_time + '</td><td class="p-3 font-bold text-rose-600">' + row.actual_time + '</td><td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ' + cs + '">' + row.status + '</span></td><td class="p-3 text-center whitespace-nowrap">' + controls + '</td></tr>';
-        });
-      }
 
       let filteredAttendance = data.attendance.filter(row => {
         if (selectedTasker !== "ALL" && row.name !== selectedTasker) return false;
@@ -801,7 +739,7 @@
       else {
         filteredPayments.forEach(row => {
           let statusBadge = row.status === "Acknowledged" || row.status === "Settled & Adjusted" ? '<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[11px]">✓ ' + row.status + '</span>' : '<span class="bg-amber-100 text-amber-800 font-medium px-2 py-0.5 rounded text-[11px]">Unreviewed</span>';
-          payBody.innerHTML += '<tr class="border-b border-slate-100 text-xs"><td class="p-3 font-bold text-slate-900">' + row.name + '</td><td class="p-3 font-mono text-slate-500">' + row.userId + '</td><td class="p-3 text-indigo-700">' + row.period + '</td><td class="p-3">' + row.weeks + ' wks</td><td class="p-3">₱' + row.gross.toFixed(2) + '</td><td class="p-3 text-rose-600">-₱' + row.deductions.toFixed(2) + '</td><td class="p-3 font-black text-emerald-600">₱' + row.net.toFixed(2) + '</td><td class="p-3 italic max-w-xs truncate">' + row.remarks + '</td><td class="p-3 text-center">' + statusBadge + '</td><td class="p-3 text-xs max-w-xs break-words">' + (row.disputeReason || "-") + '</td></tr>';
+          payBody.innerHTML += '<tr class="border-b border-slate-100 text-xs"><td class="p-3 font-bold text-slate-900">' + row.name + '</td><td class="p-3 font-mono text-slate-500">' + row.userId + '</td><td class="p-3 text-indigo-700 text-xs">' + row.period + '</td><td class="p-3">' + row.weeks + ' wks</td><td class="p-3">₱' + row.gross.toFixed(2) + '</td><td class="p-3 text-rose-600">-₱' + row.deductions.toFixed(2) + '</td><td class="p-3 font-black text-emerald-600">₱' + row.net.toFixed(2) + '</td><td class="p-3 italic max-w-xs truncate">' + row.remarks + '</td><td class="p-3 text-center">' + statusBadge + '</td><td class="p-3 text-xs max-w-xs break-words">' + (row.disputeReason || "-") + '</td></tr>';
         });
       }
 
@@ -870,15 +808,13 @@
         shiftEnd: document.getElementById('add-u-shift-end').value,
         daysOff: document.getElementById('add-u-off').value,
         leaveAllowance: document.getElementById('add-u-leaves').value,
-        lunchTime: document.getElementById('add-u-lunch').value,
-        break1Time: document.getElementById('add-u-break1').value,
-        break2Time: document.getElementById('add-u-break2').value,
-        mealTime: document.getElementById('add-u-meal').value
+        maxBreak: document.getElementById('add-u-max-break').value,
+        maxMeal: document.getElementById('add-u-max-meal').value
       };
       if (!payload.name || !payload.email) { alert("Please compile both Legal Name and Email fields."); return; }
-      fb.className = "text-xs font-bold p-2 rounded bg-amber-50 text-amber-800 block"; fb.innerText = "Registering user profile line...";
+      fb.className = "text-xs font-bold p-2 rounded bg-amber-50 text-amber-800 block mt-2"; fb.innerText = "Registering user profile line...";
       callAPI('POST', '', payload, function(res) {
-        fb.innerText = res.message; fb.className = res.success ? "text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800 block" : "text-xs font-bold p-2 rounded bg-rose-50 text-rose-800 block";
+        fb.innerText = res.message; fb.className = res.success ? "text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800 block mt-2" : "text-xs font-bold p-2 rounded bg-rose-50 text-rose-800 block mt-2";
         if (res.success) { ['add-u-name', 'add-u-email', 'add-u-pass'].forEach(id => document.getElementById(id).value = ""); fetchGlobalAdminLogs(); }
       });
     }
