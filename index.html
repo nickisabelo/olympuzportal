@@ -470,6 +470,16 @@
           </div>
 
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+            <h2 class="text-xl font-bold text-indigo-900">Master Service Payments Distribution History</h2>
+            <div class="overflow-x-auto rounded-lg border border-slate-100">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Name</th><th class="p-3">ID</th><th class="p-3">Period</th><th class="p-3">Weeks</th><th class="p-3">Mode</th><th class="p-3">Gross</th><th class="p-3">Deduct</th><th class="p-3 font-bold text-indigo-600">Net</th><th class="p-3 text-center">Receipt Link</th><th class="p-3 font-bold text-center">Review Status</th><th class="p-3 max-w-xs">Dispute Notes</th></tr></thead>
+                <tbody id="admin-payments-history-table" class="divide-y divide-slate-50"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-slate-800">Corporate Leave Action & Approval Queue</h2>
             <div class="overflow-x-auto rounded-lg border border-slate-100">
               <table class="w-full text-left border-collapse text-xs">
@@ -785,7 +795,9 @@
             if (data.serverTime) window.serverTimeOffset = Date.now() - data.serverTime;
           }
           renderLiveGlobalFeed();
-          populateFeedbackTargetDropdown();
+          if (document.getElementById('fb-target-user')) {
+             populateFeedbackTargetDropdown();
+          }
         }
       });
     }
@@ -1194,7 +1206,7 @@
       
       if (id === 'task-report-sec') { document.getElementById('rep-date').value = new Date().toISOString().split('T')[0]; document.getElementById('public-filter-tasker').value = "ALL"; loadPublicTaskReportsFeed(); }
       if (id === 'referral-report-sec') loadReferralReportsFeed();
-      if (id === 'feedback-submit-sec') populateFeedbackTargetDropdown();
+      if (id === 'feedback-submit-sec') loadGlobalStatusFeed(); // This guarantees the dropdown is populated!
       if (id === 'global-feed-sec') loadGlobalStatusFeed();
       if (id === 'admin-sec') fetchGlobalAdminLogs();
       if (id === 'attendance-sec' || id === 'leave-request-sec' || id === 'ca-request-sec' || id === 'coaching-sec' || id === 'account-settings-sec' || id === 'restday-request-sec') refreshUserTimers();
