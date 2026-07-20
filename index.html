@@ -251,7 +251,6 @@
               <div><label class="font-bold text-slate-600">Days Off Allotment</label><input type="text" id="add-u-off" class="w-full p-2 border rounded mt-1 bg-slate-50" value="Saturday, Sunday"></div>
               <div><label class="font-bold text-slate-600">Leave Balance</label><input type="number" id="add-u-leaves" class="w-full p-2 border rounded mt-1 bg-slate-50" value="15"></div>
               
-              <!-- Updated Dynamic Duration Fields -->
               <div><label class="font-bold text-slate-600 text-rose-600">Quick Break Total (Mins)</label><input type="number" id="add-u-max-break" class="w-full p-2 border rounded mt-1 bg-slate-50" value="15"></div>
               <div><label class="font-bold text-slate-600 text-rose-600">Meal Break Total (Mins)</label><input type="number" id="add-u-max-meal" class="w-full p-2 border rounded mt-1 bg-slate-50" value="60"></div>
               
@@ -500,7 +499,7 @@
           }
         }
         const feedView = document.getElementById('global-feed-sec');
-        if (currentUser && feedView && !feedView.classList.contains('hidden') && window.cachedGlobalFeed) {
+        if (currentUser && feedView && !feedView.classList.contains('hidden')) {
           renderLiveGlobalFeed();
         }
       }, 1000);
@@ -545,24 +544,27 @@
       });
     }
 
-    // Safely handles the incoming payload object to ensure the frontend extracts the feed array
     function loadGlobalStatusFeed() {
-      callAPI('GET', '?action=getWorkspaceStatusFeed', null, function(data) {
-        if (data && !data.error) {
-          window.cachedGlobalFeed = data.feed || [];
-          if (data.serverTime) {
-            window.serverTimeOffset = Date.now() - data.serverTime;
-          }
-          renderLiveGlobalFeed();
+      callAPI('GET', '?action=getWorkspaceStatusFeed', null, function(response) {
+        if (!response || response.error) return;
+        
+        let feedData = [];
+        if (Array.isArray(response)) {
+          feedData = response;
+        } else if (response.feed && Array.isArray(response.feed)) {
+          feedData = response.feed;
+          if (response.serverTime) window.serverTimeOffset = Date.now() - response.serverTime;
         }
+        
+        window.cachedGlobalFeed = feedData;
+        renderLiveGlobalFeed();
       });
     }
 
     function renderLiveGlobalFeed() {
       const feedBody = document.getElementById('global-feed-table');
       
-      // Secondary safety check to absolutely guarantee we never trigger `.forEach()` on undefined data
-      if (!Array.isArray(window.cachedGlobalFeed) || window.cachedGlobalFeed.length === 0) {
+      if (!window.cachedGlobalFeed || !Array.isArray(window.cachedGlobalFeed) || window.cachedGlobalFeed.length === 0) {
         feedBody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-400">No logs today.</td></tr>';
         return;
       }
