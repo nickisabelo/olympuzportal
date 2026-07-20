@@ -43,9 +43,10 @@
         <button onclick="showSection('leave-request-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">📇 Leave Request</button>
         <button onclick="showSection('restday-request-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">📅 RD OT / Cover Absent</button>
         <button onclick="showSection('task-report-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">📝 Task Done Report</button>
+        <button onclick="showSection('referral-report-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition text-indigo-700">📈 Referral Tally Report</button>
         <button onclick="routePayrollSection()" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">💵 Service Payment Portal</button>
         <button onclick="showSection('account-settings-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">⚙️ Account Settings</button>
-        <button id="admin-dash-btn" onclick="showSection('admin-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg hidden font-semibold text-indigo-700 transition">📊 Global Overview</button>
+        <button id="admin-dash-btn" onclick="showSection('admin-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg hidden font-semibold text-rose-700 transition">📊 Global Overview</button>
       </nav>
 
       <main class="flex-1 p-6 md:p-8 overflow-y-auto">
@@ -118,10 +119,7 @@
               <h2 class="text-xl font-bold text-slate-800">File a Leave Request</h2>
               <div><label class="block text-xs font-bold text-slate-500 mb-1">Target Leave Date</label><input type="date" id="l-date" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm"></div>
               <div><label class="block text-xs font-bold text-slate-500 mb-1">Explicit Reason for Absence</label><textarea id="l-reason" rows="3" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm" placeholder="Provide full justification comments..."></textarea></div>
-              <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">Upload Proof/Attachment (Optional)</label>
-                <input type="file" id="l-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
-              </div>
+              <div><label class="block text-xs font-bold text-slate-500 mb-1">Upload Proof/Attachment (Optional)</label><input type="file" id="l-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"></div>
               <button onclick="submitLeaveForm()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-2.5 rounded-lg font-bold text-sm shadow transition">Submit Request</button>
               <p id="leave-feedback" class="text-center font-bold text-xs bg-indigo-50 text-indigo-800 p-2 rounded hidden"></p>
             </div>
@@ -130,15 +128,7 @@
               <div class="border-t border-slate-100 pt-4 mt-4"><h3 class="text-xs font-bold text-slate-400 uppercase tracking-wide">Remaining Leaves</h3><div id="stat-leave-remain" class="text-3xl font-black text-emerald-600 mt-1">0 days</div></div>
             </div>
           </div>
-          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-            <h3 class="text-md font-bold text-slate-900 border-b pb-2 mb-3">My Personal Leave Queue Ledger</h3>
-            <div class="overflow-x-auto rounded-lg border border-slate-100">
-              <table class="w-full text-left border-collapse text-xs">
-                <thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Requested Date</th><th class="p-3">Reason Description</th><th class="p-3 text-center">Attachment</th><th class="p-3">Approval Status</th><th class="p-3">Management Comments</th></tr></thead>
-                <tbody id="personal-leave-table" class="divide-y divide-slate-50"></tbody>
-              </table>
-            </div>
-          </div>
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100"><h3 class="text-md font-bold text-slate-900 border-b pb-2 mb-3">My Personal Leave Queue Ledger</h3><div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Requested Date</th><th class="p-3">Reason Description</th><th class="p-3 text-center">Attachment</th><th class="p-3">Approval Status</th><th class="p-3">Management Comments</th></tr></thead><tbody id="personal-leave-table" class="divide-y divide-slate-50"></tbody></table></div></div>
         </section>
 
         <section id="restday-request-sec" class="hidden space-y-6 max-w-5xl">
@@ -146,7 +136,7 @@
             <h2 class="text-xl font-bold text-slate-800">📅 Rest Day Work Authorization</h2>
             <p class="text-xs text-slate-400">File a specific schedule request line to map Overtime hours or cover structural absence gaps.</p>
             <div><label class="block text-xs font-bold text-slate-500 mb-1">Target Rest Day Date</label><input type="date" id="rd-date" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50"></div>
-            <div><label class="block text-xs font-bold text-slate-500 mb-1">Justification Comments & Purpose</label><textarea id="rd-comments" rows="3" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="Specify details..."></textarea></div>
+            <div><label class="block text-xs font-bold text-slate-500 mb-1">Justification Comments & Purpose</label><textarea id="rd-comments" rows="3" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="Specify if OT requests or covering an absent log window date..."></textarea></div>
             <button onclick="submitRestDayForm()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg font-bold text-sm shadow transition">File Authorization Request</button>
             <p id="rd-feedback-msg" class="text-center font-bold text-xs p-2 rounded hidden"></p>
           </div>
@@ -176,6 +166,54 @@
           </div>
         </section>
 
+        <!-- MODULE: REFERRAL REPORT -->
+        <section id="referral-report-sec" class="hidden space-y-6 max-w-6xl">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4 h-fit">
+              <h2 class="text-xl font-bold text-slate-800">📈 Submit Referral Tally</h2>
+              
+              <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">Referral Source</label>
+                <select id="ref-source" onchange="toggleRefSource()" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50 font-bold">
+                  <option value="">-- Select Source --</option>
+                  <option value="Boss Job">Boss Job</option>
+                  <option value="Threads">Threads</option>
+                  <option value="Facebook">Facebook</option>
+                  <option value="LinkedIn">LinkedIn</option>
+                  <option value="Others">Others (Specify)</option>
+                </select>
+              </div>
+              <div id="ref-source-other-container" class="hidden">
+                <label class="block text-xs font-bold text-slate-500 mb-1">Specify Source</label>
+                <input type="text" id="ref-source-other" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50">
+              </div>
+    
+              <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">Number of Referrals</label>
+                <input type="number" id="ref-count" min="0" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50">
+              </div>
+    
+              <div class="flex items-center gap-2 pt-2">
+                <input type="checkbox" id="ref-is-covering" onchange="toggleRefCovering()" class="w-4 h-4 text-indigo-600 rounded">
+                <label class="text-xs font-bold text-slate-700">Taking over someone else's source?</label>
+              </div>
+              
+              <div id="ref-covering-container" class="hidden">
+                <label class="block text-xs font-bold text-slate-500 mb-1">Tasker Account Name</label>
+                <input type="text" id="ref-covering-name" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="Name of tasker you're covering...">
+              </div>
+    
+              <button onclick="submitReferralReport()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg font-bold text-sm shadow transition">Submit Tally</button>
+              <p id="ref-feedback" class="text-center font-bold text-xs p-2 rounded hidden"></p>
+            </div>
+    
+            <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col">
+              <h2 class="text-xl font-bold text-slate-800 mb-1">📋 Referral Tally Feed</h2>
+              <div class="flex-1 overflow-y-auto max-h-[500px] border border-slate-100 rounded-lg p-4 bg-slate-50/50 space-y-3" id="referral-reports-feed"></div>
+            </div>
+          </div>
+        </section>
+
         <section id="account-settings-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 max-w-md space-y-4">
           <h2 class="text-xl font-bold text-slate-800 border-b pb-2">⚙️ Manage Account Security</h2>
           <div class="space-y-3">
@@ -187,7 +225,6 @@
           <p id="self-pass-feedback" class="text-center font-bold text-xs p-2 rounded hidden"></p>
         </section>
 
-        <!-- MODULE: ADMIN CONTROL - PAYROLL DISBURSEMENT -->
         <section id="admin-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-6 max-w-2xl">
           <h2 class="text-xl font-bold text-indigo-700 border-b pb-2">Admin Control: Issue Fixed Weekly Payment</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -197,35 +234,25 @@
             <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Number of Service Weeks</label><input id="p-hours" type="number" step="0.1" class="w-full p-2 border border-slate-200 text-sm rounded-lg"></div>
             <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Prerogative Deductions (₱)</label><input id="p-deduct" type="number" class="w-full p-2 border border-slate-200 text-sm rounded-lg" value="0"></div>
             <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Service Billing Period</label><input id="p-month" type="text" class="w-full p-2 border border-slate-200 text-sm rounded-lg" placeholder="Week 1 - July 2026"></div>
-            
             <div>
               <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Payment Mode Matrix</label>
-              <select id="p-mode" class="w-full p-2 border border-slate-200 text-sm rounded-lg bg-slate-50 font-bold text-indigo-900">
-                <option value="E-Cash">E-Cash (Bank, Online Transaction)</option>
-                <option value="Cash">Cash (Physical Handover)</option>
-              </select>
+              <select id="p-mode" class="w-full p-2 border border-slate-200 text-sm rounded-lg bg-slate-50 font-bold text-indigo-900"><option value="E-Cash">E-Cash (Bank, Online Transaction)</option><option value="Cash">Cash (Physical Handover)</option></select>
             </div>
             <div>
               <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Upload Receipt Screenshot</label>
               <input type="file" id="p-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
             </div>
-
             <div class="sm:col-span-2"><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Service Remarks</label><input id="p-remarks" type="text" class="w-full p-2 border border-slate-200 text-sm rounded-lg" placeholder="Notes..."></div>
           </div>
           <button onclick="submitPayrollForm()" class="bg-indigo-600 text-white px-5 py-2.5 text-sm rounded-lg font-bold shadow hover:bg-indigo-700 transition">Disburse Service Payment</button>
           <p id="payroll-feedback" class="text-emerald-600 bg-emerald-50 text-xs font-bold p-2 rounded-lg hidden"></p>
         </section>
 
-        <!-- USER PAYMENTS LEDGER -->
         <section id="user-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4 max-w-7xl">
           <h2 class="text-xl font-bold text-slate-800 border-b pb-2">My Service Payment Ledgers</h2>
           <div class="overflow-x-auto rounded-lg border border-slate-100">
             <table class="w-full text-left border-collapse text-sm">
-              <thead>
-                <tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold">
-                  <th class="p-3">Service Period</th><th class="p-3">Weeks Logged</th><th class="p-3">Mode</th><th class="p-3">Gross Base</th><th class="p-3">Deductions</th><th class="p-3 font-bold text-indigo-700">Net Credited</th><th class="p-3 text-center">Receipt Document</th><th class="p-3 text-center">Status Actions</th>
-                </tr>
-              </thead>
+              <thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Service Period</th><th class="p-3">Weeks Logged</th><th class="p-3">Mode</th><th class="p-3">Gross Base</th><th class="p-3">Deductions</th><th class="p-3 font-bold text-indigo-700">Net Credited</th><th class="p-3 text-center">Receipt Document</th><th class="p-3 text-center">Status Actions</th></tr></thead>
               <tbody id="user-payroll-table" class="divide-y divide-slate-50"></tbody>
             </table>
           </div>
@@ -233,7 +260,7 @@
 
         <section id="admin-sec" class="hidden space-y-8 max-w-6xl">
           <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 space-y-4">
-            <h3 class="text-sm font-bold uppercase tracking-wider text-indigo-900">🔍 Real-Time Ledger Filtration Control</h3>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-indigo-900">🔍 Real-Time Ledger Filtration Control</h2>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div><label class="block text-xs font-bold text-slate-500 mb-1">Target Tasker</label><select id="filter-tasker" onchange="applyGlobalFilters()" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-slate-50"><option value="ALL">-- Show All Taskers --</option></select></div>
               <div><label class="block text-xs font-bold text-slate-500 mb-1">From Date</label><input type="date" id="filter-from-date" onchange="applyGlobalFilters()" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-slate-50"></div>
@@ -249,21 +276,13 @@
               <div><label class="font-bold text-slate-600">Email Address</label><input type="email" id="add-u-email" class="w-full p-2 border rounded mt-1 bg-slate-50"></div>
               <div><label class="font-bold text-slate-600">Initial Password</label><input type="text" id="add-u-pass" class="w-full p-2 border rounded mt-1 bg-slate-50" placeholder="ChangeMe123"></div>
               <div><label class="font-bold text-slate-600">Permission Role</label><select id="add-u-role" onchange="toggleFormScheduleVisibility()" class="w-full p-2 border rounded mt-1 bg-slate-50 font-bold text-indigo-700"><option value="Employee">Employee (Standard Tasker)</option><option value="Admin">Admin (Full Workspace Override)</option></select></div>
-              
               <div><label class="font-bold text-slate-600">Shift Window Start</label><input type="time" id="add-u-shift-start" class="w-full p-2 border rounded mt-1 bg-slate-50" value="09:00"></div>
               <div><label class="font-bold text-slate-600">Shift Window End</label><input type="time" id="add-u-shift-end" class="w-full p-2 border rounded mt-1 bg-slate-50" value="18:00"></div>
               <div><label class="font-bold text-slate-600">Days Off Allotment</label><input type="text" id="add-u-off" class="w-full p-2 border rounded mt-1 bg-slate-50" value="Saturday, Sunday"></div>
               <div><label class="font-bold text-slate-600">Leave Balance</label><input type="number" id="add-u-leaves" class="w-full p-2 border rounded mt-1 bg-slate-50" value="15"></div>
-              
               <div><label class="font-bold text-slate-600 text-rose-600">Quick Break Total (Mins)</label><input type="number" id="add-u-max-break" class="w-full p-2 border rounded mt-1 bg-slate-50" value="15"></div>
               <div><label class="font-bold text-slate-600 text-rose-600">Meal Break Total (Mins)</label><input type="number" id="add-u-max-meal" class="w-full p-2 border rounded mt-1 bg-slate-50" value="60"></div>
-              
-              <div>
-                <label class="font-bold text-slate-600 text-emerald-600">Half Day Setting</label>
-                <select id="add-u-half" class="w-full p-2 border rounded mt-1 bg-slate-50 font-bold">
-                  <option value="">None</option><option value="Monday">Monday</option><option value="Tuesday">Tuesday</option><option value="Wednesday">Wednesday</option><option value="Thursday">Thursday</option><option value="Friday">Friday</option><option value="Saturday">Saturday</option><option value="Sunday">Sunday</option>
-                </select>
-              </div>
+              <div><label class="font-bold text-slate-600 text-emerald-600">Half Day Setting</label><select id="add-u-half" class="w-full p-2 border rounded mt-1 bg-slate-50 font-bold"><option value="">None</option><option value="Monday">Monday</option><option value="Tuesday">Tuesday</option><option value="Wednesday">Wednesday</option><option value="Thursday">Thursday</option><option value="Friday">Friday</option><option value="Saturday">Saturday</option><option value="Sunday">Sunday</option></select></div>
             </div>
             <button onclick="executeAdminCreateUser()" class="bg-indigo-600 text-white font-bold text-xs px-4 py-2 rounded shadow hover:bg-indigo-700 transition mt-2">Register Tasker Profile</button>
             <p id="admin-create-feedback" class="text-xs font-bold p-2 rounded hidden mt-2"></p>
@@ -323,11 +342,7 @@
             <h2 class="text-xl font-bold text-indigo-900">Master Service Payments Distribution History</h2>
             <div class="overflow-x-auto rounded-lg border border-slate-100">
               <table class="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold">
-                    <th class="p-3">Name</th><th class="p-3">ID</th><th class="p-3">Period</th><th class="p-3">Weeks</th><th class="p-3">Mode</th><th class="p-3">Gross</th><th class="p-3">Deduct</th><th class="p-3 font-bold text-indigo-600">Net</th><th class="p-3 text-center">Receipt Link</th><th class="p-3 font-bold text-center">Review Status</th><th class="p-3 max-w-xs">Dispute Notes</th>
-                  </tr>
-                </thead>
+                <thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Name</th><th class="p-3">ID</th><th class="p-3">Period</th><th class="p-3">Weeks</th><th class="p-3">Mode</th><th class="p-3">Gross</th><th class="p-3">Deduct</th><th class="p-3 font-bold text-indigo-600">Net</th><th class="p-3 text-center">Receipt Link</th><th class="p-3 font-bold text-center">Review Status</th><th class="p-3 max-w-xs">Dispute Notes</th></tr></thead>
                 <tbody id="admin-payments-history-table" class="divide-y divide-slate-50"></tbody>
               </table>
             </div>
@@ -638,6 +653,77 @@
       feedBody.innerHTML = html;
     }
 
+    function toggleRefSource() {
+      const src = document.getElementById('ref-source').value;
+      if (src === 'Others') document.getElementById('ref-source-other-container').classList.remove('hidden');
+      else document.getElementById('ref-source-other-container').classList.add('hidden');
+    }
+    
+    function toggleRefCovering() {
+      const isCov = document.getElementById('ref-is-covering').checked;
+      if (isCov) document.getElementById('ref-covering-container').classList.remove('hidden');
+      else document.getElementById('ref-covering-container').classList.add('hidden');
+    }
+
+    function submitReferralReport() {
+      let source = document.getElementById('ref-source').value;
+      if (source === 'Others') source = document.getElementById('ref-source-other').value.trim();
+      
+      const count = parseInt(document.getElementById('ref-count').value);
+      const isCovering = document.getElementById('ref-is-covering').checked;
+      const coveringName = document.getElementById('ref-covering-name').value.trim();
+
+      if (!source) { alert("Please specify the referral source."); return; }
+      if (isNaN(count) || count < 0) { alert("Enter a valid number of referrals."); return; }
+      if (isCovering && !coveringName) { alert("Specify the name of the tasker you are covering for."); return; }
+
+      const fb = document.getElementById('ref-feedback');
+      fb.className = "text-center text-xs font-bold p-2 rounded bg-amber-50 text-amber-800"; fb.innerText = "Transmitting..."; fb.classList.remove('hidden');
+      
+      callAPI('POST', '', { 
+        action: "submitReferralReport", 
+        userName: currentUser.name, 
+        source: source, 
+        numReferrals: count, 
+        coveringFor: isCovering ? coveringName : "" 
+      }, function(res) {
+        fb.innerText = res.message; 
+        fb.className = res.success ? "text-center text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800" : "text-center text-xs font-bold p-2 rounded bg-rose-50 text-rose-800";
+        if (res.success) { 
+          document.getElementById('ref-count').value = ""; 
+          document.getElementById('ref-source-other').value = "";
+          document.getElementById('ref-covering-name').value = "";
+          loadReferralReportsFeed(); 
+        }
+      });
+    }
+
+    function loadReferralReportsFeed() {
+      callAPI('GET', '?action=getAllReferralReports', null, function(records) {
+        const container = document.getElementById('referral-reports-feed');
+        container.innerHTML = ""; 
+        if (!records || records.length === 0) { container.innerHTML = '<div class="text-center py-8 text-slate-400 text-xs">No referral tallies posted.</div>'; return; }
+        
+        records.forEach(row => {
+          let coveringBadge = row.covering_for ? `<span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded text-[10px]">Covering: ${row.covering_for}</span>` : '';
+          
+          container.innerHTML += `<div class="bg-white p-3.5 rounded-lg shadow-sm border border-slate-100 flex flex-col gap-1">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center text-xs gap-1">
+              <span class="font-bold text-indigo-700">${row.user_name}</span>
+              <div class="flex items-center gap-1.5 flex-wrap">
+                ${coveringBadge}
+                <span class="bg-emerald-50 font-bold px-2 py-0.5 rounded text-emerald-700 text-[10px]">Sent: ${row.timestamp}</span>
+              </div>
+            </div>
+            <div class="mt-2 flex items-center justify-between border-t border-slate-50 pt-2">
+              <span class="text-xs font-semibold text-slate-600">Source: <span class="text-slate-800 font-bold">${row.source}</span></span>
+              <span class="text-sm font-black text-indigo-600">${row.num_referrals} Referrals</span>
+            </div>
+          </div>`;
+        });
+      });
+    }
+
     function submitScheduleAdjustment(isPermanent) {
       const targetUserId = document.getElementById('sched-target-uid').value, shiftStart = document.getElementById('sched-shift-start').value, shiftEnd = document.getElementById('sched-shift-end').value;
       const maxMeal = document.getElementById('sched-max-meal').value, maxBreak = document.getElementById('sched-max-break').value, isHalfDay = document.getElementById('sched-half-day').value;
@@ -691,7 +777,7 @@
       let items = cachedPublicReports; if (selection !== "ALL") { items = cachedPublicReports.filter(r => r.name === selection); }
       container.innerHTML = ""; if (items.length === 0) { container.innerHTML = '<div class="text-center py-8 text-slate-400 text-xs">No reports fit criteria.</div>'; return; }
       items.forEach(row => {
-        container.innerHTML += '<div class="bg-white p-3.5 rounded-lg shadow-sm border border-slate-100 flex flex-col gap-1"><div class="flex flex-col sm:flex-row sm:justify-between sm:items-center text-xs gap-1"><span class="font-bold text-indigo-700">' + row.name + ' <span class="text-slate-400 font-mono font-normal">(' + row.userId + ')</span></span><div class="flex items-center gap-1.5 flex-wrap"><span class="bg-slate-100 font-semibold px-2 py-0.5 rounded text-slate-500 text-[10px]">Work Date: ' + row.date + '</span><span class="bg-emerald-50 font-bold px-2 py-0.5 rounded text-emerald-700 text-[10px]">Sent: ' + row.timestamp + '</span></div></div><p class="text-xs text-slate-600 font-medium whitespace-pre-wrap mt-1 leading-relaxed border-t border-slate-50 pt-2">' + row.summary + '</p></div>';
+        container.innerHTML += `<div class="bg-white p-3.5 rounded-lg shadow-sm border border-slate-100 flex flex-col gap-1"><div class="flex flex-col sm:flex-row sm:justify-between sm:items-center text-xs gap-1"><span class="font-bold text-indigo-700">${row.name} <span class="text-slate-400 font-mono font-normal">(${row.userId})</span></span><div class="flex items-center gap-1.5 flex-wrap"><span class="bg-slate-100 font-semibold px-2 py-0.5 rounded text-slate-500 text-[10px]">Work Date: ${row.date}</span><span class="bg-emerald-50 font-bold px-2 py-0.5 rounded text-emerald-700 text-[10px]">Sent: ${row.timestamp}</span></div></div><p class="text-xs text-slate-600 font-medium whitespace-pre-wrap mt-1 leading-relaxed border-t border-slate-50 pt-2">${row.summary}</p></div>`;
       });
     }
 
@@ -775,9 +861,11 @@
     }
 
     function showSection(id) {
-      ['attendance-sec', 'global-feed-sec', 'leave-request-sec', 'restday-request-sec', 'task-report-sec', 'account-settings-sec', 'admin-payroll-sec', 'user-payroll-sec', 'admin-sec'].forEach(sec => { document.getElementById(sec).className = 'hidden'; });
-      const target = document.getElementById(id); if(target) target.className = id === 'account-settings-sec' ? 'bg-white p-6 rounded-xl shadow-sm border border-slate-100 max-w-md space-y-4' : 'space-y-6';
+      ['attendance-sec', 'global-feed-sec', 'leave-request-sec', 'restday-request-sec', 'task-report-sec', 'referral-report-sec', 'account-settings-sec', 'admin-payroll-sec', 'user-payroll-sec', 'admin-sec'].forEach(sec => { document.getElementById(sec).className = 'hidden'; });
+      const target = document.getElementById(id); if(target) target.className = id === 'account-settings-sec' ? 'bg-white p-6 rounded-xl shadow-sm border border-slate-100 max-w-md space-y-4' : 'space-y-6 max-w-6xl';
+      
       if (id === 'task-report-sec') { document.getElementById('rep-date').value = new Date().toISOString().split('T')[0]; document.getElementById('public-filter-tasker').value = "ALL"; loadPublicTaskReportsFeed(); }
+      if (id === 'referral-report-sec') loadReferralReportsFeed();
       if (id === 'global-feed-sec') loadGlobalStatusFeed();
       if (id === 'admin-sec') fetchGlobalAdminLogs();
       if (id === 'attendance-sec' || id === 'leave-request-sec' || id === 'account-settings-sec' || id === 'restday-request-sec') refreshUserTimers();
@@ -819,7 +907,7 @@
 
       (data.absences || []).forEach(u => {
         const ps = u.permanentSchedule;
-        auditList.innerHTML += '<div class="py-2 flex justify-between items-center text-xs"><div><div class="font-bold text-slate-800">' + u.name + ' <span class="text-slate-400 font-mono">(' + u.id + ')</span></div><div class="text-[10px] text-slate-500 mt-0.5">Shift: ' + ps.shiftStart + ' - ' + ps.shiftEnd + ' | Half-Day: ' + (ps.halfDay || "None") + '</div><div class="text-[10px] text-indigo-600 font-medium">Max Q-Break: ' + ps.maxBreak + 'm | Max Meal: ' + ps.maxMeal + 'm</div></div></div>';
+        auditList.innerHTML += `<div class="py-2 flex justify-between items-center text-xs"><div><div class="font-bold text-slate-800">${u.name} <span class="text-slate-400 font-mono">(${u.id})</span></div><div class="text-[10px] text-slate-500 mt-0.5">Shift: ${ps.shiftStart} - ${ps.shiftEnd} | Half-Day: ${ps.halfDay || "None"}</div><div class="text-[10px] text-indigo-600 font-medium">Max Q-Break: ${ps.maxBreak}m | Max Meal: ${ps.maxMeal}m</div></div></div>`;
       });
 
       let filteredAttendance = (data.attendance || []).filter(row => {
@@ -830,10 +918,10 @@
       if(filteredAttendance.length === 0) { pBody.innerHTML = '<tr><td colspan="7" class="p-3 text-center text-slate-400">No records.</td></tr>'; }
       else {
         filteredAttendance.forEach(row => {
-          const bBadge = row.overBreak > 0 ? '<span class="text-rose-600 font-bold"> (+' + row.overBreak + 'm)</span>' : '';
-          const lBadge = row.overLunch > 0 ? '<span class="text-rose-600 font-bold"> (+' + row.overLunch + 'm)</span>' : '';
+          const bBadge = row.overBreak > 0 ? `<span class="text-rose-600 font-bold"> (+${row.overBreak}m)</span>` : '';
+          const lBadge = row.overLunch > 0 ? `<span class="text-rose-600 font-bold"> (+${row.overLunch}m)</span>` : '';
           const sc = getStatusBadgeStyle(row.status);
-          pBody.innerHTML += '<tr class="border-b border-slate-100"><td class="p-3 font-medium text-slate-900">' + row.name + '</td><td class="p-3 text-slate-500">' + row.date + '</td><td class="p-3 text-emerald-600">' + row.timeIn + '</td><td class="p-3 text-rose-600">' + row.timeOut + '</td><td class="p-3">' + row.breakText + bBadge + '</td><td class="p-3">' + row.lunchText + lBadge + '</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ' + sc + '">' + row.status + '</span></td></tr>';
+          pBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 font-medium text-slate-900">${row.name}</td><td class="p-3 text-slate-500">${row.date}</td><td class="p-3 text-emerald-600">${row.timeIn}</td><td class="p-3 text-rose-600">${row.timeOut}</td><td class="p-3">${row.breakText}${bBadge}</td><td class="p-3">${row.lunchText}${lBadge}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${sc}">${row.status}</span></td></tr>`;
         });
       }
 
@@ -845,7 +933,7 @@
       if (filteredExplicitAbsents.length === 0) { explicitAbsBody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-slate-400">No logs.</td></tr>'; }
       else {
         filteredExplicitAbsents.forEach(row => {
-          explicitAbsBody.innerHTML += '<tr class="border-b border-slate-100"><td class="p-3 text-slate-500">' + row.userId + '</td><td class="p-3 font-bold">' + row.name + '</td><td class="p-3 text-rose-600">' + row.date + '</td><td class="p-3 italic text-xs">' + row.type + '</td><td class="p-3 text-center"><button onclick="executeAdminUntagAbsentLog(\'' + row.absentId + '\', \'' + row.name + '\', \'' + row.date + '\')" class="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded border">Remove</button></td></tr>';
+          explicitAbsBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 text-slate-500">${row.userId}</td><td class="p-3 font-bold">${row.name}</td><td class="p-3 text-rose-600">${row.date}</td><td class="p-3 italic text-xs">${row.type}</td><td class="p-3 text-center"><button onclick="executeAdminUntagAbsentLog('${row.absentId}', '${row.name}', '${row.date}')" class="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded border">Remove</button></td></tr>`;
         });
       }
 
@@ -855,24 +943,19 @@
         filteredPayments.forEach(row => {
           let statusBadge = ""; let actionButtons = "";
           if (row.status === "Acknowledged" || row.status === "Settled & Adjusted" || row.status === "Dispute Approved") {
-            statusBadge = '<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[11px]">✓ ' + row.status + '</span>';
+            statusBadge = `<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[11px]">✓ ${row.status}</span>`;
           } else if (row.status === "Disputed") {
-            statusBadge = '<span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded text-[11px]">Disputed</span>';
-            actionButtons = '<div class="mt-1 flex justify-center gap-1"><button onclick="adminResolveDispute(\'' + row.payrollId + '\', \'Dispute Approved\', \'' + (row.disputeReason || '').replace(/'/g, "\\'") + '\')" class="bg-emerald-600 text-white px-2 py-1 rounded text-[10px] font-bold">Approve</button><button onclick="adminResolveDispute(\'' + row.payrollId + '\', \'Dispute Rejected\', \'' + (row.disputeReason || '').replace(/'/g, "\\'") + '\')" class="bg-rose-600 text-white px-2 py-1 rounded text-[10px] font-bold">Reject</button></div>';
+            statusBadge = `<span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded text-[11px]">Disputed</span>`;
+            actionButtons = `<div class="mt-1 flex justify-center gap-1"><button onclick="adminResolveDispute('${row.payrollId}', 'Dispute Approved', '${(row.disputeReason || '').replace(/'/g, "\\'")}')" class="bg-emerald-600 text-white px-2 py-1 rounded text-[10px] font-bold">Approve</button><button onclick="adminResolveDispute('${row.payrollId}', 'Dispute Rejected', '${(row.disputeReason || '').replace(/'/g, "\\'")}')" class="bg-rose-600 text-white px-2 py-1 rounded text-[10px] font-bold">Reject</button></div>`;
           } else if (row.status === "Dispute Rejected") {
-            statusBadge = '<span class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded text-[11px]">Dispute Rejected</span>';
-          } else { statusBadge = '<span class="bg-slate-100 text-slate-800 font-medium px-2 py-0.5 rounded text-[11px]">Unreviewed</span>'; }
+            statusBadge = `<span class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded text-[11px]">Dispute Rejected</span>`;
+          } else { statusBadge = `<span class="bg-slate-100 text-slate-800 font-medium px-2 py-0.5 rounded text-[11px]">Unreviewed</span>`; }
           
-          let receiptBtn = row.receiptImage 
-            ? '<button onclick="openImagePreviewOverlayModal(\'' + row.receiptImage + '\')" class="text-indigo-600 hover:text-indigo-900 font-bold underline">View Photo</button>' 
-            : '<span class="text-slate-400 italic">No Upload</span>';
-          
+          let receiptBtn = row.receiptImage ? `<button onclick="openImagePreviewOverlayModal('${row.receiptImage}')" class="text-indigo-600 hover:text-indigo-900 font-bold underline">View Photo</button>` : `<span class="text-slate-400 italic">No Upload</span>`;
           let finalStatusCol = `<div class="text-center flex flex-col items-center">${statusBadge}${actionButtons}</div>`;
-          const paymentModeBadge = row.paymentMode === 'Cash' 
-            ? '<span class="bg-amber-100 text-amber-900 font-bold px-1.5 py-0.5 rounded text-[10px]">💵 Cash</span>' 
-            : '<span class="bg-indigo-100 text-indigo-900 font-bold px-1.5 py-0.5 rounded text-[10px]">⚡ E-Cash</span>';
+          const paymentModeBadge = row.paymentMode === 'Cash' ? `<span class="bg-amber-100 text-amber-900 font-bold px-1.5 py-0.5 rounded text-[10px]">💵 Cash</span>` : `<span class="bg-indigo-100 text-indigo-900 font-bold px-1.5 py-0.5 rounded text-[10px]">⚡ E-Cash</span>`;
 
-          payBody.innerHTML += '<tr class="border-b border-slate-100 text-xs"><td class="p-3 font-bold text-slate-900">' + row.name + '</td><td class="p-3 font-mono text-slate-500">' + row.userId + '</td><td class="p-3 text-indigo-700 text-xs">' + row.period + '</td><td class="p-3">' + row.weeks + ' wks</td><td class="p-3">' + paymentModeBadge + '</td><td class="p-3">₱' + row.gross.toFixed(2) + '</td><td class="p-3 text-rose-600">-₱' + row.deductions.toFixed(2) + '</td><td class="p-3 font-black text-emerald-600">₱' + row.net.toFixed(2) + '</td><td class="p-3 font-semibold text-center">' + receiptBtn + '</td><td class="p-3">' + finalStatusCol + '</td><td class="p-3 text-xs max-w-xs break-words whitespace-pre-wrap">' + (row.disputeReason || "-") + '</td></tr>';
+          payBody.innerHTML += `<tr class="border-b border-slate-100 text-xs"><td class="p-3 font-bold text-slate-900">${row.name}</td><td class="p-3 font-mono text-slate-500">${row.userId}</td><td class="p-3 text-indigo-700 text-xs">${row.period}</td><td class="p-3">${row.weeks} wks</td><td class="p-3">${paymentModeBadge}</td><td class="p-3">₱${row.gross.toFixed(2)}</td><td class="p-3 text-rose-600">-₱${row.deductions.toFixed(2)}</td><td class="p-3 font-black text-emerald-600">₱${row.net.toFixed(2)}</td><td class="p-3 font-semibold text-center">${receiptBtn}</td><td class="p-3">${finalStatusCol}</td><td class="p-3 text-xs max-w-xs break-words whitespace-pre-wrap">${row.disputeReason || "-"}</td></tr>`;
         });
       }
 
@@ -880,22 +963,22 @@
       if (filteredRestDays.length === 0) { rdBody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-slate-400">Queue clean.</td></tr>'; }
       else {
         filteredRestDays.forEach(row => {
-          let controls = '<span class="text-slate-400 italic text-xs">Evaluated</span>';
-          if (row.status === "Pending") { controls = '<button onclick="executeAdminMakeRestDayDecision(\'' + row.requestId + '\', \'Approved\')" class="bg-emerald-600 text-white font-bold text-[11px] px-2 py-0.5 rounded mr-1">Approve</button><button onclick="executeAdminMakeRestDayDecision(\'' + row.requestId + '\', \'Denied\')" class="bg-rose-600 text-white font-bold text-[11px] px-2 py-0.5 rounded">Deny</button>'; }
+          let controls = `<span class="text-slate-400 italic text-xs">Evaluated</span>`;
+          if (row.status === "Pending") { controls = `<button onclick="executeAdminMakeRestDayDecision('${row.requestId}', 'Approved')" class="bg-emerald-600 text-white font-bold text-[11px] px-2 py-0.5 rounded mr-1">Approve</button><button onclick="executeAdminMakeRestDayDecision('${row.requestId}', 'Denied')" class="bg-rose-600 text-white font-bold text-[11px] px-2 py-0.5 rounded">Deny</button>`; }
           const rc = row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600';
-          rdBody.innerHTML += '<tr class="border-b border-slate-100"><td class="p-3 font-bold text-slate-900">' + row.name + '</td><td class="p-3 text-indigo-700">' + row.date + '</td><td class="p-3 text-slate-600 text-xs">' + row.comments + '</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ' + rc + '">' + row.status + '</span></td><td class="p-3 text-center whitespace-nowrap">' + controls + '</td></tr>';
+          rdBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 font-bold text-slate-900">${row.name}</td><td class="p-3 text-indigo-700">${row.date}</td><td class="p-3 text-slate-600 text-xs">${row.comments}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${rc}">${row.status}</span></td><td class="p-3 text-center whitespace-nowrap">${controls}</td></tr>`;
         });
       }
 
       (data.absences || []).filter(r => !(selectedTasker !== "ALL" && r.name !== selectedTasker)).forEach(row => {
         const missClass = row.absents > 0 ? 'text-rose-600 bg-rose-50/30' : 'text-emerald-600';
-        absBody.innerHTML += '<tr class="border-b border-slate-100"><td class="p-3 text-slate-500">' + row.id + '</td><td class="p-3 font-medium text-slate-900">' + row.name + '</td><td class="p-3 text-slate-500">' + row.daysOff + '</td><td class="p-3 text-indigo-600">' + row.halfDay + '</td><td class="p-3 font-black ' + missClass + '">' + row.absents + ' days missed</td><td class="p-3 text-center space-x-1 whitespace-nowrap"><button onclick="executeAdminTagUserAbsent(\'' + row.id + '\', \'' + row.name + '\')" class="text-xs bg-rose-600 text-white font-bold px-2 py-1 rounded">Tag Absent</button><button onclick="executeAdminOverridePassword(\'' + row.id + '\')" class="text-xs bg-indigo-50 text-indigo-700 font-semibold px-2 py-1 rounded border">Reset Pass</button><button onclick="executeAdminRemoveUser(\'' + row.id + '\', \'' + row.name + '\')" class="text-xs bg-rose-50 text-rose-600 font-bold px-2 py-1 rounded border">Purge</button></td></tr>';
+        absBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 text-slate-500">${row.id}</td><td class="p-3 font-medium text-slate-900">${row.name}</td><td class="p-3 text-slate-500">${row.daysOff}</td><td class="p-3 text-indigo-600">${row.halfDay}</td><td class="p-3 font-black ${missClass}">${row.absents} days missed</td><td class="p-3 text-center space-x-1 whitespace-nowrap"><button onclick="executeAdminTagUserAbsent('${row.id}', '${row.name}')" class="text-xs bg-rose-600 text-white font-bold px-2 py-1 rounded">Tag Absent</button><button onclick="executeAdminOverridePassword('${row.id}')" class="text-xs bg-indigo-50 text-indigo-700 font-semibold px-2 py-1 rounded border">Reset Pass</button><button onclick="executeAdminRemoveUser('${row.id}', '${row.name}')" class="text-xs bg-rose-50 text-rose-600 font-bold px-2 py-1 rounded border">Purge</button></td></tr>`;
       });
 
       let filteredLeaves = (data.leaves || []).filter(row => { return !(selectedTasker !== "ALL" && row.name !== selectedTasker); });
       if(filteredLeaves.length === 0) { lBody.innerHTML = '<tr><td colspan="6" class="p-3 text-center text-slate-400">Clean queue.</td></tr>'; }
       filteredLeaves.forEach(row => {
-        let controls = '<span class="text-slate-400 italic text-xs">Closed Logs</span>';
+        let controls = `<span class="text-slate-400 italic text-xs">Closed Logs</span>`;
         if (row.status === "Pending") { controls = `<button onclick="adminExecuteLeave('${row.id}','Approved')" class="bg-emerald-600 text-white font-bold text-xs px-2.5 py-0.5 rounded mr-1">Approve</button><button onclick="adminExecuteLeave('${row.id}','Denied')" class="bg-rose-600 text-white font-bold text-xs px-2.5 py-0.5 rounded">Deny</button>`; }
         const sc = row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600';
         let attachBtn = row.attachment ? `<button onclick="openImagePreviewOverlayModal('${row.attachment}')" class="text-indigo-600 hover:text-indigo-900 font-bold underline text-xs">View</button>` : `<span class="text-slate-400 italic text-xs">None</span>`;
@@ -919,28 +1002,28 @@
         payments.forEach(row => {
           let statusBadge = "";
           if (row.status === "Acknowledged" || row.status === "Settled & Adjusted") {
-            statusBadge = '<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[11px]">✓ ' + row.status + '</span>';
+            statusBadge = `<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[11px]">✓ ${row.status}</span>`;
           } else if (row.status === "Disputed") {
-            statusBadge = '<span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded text-[11px]">⏳ Pending Dispute</span>';
+            statusBadge = `<span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded text-[11px]">⏳ Pending Dispute</span>`;
           } else if (row.status === "Dispute Approved") {
-            statusBadge = '<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[11px]">✓ Dispute Approved</span>';
+            statusBadge = `<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[11px]">✓ Dispute Approved</span>`;
           } else if (row.status === "Dispute Rejected") {
-            statusBadge = '<div class="flex flex-col gap-1 items-center"><span class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded text-[11px]">❌ Dispute Rejected</span>' +
-                          '<button onclick="acknowledgePayment(\'' + row.payrollId + '\')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2 py-1 rounded text-[10px]">Acknowledge</button></div>';
+            statusBadge = `<div class="flex flex-col gap-1 items-center"><span class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded text-[11px]">❌ Dispute Rejected</span>` +
+                          `<button onclick="acknowledgePayment('${row.payrollId}')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2 py-1 rounded text-[10px]">Acknowledge</button></div>`;
           } else {
-            statusBadge = '<div class="flex gap-1 justify-center"><button onclick="acknowledgePayment(\'' + row.payrollId + '\')" class="bg-emerald-600 text-white font-bold px-2 py-1 rounded text-[10px] transition">Acknowledge</button>' +
-                          '<button onclick="disputePayment(\'' + row.payrollId + '\')" class="bg-rose-600 text-white font-bold px-2 py-1 rounded text-[10px] transition">Dispute</button></div>';
+            statusBadge = `<div class="flex gap-1 justify-center"><button onclick="acknowledgePayment('${row.payrollId}')" class="bg-emerald-600 text-white font-bold px-2 py-1 rounded text-[10px] transition">Acknowledge</button>` +
+                          `<button onclick="disputePayment('${row.payrollId}')" class="bg-rose-600 text-white font-bold px-2 py-1 rounded text-[10px] transition">Dispute</button></div>`;
           }
 
           let receiptBtn = row.receiptImage 
-            ? '<button onclick="openImagePreviewOverlayModal(\'' + row.receiptImage + '\')" class="text-indigo-600 hover:text-indigo-900 font-bold underline">View Screenshot</button>' 
-            : '<span class="text-slate-400 italic">No Attachment</span>';
+            ? `<button onclick="openImagePreviewOverlayModal('${row.receiptImage}')" class="text-indigo-600 hover:text-indigo-900 font-bold underline">View Screenshot</button>` 
+            : `<span class="text-slate-400 italic">No Attachment</span>`;
 
           const paymentModeBadge = row.paymentMode === 'Cash' 
-            ? '<span class="bg-amber-100 text-amber-900 font-bold px-1.5 py-0.5 rounded text-[10px]">💵 Cash</span>' 
-            : '<span class="bg-indigo-100 text-indigo-900 font-bold px-1.5 py-0.5 rounded text-[10px]">⚡ E-Cash</span>';
+            ? `<span class="bg-amber-100 text-amber-900 font-bold px-1.5 py-0.5 rounded text-[10px]">💵 Cash</span>` 
+            : `<span class="bg-indigo-100 text-indigo-900 font-bold px-1.5 py-0.5 rounded text-[10px]">⚡ E-Cash</span>`;
 
-          tableBody.innerHTML += '<tr class="border-b border-slate-100"><td class="p-3 font-semibold text-slate-800">' + row.period + '</td><td class="p-3">' + row.weeks + ' wks</td><td class="p-3">' + paymentModeBadge + '</td><td class="p-3">₱' + row.gross.toFixed(2) + '</td><td class="p-3 text-rose-600">-₱' + row.deductions.toFixed(2) + '</td><td class="p-3 font-black text-indigo-700">₱' + row.net.toFixed(2) + '</td><td class="p-3 text-center font-semibold">' + receiptBtn + '</td><td class="p-3 text-center">' + statusBadge + '</td></tr>';
+          tableBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 font-semibold text-slate-800">${row.period}</td><td class="p-3">${row.weeks} wks</td><td class="p-3">${paymentModeBadge}</td><td class="p-3">₱${row.gross.toFixed(2)}</td><td class="p-3 text-rose-600">-₱${row.deductions.toFixed(2)}</td><td class="p-3 font-black text-indigo-700">₱${row.net.toFixed(2)}</td><td class="p-3 text-center font-semibold">${receiptBtn}</td><td class="p-3 text-center">${statusBadge}</td></tr>`;
         });
       });
     }
@@ -1019,9 +1102,7 @@
         const reader = new FileReader();
         reader.onload = function(e) { executePost(e.target.result); };
         reader.readAsDataURL(fileInput.files[0]);
-      } else {
-        executePost('');
-      }
+      } else { executePost(''); }
     }
 
     function submitScheduleAdjustment(isPermanent) {
