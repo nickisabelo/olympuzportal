@@ -703,11 +703,11 @@
       }
       showSection('attendance-sec');
       resetInactivityTracker();
-      setInterval(refreshUserTimers, 30000);
-      setInterval(function() { if (!document.getElementById('global-feed-sec').classList.contains('hidden')) loadGlobalStatusFeed(); }, 15000);
-      setInterval(function() { if (!document.getElementById('task-report-sec').classList.contains('hidden')) loadPublicTaskReportsFeed(); }, 60000);
-      setInterval(function() { if (!document.getElementById('other-task-report-sec').classList.contains('hidden')) loadOtherTaskReportsFeed(); }, 60000);
-      setInterval(function() { if (currentUser.role === 'Admin' && !document.getElementById('admin-sec').classList.contains('hidden')) fetchGlobalAdminLogs(); }, 45000);
+      setInterval(function() { if (currentUser) refreshUserTimers(); }, 30000);
+      setInterval(function() { if (currentUser && !document.getElementById('global-feed-sec').classList.contains('hidden')) loadGlobalStatusFeed(); }, 15000);
+      setInterval(function() { if (currentUser && !document.getElementById('task-report-sec').classList.contains('hidden')) loadPublicTaskReportsFeed(); }, 60000);
+      setInterval(function() { if (currentUser && !document.getElementById('other-task-report-sec').classList.contains('hidden')) loadOtherTaskReportsFeed(); }, 60000);
+      setInterval(function() { if (currentUser && currentUser.role === 'Admin' && !document.getElementById('admin-sec').classList.contains('hidden')) fetchGlobalAdminLogs(); }, 45000);
       initializeRealtimeTicker();
     }
 
@@ -1496,7 +1496,7 @@
     function executeAdminCreateUser() {
       const fb = document.getElementById('admin-create-feedback');
       const payload = {
-        action: "registerUser",
+        action: "adminCreateUser",
         name: document.getElementById('add-u-name').value,
         email: document.getElementById('add-u-email').value,
         password: document.getElementById('add-u-pass').value || "ChangeMe123",
