@@ -30,7 +30,7 @@
     </div>
   </div>
 
-  <div id="app-page" class="hidden min-h-screen flex flex-col">
+  <div id="app-page" class="hidden min-h-screen flex flex-col relative">
     <header class="bg-indigo-900 text-white px-6 py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 shadow-md">
       <div class="flex flex-col"><span class="text-2xl font-black tracking-wider uppercase">Olympuz</span><span class="text-[10px] text-indigo-200 font-medium tracking-wider -mt-1">powered by Edward Belacse Career Consultancy Services</span></div>
       <div class="flex items-center gap-4 self-end sm:self-auto"><span id="user-display" class="bg-indigo-800 text-xs font-semibold px-3 py-1.5 rounded-full border border-indigo-700"></span><button onclick="logout()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition">Logout</button></div>
@@ -44,12 +44,13 @@
         <button onclick="showSection('restday-request-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">📅 RD OT / Cover Absent</button>
         <button onclick="showSection('task-report-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">📝 Task Done Report</button>
         <button onclick="showSection('referral-report-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition text-indigo-700">📈 Referral Tally Report</button>
+        <button onclick="showSection('ca-request-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition text-emerald-700">💸 CA Req</button>
         <button onclick="routePayrollSection()" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">💵 Service Payment Portal</button>
         <button onclick="showSection('account-settings-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">⚙️ Account Settings</button>
         <button id="admin-dash-btn" onclick="showSection('admin-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg hidden font-semibold text-rose-700 transition">📊 Global Overview</button>
       </nav>
 
-      <main class="flex-1 p-6 md:p-8 overflow-y-auto">
+      <main class="flex-1 p-6 md:p-8 overflow-y-auto relative">
         
         <section id="attendance-sec" class="hidden space-y-6 max-w-4xl">
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-6">
@@ -136,13 +137,35 @@
             <h2 class="text-xl font-bold text-slate-800">📅 Rest Day Work Authorization</h2>
             <p class="text-xs text-slate-400">File a specific schedule request line to map Overtime hours or cover structural absence gaps.</p>
             <div><label class="block text-xs font-bold text-slate-500 mb-1">Target Rest Day Date</label><input type="date" id="rd-date" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50"></div>
-            <div><label class="block text-xs font-bold text-slate-500 mb-1">Justification Comments & Purpose</label><textarea id="rd-comments" rows="3" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="Specify if OT requests or covering an absent log window date..."></textarea></div>
+            <div><label class="block text-xs font-bold text-slate-500 mb-1">Justification Comments & Purpose</label><textarea id="rd-comments" rows="3" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="Specify details..."></textarea></div>
             <button onclick="submitRestDayForm()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg font-bold text-sm shadow transition">File Authorization Request</button>
             <p id="rd-feedback-msg" class="text-center font-bold text-xs p-2 rounded hidden"></p>
           </div>
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h3 class="text-md font-bold text-slate-900 border-b pb-2 mb-3">My Rest Day Authorization Queue History</h3>
             <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Target Date</th><th class="p-3">Justification Purpose Statement</th><th class="p-3">Status</th><th class="p-3">Management Review Notes</th></tr></thead><tbody id="personal-restday-table" class="divide-y divide-slate-50"></tbody></table></div>
+          </div>
+        </section>
+
+        <!-- MODULE: CA REQUEST (TASKER) -->
+        <section id="ca-request-sec" class="hidden space-y-6 max-w-5xl">
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4 max-w-md">
+            <h2 class="text-xl font-bold text-emerald-700">💸 Cash Advance Request</h2>
+            <p class="text-xs text-slate-400">Submit a formal request for a cash advance limit line.</p>
+            <div><label class="block text-xs font-bold text-slate-500 mb-1">Requested Amount (₱)</label><input type="number" id="ca-amount" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="0.00"></div>
+            <div><label class="block text-xs font-bold text-slate-500 mb-1">Reason for Cash Advance</label><textarea id="ca-reason" rows="3" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="Specify valid reasoning..."></textarea></div>
+            <div><label class="block text-xs font-bold text-slate-500 mb-1">Upload Proof/Document (Optional)</label><input type="file" id="ca-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"></div>
+            <button onclick="submitCAForm()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white p-3 rounded-lg font-bold text-sm shadow transition">Submit CA Request</button>
+            <p id="ca-feedback-msg" class="text-center font-bold text-xs p-2 rounded hidden"></p>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+            <h3 class="text-md font-bold text-slate-900 border-b pb-2 mb-3">My Cash Advance Authorization History</h3>
+            <div class="overflow-x-auto rounded-lg border border-slate-100">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Request Date</th><th class="p-3">Amount</th><th class="p-3">Reason</th><th class="p-3 text-center">My Attachment</th><th class="p-3">Status</th><th class="p-3">Admin Notes</th><th class="p-3 text-center">Disbursement Proof</th></tr></thead>
+                <tbody id="personal-ca-table" class="divide-y divide-slate-50"></tbody>
+              </table>
+            </div>
           </div>
         </section>
 
@@ -225,6 +248,7 @@
           <p id="self-pass-feedback" class="text-center font-bold text-xs p-2 rounded hidden"></p>
         </section>
 
+        <!-- MODULE: ADMIN CONTROL - PAYROLL DISBURSEMENT -->
         <section id="admin-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-6 max-w-2xl">
           <h2 class="text-xl font-bold text-indigo-700 border-b pb-2">Admin Control: Issue Fixed Weekly Payment</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -234,25 +258,42 @@
             <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Number of Service Weeks</label><input id="p-hours" type="number" step="0.1" class="w-full p-2 border border-slate-200 text-sm rounded-lg"></div>
             <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Prerogative Deductions (₱)</label><input id="p-deduct" type="number" class="w-full p-2 border border-slate-200 text-sm rounded-lg" value="0"></div>
             <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Service Billing Period</label><input id="p-month" type="text" class="w-full p-2 border border-slate-200 text-sm rounded-lg" placeholder="Week 1 - July 2026"></div>
+            
             <div>
               <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Payment Mode Matrix</label>
-              <select id="p-mode" class="w-full p-2 border border-slate-200 text-sm rounded-lg bg-slate-50 font-bold text-indigo-900"><option value="E-Cash">E-Cash (Bank, Online Transaction)</option><option value="Cash">Cash (Physical Handover)</option></select>
+              <select id="p-mode" class="w-full p-2 border border-slate-200 text-sm rounded-lg bg-slate-50 font-bold text-indigo-900">
+                <option value="E-Cash">E-Cash (Bank, Online Transaction)</option>
+                <option value="Cash">Cash (Physical Handover)</option>
+              </select>
             </div>
             <div>
               <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Upload Receipt Screenshot</label>
               <input type="file" id="p-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
             </div>
+
             <div class="sm:col-span-2"><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Service Remarks</label><input id="p-remarks" type="text" class="w-full p-2 border border-slate-200 text-sm rounded-lg" placeholder="Notes..."></div>
           </div>
           <button onclick="submitPayrollForm()" class="bg-indigo-600 text-white px-5 py-2.5 text-sm rounded-lg font-bold shadow hover:bg-indigo-700 transition">Disburse Service Payment</button>
           <p id="payroll-feedback" class="text-emerald-600 bg-emerald-50 text-xs font-bold p-2 rounded-lg hidden"></p>
         </section>
 
+        <!-- USER PAYMENTS LEDGER -->
         <section id="user-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4 max-w-7xl">
           <h2 class="text-xl font-bold text-slate-800 border-b pb-2">My Service Payment Ledgers</h2>
           <div class="overflow-x-auto rounded-lg border border-slate-100">
             <table class="w-full text-left border-collapse text-sm">
-              <thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Service Period</th><th class="p-3">Weeks Logged</th><th class="p-3">Mode</th><th class="p-3">Gross Base</th><th class="p-3">Deductions</th><th class="p-3 font-bold text-indigo-700">Net Credited</th><th class="p-3 text-center">Receipt Document</th><th class="p-3 text-center">Status Actions</th></tr></thead>
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold">
+                  <th class="p-3">Service Period</th>
+                  <th class="p-3">Weeks Logged</th>
+                  <th class="p-3">Mode</th>
+                  <th class="p-3">Gross Base</th>
+                  <th class="p-3">Deductions</th>
+                  <th class="p-3 font-bold text-indigo-700">Net Credited</th>
+                  <th class="p-3 text-center">Receipt Document</th>
+                  <th class="p-3 text-center">Status Actions</th>
+                </tr>
+              </thead>
               <tbody id="user-payroll-table" class="divide-y divide-slate-50"></tbody>
             </table>
           </div>
@@ -260,13 +301,24 @@
 
         <section id="admin-sec" class="hidden space-y-8 max-w-6xl">
           <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 space-y-4">
-            <h2 class="text-sm font-bold uppercase tracking-wider text-indigo-900">🔍 Real-Time Ledger Filtration Control</h2>
+            <h3 class="text-sm font-bold uppercase tracking-wider text-indigo-900">🔍 Real-Time Ledger Filtration Control</h3>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div><label class="block text-xs font-bold text-slate-500 mb-1">Target Tasker</label><select id="filter-tasker" onchange="applyGlobalFilters()" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-slate-50"><option value="ALL">-- Show All Taskers --</option></select></div>
               <div><label class="block text-xs font-bold text-slate-500 mb-1">From Date</label><input type="date" id="filter-from-date" onchange="applyGlobalFilters()" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-slate-50"></div>
               <div><label class="block text-xs font-bold text-slate-500 mb-1">To Date</label><input type="date" id="filter-to-date" onchange="applyGlobalFilters()" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-slate-50"></div>
             </div>
             <div class="flex justify-end"><button onclick="clearGlobalFilters()" class="text-xs bg-slate-100 text-slate-600 font-bold px-3 py-1.5 rounded-lg">Reset Filters</button></div>
+          </div>
+
+          <!-- MODULE: CORPORATE CA QUEUE (ADMIN) -->
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+            <h2 class="text-xl font-bold text-emerald-800 border-b pb-2 mb-3">Corporate Cash Advance Approvals Queue</h2>
+            <div class="overflow-x-auto rounded-lg border border-slate-100">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Tasker</th><th class="p-3">Date</th><th class="p-3">Amount</th><th class="p-3">Reason</th><th class="p-3 text-center">Tasker Proof</th><th class="p-3">Status</th><th class="p-3 text-center">Disbursement/Admin Note</th><th class="p-3 text-center">Control</th></tr></thead>
+                <tbody id="admin-ca-table" class="divide-y divide-slate-50"></tbody>
+              </table>
+            </div>
           </div>
 
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4">
@@ -364,6 +416,27 @@
           </div>
         </section>
       </main>
+    </div>
+  </div>
+
+  <!-- CA Decision Modal -->
+  <div id="ca-decision-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 px-4">
+    <div class="bg-white p-6 rounded-xl shadow-xl w-full max-w-md space-y-4">
+      <h3 class="text-lg font-bold text-slate-800 border-b pb-2">Process Cash Advance</h3>
+      <input type="hidden" id="ca-modal-req-id">
+      <div>
+        <label class="block text-xs font-bold text-slate-500 mb-1">Feedback / Denial Reason</label>
+        <textarea id="ca-modal-feedback" rows="3" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="Notes for the tasker..."></textarea>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-500 mb-1">Disbursement Proof (For Approvals)</label>
+        <input type="file" id="ca-modal-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700">
+      </div>
+      <div class="flex gap-2 pt-2">
+        <button onclick="submitCADecision('Approved')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-sm transition">Approve & Send</button>
+        <button onclick="submitCADecision('Denied')" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 rounded-lg text-sm transition">Deny Request</button>
+      </div>
+      <button onclick="closeCAModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2 rounded-lg text-xs mt-1 transition">Cancel</button>
     </div>
   </div>
 
@@ -570,6 +643,18 @@
             rdBody.innerHTML += '<tr><td class="p-3 font-medium text-slate-900">' + row.date + '</td><td class="p-3 text-slate-600 whitespace-pre-wrap">' + row.comments + '</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ' + rc + '">' + row.status + '</span></td><td class="p-3 text-slate-500 italic">' + row.feedback + '</td></tr>';
           });
         }
+
+        const caBody = document.getElementById('personal-ca-table'); caBody.innerHTML = "";
+        const caArray = stats.cashAdvances || [];
+        if (caArray.length === 0) { caBody.innerHTML = '<tr><td colspan="7" class="p-3 text-center text-slate-400">No Cash Advance requests found.</td></tr>'; }
+        else {
+          caArray.forEach(row => {
+            const rc = row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : (row.status === 'Denied' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-800');
+            let tAttach = row.attachment ? `<button onclick="openImagePreviewOverlayModal('${row.attachment}')" class="text-indigo-600 hover:underline font-bold text-xs">View</button>` : `<span class="text-slate-400 italic text-xs">None</span>`;
+            let aAttach = row.adminAttachment ? `<button onclick="openImagePreviewOverlayModal('${row.adminAttachment}')" class="text-emerald-600 hover:underline font-bold text-xs">View</button>` : `<span class="text-slate-400 italic text-xs">None</span>`;
+            caBody.innerHTML += `<tr><td class="p-3 font-medium">${row.requestDate}</td><td class="p-3 font-bold text-emerald-700">₱${row.amount.toFixed(2)}</td><td class="p-3 text-slate-600">${row.reason}</td><td class="p-3 text-center">${tAttach}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${rc}">${row.status}</span></td><td class="p-3 text-slate-500 italic max-w-[150px] truncate">${row.feedback || '-'}</td><td class="p-3 text-center">${aAttach}</td></tr>`;
+          });
+        }
       });
     }
 
@@ -668,7 +753,6 @@
     function submitReferralReport() {
       let source = document.getElementById('ref-source').value;
       if (source === 'Others') source = document.getElementById('ref-source-other').value.trim();
-      
       const count = parseInt(document.getElementById('ref-count').value);
       const isCovering = document.getElementById('ref-is-covering').checked;
       const coveringName = document.getElementById('ref-covering-name').value.trim();
@@ -681,21 +765,71 @@
       fb.className = "text-center text-xs font-bold p-2 rounded bg-amber-50 text-amber-800"; fb.innerText = "Transmitting..."; fb.classList.remove('hidden');
       
       callAPI('POST', '', { 
-        action: "submitReferralReport", 
-        userName: currentUser.name, 
-        source: source, 
-        numReferrals: count, 
-        coveringFor: isCovering ? coveringName : "" 
+        action: "submitReferralReport", userName: currentUser.name, source: source, numReferrals: count, coveringFor: isCovering ? coveringName : "" 
       }, function(res) {
-        fb.innerText = res.message; 
-        fb.className = res.success ? "text-center text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800" : "text-center text-xs font-bold p-2 rounded bg-rose-50 text-rose-800";
+        fb.innerText = res.message; fb.className = res.success ? "text-center text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800" : "text-center text-xs font-bold p-2 rounded bg-rose-50 text-rose-800";
         if (res.success) { 
-          document.getElementById('ref-count').value = ""; 
-          document.getElementById('ref-source-other').value = "";
-          document.getElementById('ref-covering-name').value = "";
+          document.getElementById('ref-count').value = ""; document.getElementById('ref-source-other').value = ""; document.getElementById('ref-covering-name').value = "";
           loadReferralReportsFeed(); 
         }
       });
+    }
+
+    function submitCAForm() {
+      const amt = parseFloat(document.getElementById('ca-amount').value);
+      const reason = document.getElementById('ca-reason').value;
+      const fileInput = document.getElementById('ca-file');
+      const fb = document.getElementById('ca-feedback-msg');
+
+      if (isNaN(amt) || amt <= 0 || !reason.trim()) { alert("Please provide a valid amount and reasoning."); return; }
+
+      fb.className = "text-center text-xs font-bold p-2 rounded bg-amber-50 text-amber-800"; fb.innerText = "Transmitting request..."; fb.classList.remove('hidden');
+
+      const executePost = (base64String = '') => {
+        callAPI('POST', '', { action: "submitCARequest", userName: currentUser.name, amount: amt, reason: reason, attachment: base64String }, function(res) {
+          fb.innerText = res.message; fb.className = res.success ? "text-center text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800" : "text-center text-xs font-bold p-2 rounded bg-rose-50 text-rose-800";
+          if (res.success) { document.getElementById('ca-amount').value = ""; document.getElementById('ca-reason').value = ""; if(fileInput) fileInput.value = ""; refreshUserTimers(); }
+        });
+      };
+
+      if (fileInput && fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) { executePost(e.target.result); };
+        reader.readAsDataURL(fileInput.files[0]);
+      } else { executePost(''); }
+    }
+
+    function openCAModal(requestId) {
+      document.getElementById('ca-modal-req-id').value = requestId;
+      document.getElementById('ca-modal-feedback').value = "";
+      document.getElementById('ca-modal-file').value = "";
+      document.getElementById('ca-decision-modal').classList.remove('hidden');
+    }
+
+    function closeCAModal() {
+      document.getElementById('ca-decision-modal').classList.add('hidden');
+    }
+
+    function submitCADecision(status) {
+      const reqId = document.getElementById('ca-modal-req-id').value;
+      const feedback = document.getElementById('ca-modal-feedback').value;
+      const fileInput = document.getElementById('ca-modal-file');
+
+      if (status === 'Denied' && !feedback.trim()) { alert("Please provide a denial reason/feedback notes."); return; }
+
+      const executePost = (base64String = '') => {
+        callAPI('POST', '', { action: "processCAAction", requestId: reqId, status: status, feedback: feedback, adminAttachment: base64String }, function(res) {
+          alert(res.message);
+          closeCAModal();
+          if (res.success) fetchGlobalAdminLogs();
+        });
+      };
+
+      if (status === 'Approved' && fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) { executePost(e.target.result); };
+        reader.readAsDataURL(fileInput.files[0]);
+      } else { executePost(''); }
     }
 
     function loadReferralReportsFeed() {
@@ -747,16 +881,6 @@
           if (id === 'add-u-max-meal') el.value = "60";
           if (id === 'add-u-half') el.value = "";
         }
-      });
-    }
-
-    function submitRestDayForm() {
-      const targetDate = document.getElementById('rd-date').value, comments = document.getElementById('rd-comments').value, fb = document.getElementById('rd-feedback-msg');
-      if (!targetDate || !comments.trim()) { alert("Compile entries."); return; }
-      fb.className = "text-center text-xs font-bold p-2 rounded bg-amber-50 text-amber-800"; fb.innerText = "Transmitting request..."; fb.classList.remove('hidden');
-      callAPI('POST', '', { action: "submitRestDayRequest", userId: currentUser.id, userName: currentUser.name, targetDate: targetDate, comments: comments }, function(res) {
-        fb.innerText = res.message; fb.className = res.success ? "text-center text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800" : "text-center text-xs font-bold p-2 rounded bg-rose-50 text-rose-800";
-        if (res.success) { document.getElementById('rd-date').value = ""; document.getElementById('rd-comments').value = ""; refreshUserTimers(); }
       });
     }
 
@@ -861,14 +985,14 @@
     }
 
     function showSection(id) {
-      ['attendance-sec', 'global-feed-sec', 'leave-request-sec', 'restday-request-sec', 'task-report-sec', 'referral-report-sec', 'account-settings-sec', 'admin-payroll-sec', 'user-payroll-sec', 'admin-sec'].forEach(sec => { document.getElementById(sec).className = 'hidden'; });
+      ['attendance-sec', 'global-feed-sec', 'leave-request-sec', 'restday-request-sec', 'task-report-sec', 'referral-report-sec', 'ca-request-sec', 'account-settings-sec', 'admin-payroll-sec', 'user-payroll-sec', 'admin-sec'].forEach(sec => { document.getElementById(sec).className = 'hidden'; });
       const target = document.getElementById(id); if(target) target.className = id === 'account-settings-sec' ? 'bg-white p-6 rounded-xl shadow-sm border border-slate-100 max-w-md space-y-4' : 'space-y-6 max-w-6xl';
       
       if (id === 'task-report-sec') { document.getElementById('rep-date').value = new Date().toISOString().split('T')[0]; document.getElementById('public-filter-tasker').value = "ALL"; loadPublicTaskReportsFeed(); }
       if (id === 'referral-report-sec') loadReferralReportsFeed();
       if (id === 'global-feed-sec') loadGlobalStatusFeed();
       if (id === 'admin-sec') fetchGlobalAdminLogs();
-      if (id === 'attendance-sec' || id === 'leave-request-sec' || id === 'account-settings-sec' || id === 'restday-request-sec') refreshUserTimers();
+      if (id === 'attendance-sec' || id === 'leave-request-sec' || id === 'ca-request-sec' || id === 'account-settings-sec' || id === 'restday-request-sec') refreshUserTimers();
     }
 
     function logout() {
@@ -901,9 +1025,9 @@
       
       const pBody = document.getElementById('admin-attendance-table'), absBody = document.getElementById('admin-absence-table'), lBody = document.getElementById('admin-leave-table');
       const payBody = document.getElementById('admin-payments-history-table'), explicitAbsBody = document.getElementById('admin-explicit-absents-table'), rdBody = document.getElementById('admin-restday-table');
-      const auditList = document.getElementById('current-schedule-audit-list');
+      const caAdminBody = document.getElementById('admin-ca-table'), auditList = document.getElementById('current-schedule-audit-list');
       
-      pBody.innerHTML = ""; absBody.innerHTML = ""; lBody.innerHTML = ""; payBody.innerHTML = ""; explicitAbsBody.innerHTML = ""; rdBody.innerHTML = ""; auditList.innerHTML = "";
+      pBody.innerHTML = ""; absBody.innerHTML = ""; lBody.innerHTML = ""; payBody.innerHTML = ""; explicitAbsBody.innerHTML = ""; rdBody.innerHTML = ""; caAdminBody.innerHTML = ""; auditList.innerHTML = "";
 
       (data.absences || []).forEach(u => {
         const ps = u.permanentSchedule;
@@ -967,6 +1091,22 @@
           if (row.status === "Pending") { controls = `<button onclick="executeAdminMakeRestDayDecision('${row.requestId}', 'Approved')" class="bg-emerald-600 text-white font-bold text-[11px] px-2 py-0.5 rounded mr-1">Approve</button><button onclick="executeAdminMakeRestDayDecision('${row.requestId}', 'Denied')" class="bg-rose-600 text-white font-bold text-[11px] px-2 py-0.5 rounded">Deny</button>`; }
           const rc = row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600';
           rdBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 font-bold text-slate-900">${row.name}</td><td class="p-3 text-indigo-700">${row.date}</td><td class="p-3 text-slate-600 text-xs">${row.comments}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${rc}">${row.status}</span></td><td class="p-3 text-center whitespace-nowrap">${controls}</td></tr>`;
+        });
+      }
+
+      let filteredCAs = (data.cashAdvances || []).filter(row => { return !(selectedTasker !== "ALL" && row.name !== selectedTasker); });
+      if (filteredCAs.length === 0) { caAdminBody.innerHTML = '<tr><td colspan="8" class="p-3 text-center text-slate-400">No Cash Advance requests.</td></tr>'; }
+      else {
+        filteredCAs.forEach(row => {
+          let controls = `<span class="text-slate-400 italic text-xs">Evaluated</span>`;
+          if (row.status === "Pending") { controls = `<button onclick="openCAModal('${row.id}')" class="bg-indigo-600 text-white font-bold text-[11px] px-3 py-1 rounded">Review</button>`; }
+          const rc = row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : (row.status === 'Denied' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-800');
+          let tAttach = row.attachment ? `<button onclick="openImagePreviewOverlayModal('${row.attachment}')" class="text-indigo-600 hover:underline font-bold text-xs">View Proof</button>` : `<span class="text-slate-400 italic text-xs">None</span>`;
+          let aAttach = row.adminAttachment ? `<button onclick="openImagePreviewOverlayModal('${row.adminAttachment}')" class="text-emerald-600 hover:underline font-bold text-xs">View Form</button>` : `<span class="text-slate-400 italic text-xs">None</span>`;
+          
+          let notesHtml = row.feedback ? `<div class="max-w-[150px] truncate text-slate-500 italic">${row.feedback}</div>` : '';
+          
+          caAdminBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 font-bold text-slate-900">${row.name}</td><td class="p-3 text-slate-500">${row.requestDate}</td><td class="p-3 font-bold text-emerald-700">₱${row.amount.toFixed(2)}</td><td class="p-3 text-slate-600 text-xs">${row.reason}</td><td class="p-3 text-center">${tAttach}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${rc}">${row.status}</span></td><td class="p-3 text-center flex flex-col items-center">${aAttach}${notesHtml}</td><td class="p-3 text-center whitespace-nowrap">${controls}</td></tr>`;
         });
       }
 
@@ -1102,7 +1242,9 @@
         const reader = new FileReader();
         reader.onload = function(e) { executePost(e.target.result); };
         reader.readAsDataURL(fileInput.files[0]);
-      } else { executePost(''); }
+      } else {
+        executePost('');
+      }
     }
 
     function submitScheduleAdjustment(isPermanent) {
