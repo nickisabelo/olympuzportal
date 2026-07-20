@@ -45,6 +45,8 @@
         <button onclick="showSection('task-report-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">📝 Task Done Report</button>
         <button onclick="showSection('referral-report-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition text-indigo-700">📈 Referral Tally Report</button>
         <button onclick="showSection('ca-request-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition text-emerald-700">💸 CA Req</button>
+        <button onclick="showSection('coaching-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition text-rose-700">🛡️ Coaching / Disciplinary</button>
+        <button onclick="showSection('feedback-submit-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition text-amber-700">🚩 Submit Feedback Report</button>
         <button onclick="routePayrollSection()" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">💵 Service Payment Portal</button>
         <button onclick="showSection('account-settings-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg block font-semibold transition">⚙️ Account Settings</button>
         <button id="admin-dash-btn" onclick="showSection('admin-sec')" class="w-full text-left p-2.5 text-sm hover:bg-indigo-50 rounded-lg hidden font-semibold text-rose-700 transition">📊 Global Overview</button>
@@ -169,6 +171,54 @@
           </div>
         </section>
 
+        <!-- MODULE: COACHING / DISCIPLINARY -->
+        <section id="coaching-sec" class="hidden space-y-6 max-w-6xl">
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+            <h2 class="text-xl font-bold text-rose-800 border-b pb-2 mb-3">🛡️ My Coaching & Disciplinary Reports</h2>
+            <div id="personal-coaching-container" class="space-y-4">
+              <p class="text-slate-400 text-xs italic">Loading reports...</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- MODULE: SUBMIT FEEDBACK REPORT (CONFIDENTIAL) -->
+        <section id="feedback-submit-sec" class="hidden space-y-6 max-w-4xl">
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4">
+            <h2 class="text-xl font-bold text-amber-700">🚩 Submit Confidential Feedback Report</h2>
+            <div class="bg-amber-50 p-3 rounded text-amber-800 text-xs font-bold border border-amber-200">
+              Disclaimer: All reports will be kept strictly confidential. The reporter's identity shall remain anonymous to the target tasker (Admins retain visibility for verification purposes).
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">Target Tasker</label>
+                <select id="fb-target-user" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50 font-bold text-indigo-900">
+                  <option value="">-- Select Target Tasker --</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">Report Category</label>
+                <select id="fb-category" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50 font-bold text-indigo-900">
+                  <option value="">-- Select Category --</option>
+                  <option value="Behavior">Behavior</option>
+                  <option value="Work Avoidance">Work Avoidance</option>
+                  <option value="Insubordination (Team Lead)">Insubordination (Team Lead)</option>
+                  <option value="Others">Others</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Reasoning / Feedback Details</label>
+              <textarea id="fb-reason" rows="4" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="Provide full detailed reasoning for this report..."></textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Upload Proof/Document (Optional)</label>
+              <input type="file" id="fb-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100">
+            </div>
+            <button onclick="submitFeedbackReport()" class="w-full bg-amber-600 hover:bg-amber-700 text-white p-3 rounded-lg font-bold text-sm shadow transition">Submit Confidential Report</button>
+            <p id="fb-feedback-msg" class="text-center font-bold text-xs p-2 rounded hidden"></p>
+          </div>
+        </section>
+
         <section id="task-report-sec" class="hidden space-y-6 max-w-6xl">
           <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div><h3 class="text-sm font-bold text-slate-800">🎯 Task Filter Control Panel</h3><p class="text-[11px] text-slate-400">Everyone can sort and screen work logs by individual tasker profiles.</p></div>
@@ -270,6 +320,68 @@
             <div class="flex justify-end"><button onclick="clearGlobalFilters()" class="text-xs bg-slate-100 text-slate-600 font-bold px-3 py-1.5 rounded-lg">Reset Filters</button></div>
           </div>
 
+          <!-- MODULE: ADMIN COACHING ISSUE FORM -->
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4">
+            <h2 class="text-xl font-bold text-rose-800">🛡️ Issue Coaching / Disciplinary Action</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">Target Tasker</label>
+                <select id="admin-coach-target" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50 font-bold text-indigo-900">
+                  <option value="">-- Select Target Tasker --</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">Status / Severity</label>
+                <select id="admin-coach-status" onchange="toggleAdminCoachingPenalty()" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50 font-bold text-rose-700">
+                  <option value="Verbal warning">Verbal warning</option>
+                  <option value="NTE">NTE (Notice to Explain)</option>
+                  <option value="Written Warning">Written Warning</option>
+                  <option value="Final Warning">Final Warning</option>
+                </select>
+              </div>
+            </div>
+            <div id="admin-coach-penalty-container" class="hidden">
+              <label class="block text-xs font-bold text-rose-600 mb-1">Penalty Tag (For Final Warning)</label>
+              <select id="admin-coach-penalty" class="w-full p-2.5 border border-rose-200 rounded-lg text-sm bg-rose-50 font-bold text-rose-900">
+                <option value="">-- Select Penalty (Optional) --</option>
+                <option value="Subject for suspension">Subject for suspension</option>
+                <option value="Subject for termination">Subject for termination</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Coaching / Feedback Details</label>
+              <textarea id="admin-coach-text" rows="4" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="Provide full details of the feedback or issue..."></textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Upload Proof/Document (Optional)</label>
+              <input type="file" id="admin-coach-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-rose-50 file:text-rose-700 hover:file:bg-rose-100">
+            </div>
+            <button onclick="submitCoachingReport()" class="w-full bg-rose-600 hover:bg-rose-700 text-white p-3 rounded-lg font-bold text-sm shadow transition">Issue Coaching Action</button>
+            <p id="admin-coach-feedback-msg" class="text-center font-bold text-xs p-2 rounded hidden"></p>
+          </div>
+
+          <!-- MODULE: MASTER COACHING LOGS (ADMIN VIEW) -->
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+            <h2 class="text-xl font-bold text-rose-800 border-b pb-2 mb-3">Master Coaching & Disciplinary Logs</h2>
+            <div class="overflow-x-auto rounded-lg border border-slate-100">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Tasker Name</th><th class="p-3">Date Issued</th><th class="p-3">Issued By</th><th class="p-3">Status/Penalty</th><th class="p-3">Coaching Notes</th><th class="p-3 text-center">Admin Proof</th><th class="p-3">Tasker Reply</th><th class="p-3 text-center">Tasker Proof</th><th class="p-3 text-center">Acknowledged</th></tr></thead>
+                <tbody id="admin-coaching-table" class="divide-y divide-slate-50"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- MODULE: CONFIDENTIAL FEEDBACK REPORTS (ADMIN VIEW) -->
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+            <h2 class="text-xl font-bold text-amber-700 border-b pb-2 mb-3">Confidential Feedback Reports</h2>
+            <div class="overflow-x-auto rounded-lg border border-slate-100">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Date</th><th class="p-3">Reporter</th><th class="p-3">Target Tasker</th><th class="p-3">Category</th><th class="p-3">Reasoning</th><th class="p-3 text-center">Proof/Attachment</th></tr></thead>
+                <tbody id="admin-feedback-table" class="divide-y divide-slate-50"></tbody>
+              </table>
+            </div>
+          </div>
+
           <!-- MODULE: CORPORATE CA QUEUE (ADMIN) -->
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-emerald-800 border-b pb-2 mb-3">Corporate Cash Advance Approvals Queue</h2>
@@ -355,16 +467,6 @@
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4">
             <h2 class="text-xl font-bold text-rose-800">📋 Master Absences Historical Database Registry</h2>
             <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">User ID</th><th class="p-3">Tasker Name</th><th class="p-3">Date</th><th class="p-3">Mode</th><th class="p-3 text-center">Actions</th></tr></thead><tbody id="admin-explicit-absents-table" class="divide-y divide-slate-50"></tbody></table></div>
-          </div>
-
-          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-            <h2 class="text-xl font-bold text-indigo-900">Master Service Payments Distribution History</h2>
-            <div class="overflow-x-auto rounded-lg border border-slate-100">
-              <table class="w-full text-left border-collapse text-xs">
-                <thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Name</th><th class="p-3">ID</th><th class="p-3">Period</th><th class="p-3">Weeks</th><th class="p-3">Mode</th><th class="p-3">Gross</th><th class="p-3">Deduct</th><th class="p-3 font-bold text-indigo-600">Net</th><th class="p-3 text-center">Receipt Link</th><th class="p-3 font-bold text-center">Review Status</th><th class="p-3 max-w-xs">Dispute Notes</th></tr></thead>
-                <tbody id="admin-payments-history-table" class="divide-y divide-slate-50"></tbody>
-              </table>
-            </div>
           </div>
 
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -650,6 +752,26 @@
             caBody.innerHTML += `<tr><td class="p-3 font-medium">${row.requestDate}</td><td class="p-3 font-bold text-emerald-700">₱${row.amount.toFixed(2)}</td><td class="p-3 text-slate-600">${row.reason}</td><td class="p-3 text-center">${tAttach}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${rc}">${row.status}</span></td><td class="p-3 text-slate-500 italic max-w-[150px] truncate">${row.feedback || '-'}</td><td class="p-3 text-center">${aAttach}</td></tr>`;
           });
         }
+
+        const coachBody = document.getElementById('personal-coaching-container'); coachBody.innerHTML = "";
+        const coachArray = stats.coachingReports || [];
+        if (coachArray.length === 0) { coachBody.innerHTML = '<div class="text-slate-400 text-xs text-center py-4">No coaching or disciplinary logs received.</div>'; }
+        else {
+          coachArray.forEach(row => {
+            let pBadge = row.penaltyTag ? `<span class="bg-rose-100 text-rose-800 px-2 py-0.5 rounded text-[10px] font-bold ml-2">${row.penaltyTag}</span>` : '';
+            let aAttach = row.adminAttachment ? `<button onclick="openImagePreviewOverlayModal('${row.adminAttachment}')" class="text-xs font-bold text-rose-600 underline mt-1">View Admin Attachment</button>` : '';
+            
+            let actionArea = "";
+            if (row.isAcknowledged) {
+              let tAttach = row.taskerAttachment ? `<button onclick="openImagePreviewOverlayModal('${row.taskerAttachment}')" class="text-xs font-bold text-indigo-600 underline">View My Attachment</button>` : '';
+              actionArea = `<div class="bg-slate-50 p-3 rounded mt-3 border border-slate-200"><div class="text-xs font-bold text-emerald-700 mb-1">✓ Acknowledged & Replied</div><p class="text-xs text-slate-600 whitespace-pre-wrap">${row.taskerReply || "No notes provided."}</p><div class="mt-1">${tAttach}</div></div>`;
+            } else {
+              actionArea = `<div class="bg-slate-50 p-3 rounded mt-3 border border-slate-200 space-y-2"><div class="text-xs font-bold text-amber-700 mb-1">⚠️ Action Required: Please acknowledge and provide your action plan/feedback.</div><textarea id="coach-reply-${row.id}" rows="2" class="w-full p-2 border border-slate-200 rounded text-xs" placeholder="Your action plan / notes..."></textarea><div><label class="block text-[10px] font-bold text-slate-500 mb-1">Upload Defense/Proof (Optional)</label><input type="file" id="coach-reply-file-${row.id}" accept="image/*" class="w-full text-[10px] text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-[10px] file:font-bold file:bg-indigo-50 file:text-indigo-700"></div><button onclick="acknowledgeCoaching('${row.id}')" class="bg-indigo-600 text-white font-bold text-xs px-3 py-1.5 rounded hover:bg-indigo-700 transition">Acknowledge & Submit</button></div>`;
+            }
+
+            coachBody.innerHTML += `<div class="p-4 border border-rose-100 rounded-lg bg-white shadow-sm"><div class="flex justify-between items-start border-b border-rose-50 pb-2 mb-2"><div><span class="font-bold text-rose-800 text-sm">${row.status}</span>${pBadge}</div><div class="text-[10px] text-slate-500 font-semibold text-right">Issued By: ${row.adminName}<br>${row.timestamp}</div></div><p class="text-xs text-slate-700 whitespace-pre-wrap">${row.text}</p>${aAttach}${actionArea}</div>`;
+          });
+        }
       });
     }
 
@@ -663,8 +785,22 @@
             if (data.serverTime) window.serverTimeOffset = Date.now() - data.serverTime;
           }
           renderLiveGlobalFeed();
+          populateFeedbackTargetDropdown();
         }
       });
+    }
+
+    function populateFeedbackTargetDropdown() {
+      const drop = document.getElementById('fb-target-user');
+      if (!drop) return;
+      const val = drop.value;
+      drop.innerHTML = '<option value="">-- Select Target Tasker --</option>';
+      (window.cachedGlobalFeed || []).forEach(t => {
+        if (currentUser && t.id !== currentUser.id) {
+          drop.innerHTML += `<option value="${t.id}|${t.name}">${t.name} [${t.id}]</option>`;
+        }
+      });
+      if(val) drop.value = val;
     }
 
     function renderLiveGlobalFeed() {
@@ -770,7 +906,78 @@
       });
     }
 
-    // CA FORM WITH COMPRESSION INJECTED
+    function submitFeedbackReport() {
+      const targetVal = document.getElementById('fb-target-user').value;
+      const category = document.getElementById('fb-category').value;
+      const reason = document.getElementById('fb-reason').value;
+      const fileInput = document.getElementById('fb-file');
+      const fb = document.getElementById('fb-feedback-msg');
+
+      if (!targetVal || !category || !reason.trim()) { alert("Please compile Target, Category, and Details."); return; }
+      
+      const [targetId, targetName] = targetVal.split('|');
+
+      fb.className = "text-center text-xs font-bold p-2 rounded bg-amber-50 text-amber-800 block mt-2"; fb.innerText = "Encrypting and transmitting report...";
+
+      const executePost = (base64String = '') => {
+        callAPI('POST', '', { action: "submitFeedbackReport", targetUserId: targetId, targetName: targetName, category: category, reason: reason, attachment: base64String }, function(res) {
+          fb.innerText = res.message || res.error || "Server error"; fb.className = res.success ? "text-center text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800 block mt-2" : "text-center text-xs font-bold p-2 rounded bg-rose-50 text-rose-800 block mt-2";
+          if (res.success) { document.getElementById('fb-target-user').value = ""; document.getElementById('fb-category').value = ""; document.getElementById('fb-reason').value = ""; if(fileInput) fileInput.value = ""; }
+        });
+      };
+
+      if (fileInput && fileInput.files && fileInput.files[0]) {
+        compressImage(fileInput.files[0], function(compressedData) { executePost(compressedData); });
+      } else { executePost(''); }
+    }
+
+    function toggleAdminCoachingPenalty() {
+      const val = document.getElementById('admin-coach-status').value;
+      if(val === 'Final Warning') document.getElementById('admin-coach-penalty-container').classList.remove('hidden');
+      else { document.getElementById('admin-coach-penalty-container').classList.add('hidden'); document.getElementById('admin-coach-penalty').value = ""; }
+    }
+
+    function submitCoachingReport() {
+      const targetUserId = document.getElementById('admin-coach-target').value;
+      const status = document.getElementById('admin-coach-status').value;
+      const penalty = document.getElementById('admin-coach-penalty').value;
+      const text = document.getElementById('admin-coach-text').value;
+      const fileInput = document.getElementById('admin-coach-file');
+      const fb = document.getElementById('admin-coach-feedback-msg');
+
+      if (!targetUserId || !text.trim()) { alert("Target Tasker and Details are required."); return; }
+      const targetName = document.getElementById('admin-coach-target').options[document.getElementById('admin-coach-target').selectedIndex].text.split(' [')[0];
+
+      fb.className = "text-center text-xs font-bold p-2 rounded bg-amber-50 text-amber-800 block mt-2"; fb.innerText = "Issuing action...";
+
+      const executePost = (base64String = '') => {
+        callAPI('POST', '', { action: "submitCoachingReport", targetUserId: targetUserId, targetName: targetName, status: status, penaltyTag: penalty, coachingText: text, adminAttachment: base64String }, function(res) {
+          fb.innerText = res.message || res.error || "Server error"; fb.className = res.success ? "text-center text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800 block mt-2" : "text-center text-xs font-bold p-2 rounded bg-rose-50 text-rose-800 block mt-2";
+          if (res.success) { document.getElementById('admin-coach-target').value = ""; document.getElementById('admin-coach-text').value = ""; document.getElementById('admin-coach-status').value = "Verbal warning"; toggleAdminCoachingPenalty(); if(fileInput) fileInput.value = ""; fetchGlobalAdminLogs(); }
+        });
+      };
+
+      if (fileInput && fileInput.files && fileInput.files[0]) {
+        compressImage(fileInput.files[0], function(compressedData) { executePost(compressedData); });
+      } else { executePost(''); }
+    }
+
+    function acknowledgeCoaching(id) {
+      const reply = document.getElementById('coach-reply-' + id).value;
+      const fileInput = document.getElementById('coach-reply-file-' + id);
+      
+      const executePost = (base64String = '') => {
+        callAPI('POST', '', { action: "acknowledgeCoaching", coachingId: id, taskerReply: reply, taskerAttachment: base64String }, function(res) {
+          alert(res.message || res.error || "Processed");
+          if(res.success) refreshUserTimers();
+        });
+      };
+
+      if (fileInput && fileInput.files && fileInput.files[0]) {
+        compressImage(fileInput.files[0], function(compressedData) { executePost(compressedData); });
+      } else { executePost(''); }
+    }
+
     function submitCAForm() {
       const amt = parseFloat(document.getElementById('ca-amount').value);
       const reason = document.getElementById('ca-reason').value;
@@ -806,7 +1013,6 @@
       document.getElementById('ca-decision-modal').classList.add('hidden');
     }
 
-    // CA DECISION WITH COMPRESSION INJECTED
     function submitCADecision(status) {
       const reqId = document.getElementById('ca-modal-req-id').value;
       const feedback = document.getElementById('ca-modal-feedback').value;
@@ -857,15 +1063,14 @@
 
     function submitScheduleAdjustment(isPermanent) {
       const targetUserId = document.getElementById('sched-target-uid').value, shiftStart = document.getElementById('sched-shift-start').value, shiftEnd = document.getElementById('sched-shift-end').value;
-      const maxMeal = document.getElementById('sched-max-meal').value, maxBreak = document.getElementById('sched-max-break').value;
-      const isHalfDay = document.getElementById('sched-half-day').value, halfDayHrs = document.getElementById('sched-half-hrs').value;
+      const maxMeal = document.getElementById('sched-max-meal').value, maxBreak = document.getElementById('sched-max-break').value, isHalfDay = document.getElementById('sched-half-day').value;
       if (!targetUserId || !shiftStart || !shiftEnd || !maxMeal || !maxBreak) { alert("Please complete required scheduling selections."); return; }
-      callAPI('POST', '', { action: isPermanent ? "updatePermanentSchedule" : "updateDailyScheduleAdjustment", targetUserId: targetUserId, shiftStart: shiftStart, shiftEnd: shiftEnd, maxBreak: maxBreak, maxMeal: maxMeal, isHalfDay: isHalfDay, halfDayHours: halfDayHrs, date: new Date().toLocaleDateString('en-US') }, function(res) { alert(res.message || res.error || "Updated"); fetchGlobalAdminLogs(); });
+      callAPI('POST', '', { action: isPermanent ? "updatePermanentSchedule" : "updateDailyScheduleAdjustment", targetUserId: targetUserId, shiftStart: shiftStart, shiftEnd: shiftEnd, maxBreak: maxBreak, maxMeal: maxMeal, isHalfDay: isHalfDay, date: new Date().toLocaleDateString('en-US') }, function(res) { alert(res.message || res.error || "Updated"); fetchGlobalAdminLogs(); });
     }
 
     function toggleFormScheduleVisibility() {
       const role = document.getElementById('add-u-role').value;
-      const ids = ['add-u-shift-start', 'add-u-shift-end', 'add-u-off', 'add-u-max-break', 'add-u-max-meal', 'add-u-half', 'add-u-half-hrs'];
+      const ids = ['add-u-shift-start', 'add-u-shift-end', 'add-u-off', 'add-u-max-break', 'add-u-max-meal', 'add-u-half'];
       ids.forEach(id => {
         const el = document.getElementById(id); if (!el) return;
         const parent = el.closest('div'); if (!parent) return;
@@ -878,7 +1083,6 @@
           if (id === 'add-u-max-break') el.value = "15";
           if (id === 'add-u-max-meal') el.value = "60";
           if (id === 'add-u-half') el.value = "";
-          if (id === 'add-u-half-hrs') el.value = "4";
         }
       });
     }
@@ -985,14 +1189,15 @@
     }
 
     function showSection(id) {
-      ['attendance-sec', 'global-feed-sec', 'leave-request-sec', 'restday-request-sec', 'task-report-sec', 'referral-report-sec', 'ca-request-sec', 'account-settings-sec', 'admin-payroll-sec', 'user-payroll-sec', 'admin-sec'].forEach(sec => { document.getElementById(sec).className = 'hidden'; });
+      ['attendance-sec', 'global-feed-sec', 'leave-request-sec', 'restday-request-sec', 'task-report-sec', 'referral-report-sec', 'ca-request-sec', 'coaching-sec', 'feedback-submit-sec', 'account-settings-sec', 'admin-payroll-sec', 'user-payroll-sec', 'admin-sec'].forEach(sec => { document.getElementById(sec).className = 'hidden'; });
       const target = document.getElementById(id); if(target) target.className = id === 'account-settings-sec' ? 'bg-white p-6 rounded-xl shadow-sm border border-slate-100 max-w-md space-y-4' : 'space-y-6 max-w-6xl';
       
       if (id === 'task-report-sec') { document.getElementById('rep-date').value = new Date().toISOString().split('T')[0]; document.getElementById('public-filter-tasker').value = "ALL"; loadPublicTaskReportsFeed(); }
       if (id === 'referral-report-sec') loadReferralReportsFeed();
+      if (id === 'feedback-submit-sec') populateFeedbackTargetDropdown();
       if (id === 'global-feed-sec') loadGlobalStatusFeed();
       if (id === 'admin-sec') fetchGlobalAdminLogs();
-      if (id === 'attendance-sec' || id === 'leave-request-sec' || id === 'ca-request-sec' || id === 'account-settings-sec' || id === 'restday-request-sec') refreshUserTimers();
+      if (id === 'attendance-sec' || id === 'leave-request-sec' || id === 'ca-request-sec' || id === 'coaching-sec' || id === 'account-settings-sec' || id === 'restday-request-sec') refreshUserTimers();
     }
 
     function logout() {
@@ -1015,8 +1220,15 @@
     function populateTaskerDropdownOptions(absencesArray) {
       const dropdown = document.getElementById('filter-tasker'), savedValue = dropdown.value; dropdown.innerHTML = '<option value="ALL">-- Show All Taskers --</option>';
       (absencesArray || []).forEach(t => { dropdown.innerHTML += `<option value="${t.name}">${t.name} [${t.id}]</option>`; }); dropdown.value = savedValue;
+      
       const targetDrop = document.getElementById('sched-target-uid'); targetDrop.innerHTML = '<option value="">-- Choose Target Tasker --</option>';
       (absencesArray || []).forEach(t => { targetDrop.innerHTML += `<option value="${t.id}">${t.name} [${t.id}]</option>`; });
+
+      const adminCoachDrop = document.getElementById('admin-coach-target'); 
+      if (adminCoachDrop) {
+        adminCoachDrop.innerHTML = '<option value="">-- Select Target Tasker --</option>';
+        (absencesArray || []).forEach(t => { adminCoachDrop.innerHTML += `<option value="${t.id}">${t.name} [${t.id}]</option>`; });
+      }
     }
 
     function renderFilteredGrids(data) {
@@ -1026,8 +1238,9 @@
       const pBody = document.getElementById('admin-attendance-table'), absBody = document.getElementById('admin-absence-table'), lBody = document.getElementById('admin-leave-table');
       const payBody = document.getElementById('admin-payments-history-table'), explicitAbsBody = document.getElementById('admin-explicit-absents-table'), rdBody = document.getElementById('admin-restday-table');
       const caAdminBody = document.getElementById('admin-ca-table'), auditList = document.getElementById('current-schedule-audit-list');
+      const crBody = document.getElementById('admin-coaching-table'), fbBody = document.getElementById('admin-feedback-table');
       
-      pBody.innerHTML = ""; absBody.innerHTML = ""; lBody.innerHTML = ""; payBody.innerHTML = ""; explicitAbsBody.innerHTML = ""; rdBody.innerHTML = ""; caAdminBody.innerHTML = ""; auditList.innerHTML = "";
+      pBody.innerHTML = ""; absBody.innerHTML = ""; lBody.innerHTML = ""; payBody.innerHTML = ""; explicitAbsBody.innerHTML = ""; rdBody.innerHTML = ""; caAdminBody.innerHTML = ""; auditList.innerHTML = ""; crBody.innerHTML = ""; fbBody.innerHTML = "";
 
       (data.absences || []).forEach(u => {
         const ps = u.permanentSchedule;
@@ -1108,6 +1321,28 @@
           let notesHtml = row.feedback ? `<div class="max-w-[150px] truncate text-slate-500 italic">${row.feedback}</div>` : '';
           
           caAdminBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 font-bold text-slate-900">${row.name}</td><td class="p-3 text-slate-500">${row.requestDate}</td><td class="p-3 font-bold text-emerald-700">₱${row.amount.toFixed(2)}</td><td class="p-3 text-slate-600 text-xs">${row.reason}</td><td class="p-3 text-center">${tAttach}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${rc}">${row.status}</span></td><td class="p-3 text-center flex flex-col items-center">${aAttach}${notesHtml}</td><td class="p-3 text-center whitespace-nowrap">${controls}</td></tr>`;
+        });
+      }
+
+      let filteredCoach = (data.coachingReports || []).filter(row => { return !(selectedTasker !== "ALL" && row.user_name !== selectedTasker); });
+      if(filteredCoach.length === 0) { crBody.innerHTML = '<tr><td colspan="9" class="p-3 text-center text-slate-400">No logs found.</td></tr>'; }
+      else {
+        filteredCoach.forEach(row => {
+          let pBadge = row.penalty_tag ? `<span class="bg-rose-100 text-rose-800 px-1.5 py-0.5 rounded text-[10px] font-bold block mt-1">${row.penalty_tag}</span>` : '';
+          let aAttach = row.admin_attachment ? `<button onclick="openImagePreviewOverlayModal('${row.admin_attachment}')" class="text-indigo-600 hover:underline font-bold text-xs">View</button>` : `<span class="text-slate-400 italic text-xs">None</span>`;
+          let tAttach = row.tasker_attachment ? `<button onclick="openImagePreviewOverlayModal('${row.tasker_attachment}')" class="text-emerald-600 hover:underline font-bold text-xs">View</button>` : `<span class="text-slate-400 italic text-xs">None</span>`;
+          let ackBadge = row.is_acknowledged ? `<span class="text-emerald-600 font-bold">Yes</span>` : `<span class="text-amber-600 font-bold">Pending</span>`;
+          
+          crBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 font-bold text-slate-900">${row.user_name}</td><td class="p-3 text-slate-500 text-xs">${row.timestamp}</td><td class="p-3 text-slate-600 text-xs">${row.admin_name}</td><td class="p-3"><span class="font-bold text-rose-700 text-xs">${row.status}</span>${pBadge}</td><td class="p-3 text-slate-600 text-xs max-w-xs break-words whitespace-pre-wrap">${row.coaching_text}</td><td class="p-3 text-center">${aAttach}</td><td class="p-3 text-slate-600 text-xs max-w-xs break-words whitespace-pre-wrap">${row.tasker_reply || '-'}</td><td class="p-3 text-center">${tAttach}</td><td class="p-3 text-center">${ackBadge}</td></tr>`;
+        });
+      }
+
+      let filteredFeedback = (data.feedbackReports || []).filter(row => { return !(selectedTasker !== "ALL" && row.target_user_name !== selectedTasker); });
+      if(filteredFeedback.length === 0) { fbBody.innerHTML = '<tr><td colspan="6" class="p-3 text-center text-slate-400">No logs found.</td></tr>'; }
+      else {
+        filteredFeedback.forEach(row => {
+          let fbAttach = row.attachment ? `<button onclick="openImagePreviewOverlayModal('${row.attachment}')" class="text-amber-700 hover:underline font-bold text-xs">View Proof</button>` : `<span class="text-slate-400 italic text-xs">None</span>`;
+          fbBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 text-slate-500 text-xs">${row.timestamp}</td><td class="p-3 text-slate-600 text-xs font-mono">Hidden (ID: ${row.reporter_id})</td><td class="p-3 font-bold text-slate-900">${row.target_user_name}</td><td class="p-3"><span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-[11px] font-bold">${row.category}</span></td><td class="p-3 text-slate-600 text-xs max-w-sm break-words whitespace-pre-wrap">${row.reason}</td><td class="p-3 text-center">${fbAttach}</td></tr>`;
         });
       }
 
