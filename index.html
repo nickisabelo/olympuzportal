@@ -57,7 +57,7 @@
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-100 pb-4 gap-4">
               <div><h2 class="text-xl font-bold text-slate-800">Time Clock Operations <span id="halfday-banner" class="hidden text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-black ml-2">Half Day Active</span></h2><p class="text-xs text-slate-500">Log punch timestamps and view daily break metrics.</p></div>
               <div class="bg-indigo-50 border border-indigo-100 p-3 rounded-xl text-xs space-y-1 text-indigo-950">
-                <div><strong>Schedule Matrix:</strong></div>
+                <div><strong>Schedule Matrix (5 Days + Half-day):</strong></div>
                 <div>Shift Window: <span id="sched-shift" class="font-bold text-indigo-700">-</span></div>
                 <div>Max Allotment: <span id="sched-limits" class="font-bold text-indigo-700">-</span></div>
               </div>
@@ -194,42 +194,14 @@
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4 h-fit">
               <h2 class="text-xl font-bold text-slate-800">📈 Submit Referral Tally</h2>
-              
-              <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">Referral Source</label>
-                <select id="ref-source" onchange="toggleRefSource()" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50 font-bold">
-                  <option value="">-- Select Source --</option>
-                  <option value="Boss Job">Boss Job</option>
-                  <option value="Threads">Threads</option>
-                  <option value="Facebook">Facebook</option>
-                  <option value="LinkedIn">LinkedIn</option>
-                  <option value="Others">Others (Specify)</option>
-                </select>
-              </div>
-              <div id="ref-source-other-container" class="hidden">
-                <label class="block text-xs font-bold text-slate-500 mb-1">Specify Source</label>
-                <input type="text" id="ref-source-other" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50">
-              </div>
-    
-              <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">Number of Referrals</label>
-                <input type="number" id="ref-count" min="0" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50">
-              </div>
-    
-              <div class="flex items-center gap-2 pt-2">
-                <input type="checkbox" id="ref-is-covering" onchange="toggleRefCovering()" class="w-4 h-4 text-indigo-600 rounded">
-                <label class="text-xs font-bold text-slate-700">Taking over someone else's source?</label>
-              </div>
-              
-              <div id="ref-covering-container" class="hidden">
-                <label class="block text-xs font-bold text-slate-500 mb-1">Tasker Account Name</label>
-                <input type="text" id="ref-covering-name" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="Name of tasker you're covering...">
-              </div>
-    
+              <div><label class="block text-xs font-bold text-slate-500 mb-1">Referral Source</label><select id="ref-source" onchange="toggleRefSource()" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50 font-bold"><option value="">-- Select Source --</option><option value="Boss Job">Boss Job</option><option value="Threads">Threads</option><option value="Facebook">Facebook</option><option value="LinkedIn">LinkedIn</option><option value="Others">Others (Specify)</option></select></div>
+              <div id="ref-source-other-container" class="hidden"><label class="block text-xs font-bold text-slate-500 mb-1">Specify Source</label><input type="text" id="ref-source-other" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50"></div>
+              <div><label class="block text-xs font-bold text-slate-500 mb-1">Number of Referrals</label><input type="number" id="ref-count" min="0" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50"></div>
+              <div class="flex items-center gap-2 pt-2"><input type="checkbox" id="ref-is-covering" onchange="toggleRefCovering()" class="w-4 h-4 text-indigo-600 rounded"><label class="text-xs font-bold text-slate-700">Taking over someone else's source?</label></div>
+              <div id="ref-covering-container" class="hidden"><label class="block text-xs font-bold text-slate-500 mb-1">Tasker Account Name</label><input type="text" id="ref-covering-name" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="Name of tasker you're covering..."></div>
               <button onclick="submitReferralReport()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg font-bold text-sm shadow transition">Submit Tally</button>
               <p id="ref-feedback" class="text-center font-bold text-xs p-2 rounded hidden"></p>
             </div>
-    
             <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col">
               <h2 class="text-xl font-bold text-slate-800 mb-1">📋 Referral Tally Feed</h2>
               <div class="flex-1 overflow-y-auto max-h-[500px] border border-slate-100 rounded-lg p-4 bg-slate-50/50 space-y-3" id="referral-reports-feed"></div>
@@ -248,7 +220,6 @@
           <p id="self-pass-feedback" class="text-center font-bold text-xs p-2 rounded hidden"></p>
         </section>
 
-        <!-- MODULE: ADMIN CONTROL - PAYROLL DISBURSEMENT -->
         <section id="admin-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-6 max-w-2xl">
           <h2 class="text-xl font-bold text-indigo-700 border-b pb-2">Admin Control: Issue Fixed Weekly Payment</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -258,7 +229,6 @@
             <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Number of Service Weeks</label><input id="p-hours" type="number" step="0.1" class="w-full p-2 border border-slate-200 text-sm rounded-lg"></div>
             <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Prerogative Deductions (₱)</label><input id="p-deduct" type="number" class="w-full p-2 border border-slate-200 text-sm rounded-lg" value="0"></div>
             <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Service Billing Period</label><input id="p-month" type="text" class="w-full p-2 border border-slate-200 text-sm rounded-lg" placeholder="Week 1 - July 2026"></div>
-            
             <div>
               <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Payment Mode Matrix</label>
               <select id="p-mode" class="w-full p-2 border border-slate-200 text-sm rounded-lg bg-slate-50 font-bold text-indigo-900">
@@ -270,30 +240,17 @@
               <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Upload Receipt Screenshot</label>
               <input type="file" id="p-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
             </div>
-
             <div class="sm:col-span-2"><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Service Remarks</label><input id="p-remarks" type="text" class="w-full p-2 border border-slate-200 text-sm rounded-lg" placeholder="Notes..."></div>
           </div>
           <button onclick="submitPayrollForm()" class="bg-indigo-600 text-white px-5 py-2.5 text-sm rounded-lg font-bold shadow hover:bg-indigo-700 transition">Disburse Service Payment</button>
           <p id="payroll-feedback" class="text-emerald-600 bg-emerald-50 text-xs font-bold p-2 rounded-lg hidden"></p>
         </section>
 
-        <!-- USER PAYMENTS LEDGER -->
         <section id="user-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4 max-w-7xl">
           <h2 class="text-xl font-bold text-slate-800 border-b pb-2">My Service Payment Ledgers</h2>
           <div class="overflow-x-auto rounded-lg border border-slate-100">
             <table class="w-full text-left border-collapse text-sm">
-              <thead>
-                <tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold">
-                  <th class="p-3">Service Period</th>
-                  <th class="p-3">Weeks Logged</th>
-                  <th class="p-3">Mode</th>
-                  <th class="p-3">Gross Base</th>
-                  <th class="p-3">Deductions</th>
-                  <th class="p-3 font-bold text-indigo-700">Net Credited</th>
-                  <th class="p-3 text-center">Receipt Document</th>
-                  <th class="p-3 text-center">Status Actions</th>
-                </tr>
-              </thead>
+              <thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Service Period</th><th class="p-3">Weeks Logged</th><th class="p-3">Mode</th><th class="p-3">Gross Base</th><th class="p-3">Deductions</th><th class="p-3 font-bold text-indigo-700">Net Credited</th><th class="p-3 text-center">Receipt Document</th><th class="p-3 text-center">Status Actions</th></tr></thead>
               <tbody id="user-payroll-table" class="divide-y divide-slate-50"></tbody>
             </table>
           </div>
@@ -424,18 +381,9 @@
     <div class="bg-white p-6 rounded-xl shadow-xl w-full max-w-md space-y-4">
       <h3 class="text-lg font-bold text-slate-800 border-b pb-2">Process Cash Advance</h3>
       <input type="hidden" id="ca-modal-req-id">
-      <div>
-        <label class="block text-xs font-bold text-slate-500 mb-1">Feedback / Denial Reason</label>
-        <textarea id="ca-modal-feedback" rows="3" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="Notes for the tasker..."></textarea>
-      </div>
-      <div>
-        <label class="block text-xs font-bold text-slate-500 mb-1">Disbursement Proof (For Approvals)</label>
-        <input type="file" id="ca-modal-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700">
-      </div>
-      <div class="flex gap-2 pt-2">
-        <button onclick="submitCADecision('Approved')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-sm transition">Approve & Send</button>
-        <button onclick="submitCADecision('Denied')" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 rounded-lg text-sm transition">Deny Request</button>
-      </div>
+      <div><label class="block text-xs font-bold text-slate-500 mb-1">Feedback / Denial Reason</label><textarea id="ca-modal-feedback" rows="3" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="Notes for the tasker..."></textarea></div>
+      <div><label class="block text-xs font-bold text-slate-500 mb-1">Disbursement Proof (For Approvals)</label><input type="file" id="ca-modal-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700"></div>
+      <div class="flex gap-2 pt-2"><button onclick="submitCADecision('Approved')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-sm transition">Approve & Send</button><button onclick="submitCADecision('Denied')" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 rounded-lg text-sm transition">Deny Request</button></div>
       <button onclick="closeCAModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2 rounded-lg text-xs mt-1 transition">Cancel</button>
     </div>
   </div>
@@ -468,7 +416,17 @@
       const connector = urlParams.includes('?') ? '&' : '?';
       const noCacheUrl = API_URL + urlParams + connector + "_t=" + Date.now();
       
-      fetch(noCacheUrl, config).then(res => res.json()).then(data => callback(data)).catch(err => { console.log(err); });
+      fetch(noCacheUrl, config)
+        .then(res => {
+          if (res.status === 401 && payload?.action !== "loginUser") {
+            logout();
+            alert("Security Session Expired. Please sign in again to continue.");
+            return null;
+          }
+          return res.json();
+        })
+        .then(data => { if (data) callback(data); })
+        .catch(err => { console.log(err); });
     }
 
     window.onload = function() {
@@ -514,7 +472,7 @@
             currentUser = response.user; 
             bootPortalSession(); 
           }
-        } else { errBox.innerText = response.message || "Login failed."; errBox.classList.remove('hidden'); }
+        } else { errBox.innerText = response.message || response.error || "Login failed."; errBox.classList.remove('hidden'); }
       });
     }
 
@@ -528,7 +486,7 @@
           currentUser = response.user; 
           bootPortalSession(); 
         }
-        else { errBox.innerText = response.message; errBox.classList.remove('hidden'); alert(response.message); }
+        else { errBox.innerText = response.message || response.error || "Failed."; errBox.classList.remove('hidden'); alert(response.message || response.error); }
       });
     }
 
@@ -767,7 +725,7 @@
       callAPI('POST', '', { 
         action: "submitReferralReport", userName: currentUser.name, source: source, numReferrals: count, coveringFor: isCovering ? coveringName : "" 
       }, function(res) {
-        fb.innerText = res.message; fb.className = res.success ? "text-center text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800" : "text-center text-xs font-bold p-2 rounded bg-rose-50 text-rose-800";
+        fb.innerText = res.message || res.error || "Server error"; fb.className = res.success ? "text-center text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800" : "text-center text-xs font-bold p-2 rounded bg-rose-50 text-rose-800";
         if (res.success) { 
           document.getElementById('ref-count').value = ""; document.getElementById('ref-source-other').value = ""; document.getElementById('ref-covering-name').value = "";
           loadReferralReportsFeed(); 
@@ -787,7 +745,7 @@
 
       const executePost = (base64String = '') => {
         callAPI('POST', '', { action: "submitCARequest", userName: currentUser.name, amount: amt, reason: reason, attachment: base64String }, function(res) {
-          fb.innerText = res.message; fb.className = res.success ? "text-center text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800" : "text-center text-xs font-bold p-2 rounded bg-rose-50 text-rose-800";
+          fb.innerText = res.message || res.error || "Server error"; fb.className = res.success ? "text-center text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800" : "text-center text-xs font-bold p-2 rounded bg-rose-50 text-rose-800";
           if (res.success) { document.getElementById('ca-amount').value = ""; document.getElementById('ca-reason').value = ""; if(fileInput) fileInput.value = ""; refreshUserTimers(); }
         });
       };
@@ -819,7 +777,7 @@
 
       const executePost = (base64String = '') => {
         callAPI('POST', '', { action: "processCAAction", requestId: reqId, status: status, feedback: feedback, adminAttachment: base64String }, function(res) {
-          alert(res.message);
+          alert(res.message || res.error || "Processed");
           closeCAModal();
           if (res.success) fetchGlobalAdminLogs();
         });
@@ -862,7 +820,7 @@
       const targetUserId = document.getElementById('sched-target-uid').value, shiftStart = document.getElementById('sched-shift-start').value, shiftEnd = document.getElementById('sched-shift-end').value;
       const maxMeal = document.getElementById('sched-max-meal').value, maxBreak = document.getElementById('sched-max-break').value, isHalfDay = document.getElementById('sched-half-day').value;
       if (!targetUserId || !shiftStart || !shiftEnd || !maxMeal || !maxBreak) { alert("Please complete required scheduling selections."); return; }
-      callAPI('POST', '', { action: isPermanent ? "updatePermanentSchedule" : "updateDailyScheduleAdjustment", targetUserId: targetUserId, shiftStart: shiftStart, shiftEnd: shiftEnd, maxBreak: maxBreak, maxMeal: maxMeal, isHalfDay: isHalfDay, date: new Date().toLocaleDateString('en-US') }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
+      callAPI('POST', '', { action: isPermanent ? "updatePermanentSchedule" : "updateDailyScheduleAdjustment", targetUserId: targetUserId, shiftStart: shiftStart, shiftEnd: shiftEnd, maxBreak: maxBreak, maxMeal: maxMeal, isHalfDay: isHalfDay, date: new Date().toLocaleDateString('en-US') }, function(res) { alert(res.message || res.error || "Updated"); fetchGlobalAdminLogs(); });
     }
 
     function toggleFormScheduleVisibility() {
@@ -910,7 +868,7 @@
       if (!dateVal || !textVal.trim()) { alert("Complete entries."); return; }
       fb.className = "text-center text-xs font-bold p-2 rounded bg-amber-50 text-amber-800"; fb.innerText = "Transmitting..."; fb.classList.remove('hidden');
       callAPI('POST', '', { action: "submitDailyReport", userId: currentUser.id, userName: currentUser.name, reportDate: dateVal, summary: textVal }, function(res) {
-        fb.innerText = res.message; fb.className = res.success ? "text-center text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800" : "text-center text-xs font-bold p-2 rounded bg-rose-50 text-rose-800";
+        fb.innerText = res.message || res.error || "Failed"; fb.className = res.success ? "text-center text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800" : "text-center text-xs font-bold p-2 rounded bg-rose-50 text-rose-800";
         if (res.success) { document.getElementById('rep-summary').value = ""; loadPublicTaskReportsFeed(); }
       });
     }
@@ -927,7 +885,7 @@
       if (newPass !== confirmPass) { alert("Passwords do not match."); return; }
       fb.className = "text-center font-bold text-xs p-2 rounded bg-amber-50 text-amber-800"; fb.innerText = "Synchronizing..."; fb.classList.remove('hidden');
       callAPI('POST', '', { action: "changePasswordSelf", userId: currentUser.id, oldPassword: oldPass, newPassword: newPass }, function(res) {
-        fb.innerText = res.message; fb.className = res.success ? "text-center font-bold text-xs p-2 rounded bg-emerald-50 text-emerald-800" : "text-center font-bold text-xs p-2 rounded bg-rose-50 text-rose-800";
+        fb.innerText = res.message || res.error || "Failed"; fb.className = res.success ? "text-center font-bold text-xs p-2 rounded bg-emerald-50 text-emerald-800" : "text-center font-bold text-xs p-2 rounded bg-rose-50 text-rose-800";
         if(res.success) { ['self-old-pass', 'self-new-pass', 'self-confirm-pass'].forEach(id => document.getElementById(id).value = ""); }
       });
     }
@@ -935,7 +893,7 @@
     function triggerAttendance(punchType) {
       const fb = document.getElementById('attendance-feedback'); fb.classList.remove('hidden'); fb.className = "text-center font-bold text-sm p-3 rounded-lg bg-indigo-50 text-indigo-800"; fb.innerText = "Transmitting record...";
       callAPI('POST', '', { action: "logAttendance", userId: currentUser.id, userName: currentUser.name, actionType: punchType }, function(res) {
-        fb.innerText = res.message; fb.className = res.success ? "text-center font-bold text-sm p-3 rounded-lg bg-emerald-50 text-emerald-800" : "text-center font-bold text-sm p-3 rounded-lg bg-rose-50 text-rose-800";
+        fb.innerText = res.message || res.error || "Failed"; fb.className = res.success ? "text-center font-bold text-sm p-3 rounded-lg bg-emerald-50 text-emerald-800" : "text-center font-bold text-sm p-3 rounded-lg bg-rose-50 text-rose-800";
         refreshUserTimers();
       });
     }
@@ -947,7 +905,7 @@
 
       const executePost = (base64String = '') => {
         callAPI('POST', '', { action: "submitLeaveRequest", userId: currentUser.id, userName: currentUser.name, leaveDate: date, reason: reason, attachment: base64String }, function(res) { 
-          fb.innerText = res.message; fb.className = res.success ? "text-center text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800" : "text-center text-xs font-bold p-2 rounded bg-rose-50 text-rose-800";
+          fb.innerText = res.message || res.error || "Failed"; fb.className = res.success ? "text-center text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800" : "text-center text-xs font-bold p-2 rounded bg-rose-50 text-rose-800";
           if(res.success) { document.getElementById('l-date').value = ""; document.getElementById('l-reason').value = ""; if(fileInput) fileInput.value = ""; refreshUserTimers(); } 
         });
       };
@@ -961,27 +919,27 @@
 
     function adminExecuteLeave(reqId, status) {
       const comment = prompt("Comments:"); if(comment === null) return; 
-      callAPI('POST', '', { action: "processLeaveAction", requestId: reqId, status: status, comment: comment }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
+      callAPI('POST', '', { action: "processLeaveAction", requestId: reqId, status: status, comment: comment }, function(res) { alert(res.message || res.error || "Processed"); fetchGlobalAdminLogs(); });
     }
 
     function executeAdminUntagAbsentLog(absentId, taskerName, dateStr) {
       if(!confirm("Remove historical absence entry line?")) return;
-      callAPI('POST', '', { action: "adminUntagAbsent", absentId: absentId }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
+      callAPI('POST', '', { action: "adminUntagAbsent", absentId: absentId }, function(res) { alert(res.message || res.error || "Processed"); fetchGlobalAdminLogs(); });
     }
 
     function executeAdminOverridePassword(targetUid) {
       const newPass = prompt("Enter explicit password string:"); if (!newPass || newPass.trim() === "") return;
-      callAPI('POST', '', { action: "adminChangePassword", targetUserId: targetUid, newPassword: newPass }, function(res) { alert(res.message); });
+      callAPI('POST', '', { action: "adminChangePassword", targetUserId: targetUid, newPassword: newPass }, function(res) { alert(res.message || res.error || "Processed"); });
     }
 
     function executeAdminRemoveUser(targetUid, targetName) {
       if (!confirm("Purge account data parameters completely?")) return;
-      callAPI('POST', '', { action: "adminDeleteUser", targetUserId: targetUid }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
+      callAPI('POST', '', { action: "adminDeleteUser", targetUserId: targetUid }, function(res) { alert(res.message || res.error || "Processed"); fetchGlobalAdminLogs(); });
     }
 
     function executeAdminTagUserAbsent(targetUid, targetName) {
       const inputDate = prompt("Target Date (YYYY-MM-DD):", new Date().toISOString().split('T')[0]); if (!inputDate) return;
-      callAPI('POST', '', { action: "adminTagAbsent", targetUserId: targetUid, targetName: targetName, absentDate: inputDate }, function(res) { alert(res.message); if (res.success) fetchGlobalAdminLogs(); });
+      callAPI('POST', '', { action: "adminTagAbsent", targetUserId: targetUid, targetName: targetName, absentDate: inputDate }, function(res) { alert(res.message || res.error || "Processed"); if (res.success) fetchGlobalAdminLogs(); });
     }
 
     function showSection(id) {
@@ -1144,7 +1102,7 @@
           if (row.status === "Acknowledged" || row.status === "Settled & Adjusted") {
             statusBadge = `<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[11px]">✓ ${row.status}</span>`;
           } else if (row.status === "Disputed") {
-            statusBadge = `<span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded text-[11px]">⏳ Pending Dispute</span>`;
+            statusBadge = `<span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded text-[11px]">⏳ Pending Dispute</span>';
           } else if (row.status === "Dispute Approved") {
             statusBadge = `<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[11px]">✓ Dispute Approved</span>`;
           } else if (row.status === "Dispute Rejected") {
@@ -1172,19 +1130,19 @@
       const reason = prompt("Please provide your reason for disputing this payment calculation:");
       if (!reason || reason.trim() === "") return;
       if (!confirm("Are you sure you want to submit this dispute?")) return;
-      callAPI('POST', '', { action: "disputePayment", paymentId: paymentId, reason: reason }, function(res) { alert(res.message); if (res.success) fetchUserPayrollData(); });
+      callAPI('POST', '', { action: "disputePayment", paymentId: paymentId, reason: reason }, function(res) { alert(res.message || res.error || "Processed"); if (res.success) fetchUserPayrollData(); });
     }
 
     function acknowledgePayment(paymentId) {
       if (!confirm("Confirm acknowledgment of this payout statement?")) return;
-      callAPI('POST', '', { action: "acknowledgePayment", paymentId: paymentId, userId: currentUser.id }, function(res) { alert(res.message); if (res.success) fetchUserPayrollData(); });
+      callAPI('POST', '', { action: "acknowledgePayment", paymentId: paymentId, userId: currentUser.id }, function(res) { alert(res.message || res.error || "Processed"); if (res.success) fetchUserPayrollData(); });
     }
 
     function adminResolveDispute(paymentId, status, currentReason) {
       const notes = prompt("Marking as: " + status + "\n\nTasker's Reason: " + currentReason + "\n\nEnter your resolution notes (Optional):");
       if (notes === null) return;
       const finalReason = currentReason + (notes ? "\nAdmin Note: " + notes : "");
-      callAPI('POST', '', { action: "updatePayrollReviewStatus", payrollId: paymentId, status: status, disputeReason: finalReason }, function(res) { alert(res.message); if (res.success) fetchGlobalAdminLogs(); });
+      callAPI('POST', '', { action: "updatePayrollReviewStatus", payrollId: paymentId, status: status, disputeReason: finalReason }, function(res) { alert(res.message || res.error || "Processed"); if (res.success) fetchGlobalAdminLogs(); });
     }
 
     function executeAdminCreateUser() {
@@ -1206,7 +1164,7 @@
       if (!payload.name || !payload.email) { alert("Please compile both Legal Name and Email fields."); return; }
       fb.className = "text-xs font-bold p-2 rounded bg-amber-50 text-amber-800 block mt-2"; fb.innerText = "Registering user profile line...";
       callAPI('POST', '', payload, function(res) {
-        fb.innerText = res.message; fb.className = res.success ? "text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800 block mt-2" : "text-xs font-bold p-2 rounded bg-rose-50 text-rose-800 block mt-2";
+        fb.innerText = res.message || res.error || "Processed"; fb.className = res.success ? "text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800 block mt-2" : "text-xs font-bold p-2 rounded bg-rose-50 text-rose-800 block mt-2";
         if (res.success) { ['add-u-name', 'add-u-email', 'add-u-pass'].forEach(id => document.getElementById(id).value = ""); fetchGlobalAdminLogs(); }
       });
     }
@@ -1233,7 +1191,7 @@
         fb.className = "text-xs font-bold p-2 rounded bg-amber-50 text-amber-800 block"; fb.innerText = "Disbursing payout entry...";
 
         callAPI('POST', '', payload, function(res) {
-          fb.innerText = res.message; fb.className = res.success ? "text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800 block" : "text-xs font-bold p-2 rounded bg-rose-50 text-rose-800 block";
+          fb.innerText = res.message || res.error || "Processed"; fb.className = res.success ? "text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800 block" : "text-xs font-bold p-2 rounded bg-rose-50 text-rose-800 block";
           if (res.success) { ['p-uid', 'p-name', 'p-rate', 'p-hours', 'p-deduct', 'p-month', 'p-remarks', 'p-file'].forEach(id => { if (id !== 'p-file') document.getElementById(id).value = id === 'p-deduct' ? '0' : ''; else document.getElementById(id).value = ''; }); fetchGlobalAdminLogs(); }
         });
       };
@@ -1251,7 +1209,7 @@
       const targetUserId = document.getElementById('sched-target-uid').value, shiftStart = document.getElementById('sched-shift-start').value, shiftEnd = document.getElementById('sched-shift-end').value;
       const maxMeal = document.getElementById('sched-max-meal').value, maxBreak = document.getElementById('sched-max-break').value, isHalfDay = document.getElementById('sched-half-day').value;
       if (!targetUserId || !shiftStart || !shiftEnd || !maxMeal || !maxBreak) { alert("Please complete required scheduling selections."); return; }
-      callAPI('POST', '', { action: isPermanent ? "updatePermanentSchedule" : "updateDailyScheduleAdjustment", targetUserId: targetUserId, shiftStart: shiftStart, shiftEnd: shiftEnd, maxBreak: maxBreak, maxMeal: maxMeal, isHalfDay: isHalfDay, date: new Date().toLocaleDateString('en-US') }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
+      callAPI('POST', '', { action: isPermanent ? "updatePermanentSchedule" : "updateDailyScheduleAdjustment", targetUserId: targetUserId, shiftStart: shiftStart, shiftEnd: shiftEnd, maxBreak: maxBreak, maxMeal: maxMeal, isHalfDay: isHalfDay, date: new Date().toLocaleDateString('en-US') }, function(res) { alert(res.message || res.error || "Processed"); fetchGlobalAdminLogs(); });
     }
 
     function applyGlobalFilters() { if (cachedAdminMasterData) renderFilteredGrids(cachedAdminMasterData); }
