@@ -134,7 +134,7 @@
             <h2 class="text-xl font-bold text-slate-800">📅 Rest Day Work Authorization</h2>
             <p class="text-xs text-slate-400">File a specific schedule request line to map Overtime hours or cover structural absence gaps.</p>
             <div><label class="block text-xs font-bold text-slate-500 mb-1">Target Rest Day Date</label><input type="date" id="rd-date" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50"></div>
-            <div><label class="block text-xs font-bold text-slate-500 mb-1">Justification Comments & Purpose</label><textarea id="rd-comments" rows="3" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="Specify if OT requests or covering an absent log window date..."></textarea></div>
+            <div><label class="block text-xs font-bold text-slate-500 mb-1">Justification Comments & Purpose</label><textarea id="rd-comments" rows="3" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="Specify details..."></textarea></div>
             <button onclick="submitRestDayForm()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg font-bold text-sm shadow transition">File Authorization Request</button>
             <p id="rd-feedback-msg" class="text-center font-bold text-xs p-2 rounded hidden"></p>
           </div>
@@ -175,6 +175,7 @@
           <p id="self-pass-feedback" class="text-center font-bold text-xs p-2 rounded hidden"></p>
         </section>
 
+        <!-- MODULE: ADMIN CONTROL - PAYROLL DISBURSEMENT -->
         <section id="admin-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-6 max-w-2xl">
           <h2 class="text-xl font-bold text-indigo-700 border-b pb-2">Admin Control: Issue Fixed Weekly Payment</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -184,15 +185,46 @@
             <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Number of Service Weeks</label><input id="p-hours" type="number" step="0.1" class="w-full p-2 border border-slate-200 text-sm rounded-lg"></div>
             <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Prerogative Deductions (₱)</label><input id="p-deduct" type="number" class="w-full p-2 border border-slate-200 text-sm rounded-lg" value="0"></div>
             <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Service Billing Period</label><input id="p-month" type="text" class="w-full p-2 border border-slate-200 text-sm rounded-lg" placeholder="Week 1 - July 2026"></div>
-            <div class="sm:col-span-2"><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Service Remarks & Caveats</label><input id="p-remarks" type="text" class="w-full p-2 border border-slate-200 text-sm rounded-lg" placeholder="Notes..."></div>
+            
+            <!-- Added Payment Mode and File Attachment Selectors -->
+            <div>
+              <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Payment Mode Matrix</label>
+              <select id="p-mode" class="w-full p-2 border border-slate-200 text-sm rounded-lg bg-slate-50 font-bold text-indigo-900">
+                <option value="E-Cash">E-Cash (Bank, Online Transaction)</option>
+                <option value="Cash">Cash (Physical Handover)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Upload Receipt Screenshot</label>
+              <input type="file" id="p-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+            </div>
+
+            <div class="sm:col-span-2"><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Service Remarks</label><input id="p-remarks" type="text" class="w-full p-2 border border-slate-200 text-sm rounded-lg" placeholder="Notes..."></div>
           </div>
           <button onclick="submitPayrollForm()" class="bg-indigo-600 text-white px-5 py-2.5 text-sm rounded-lg font-bold shadow hover:bg-indigo-700 transition">Disburse Service Payment</button>
           <p id="payroll-feedback" class="text-emerald-600 bg-emerald-50 text-xs font-bold p-2 rounded-lg hidden"></p>
         </section>
 
+        <!-- USER PAYMENTS LEDGER -->
         <section id="user-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4 max-w-7xl">
           <h2 class="text-xl font-bold text-slate-800 border-b pb-2">My Service Payment Ledgers</h2>
-          <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Service Period</th><th class="p-3">Weeks Logged</th><th class="p-3">Weekly Rate</th><th class="p-3">Gross Base</th><th class="p-3">Applied Deductions</th><th class="p-3 font-bold text-indigo-700">Net Credited Revenue</th><th class="p-3">Operational Remarks</th><th class="p-3 text-center">Status & Review Actions</th></tr></thead><tbody id="user-payroll-table" class="divide-y divide-slate-50"></tbody></table></div>
+          <div class="overflow-x-auto rounded-lg border border-slate-100">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold">
+                  <th class="p-3">Service Period</th>
+                  <th class="p-3">Weeks Logged</th>
+                  <th class="p-3">Mode</th>
+                  <th class="p-3">Gross Base</th>
+                  <th class="p-3">Deductions</th>
+                  <th class="p-3 font-bold text-indigo-700">Net Credited</th>
+                  <th class="p-3">Receipt Document</th>
+                  <th class="p-3 text-center">Status Actions</th>
+                </tr>
+              </thead>
+              <tbody id="user-payroll-table" class="divide-y divide-slate-50"></tbody>
+            </table>
+          </div>
         </section>
 
         <section id="admin-sec" class="hidden space-y-8 max-w-6xl">
@@ -271,7 +303,16 @@
 
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-indigo-900">Master Service Payments Distribution History</h2>
-            <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Name</th><th class="p-3">ID</th><th class="p-3">Period</th><th class="p-3">Weeks</th><th class="p-3">Gross</th><th class="p-3">Deduct</th><th class="p-3 font-bold text-indigo-600">Net</th><th class="p-3">Remarks</th><th class="p-3 font-bold text-center">Review Status</th><th class="p-3 max-w-xs">Dispute Notes</th></tr></thead><tbody id="admin-payments-history-table" class="divide-y divide-slate-50"></tbody></table></div>
+            <div class="overflow-x-auto rounded-lg border border-slate-100">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold">
+                    <th class="p-3">Name</th><th class="p-3">ID</th><th class="p-3">Period</th><th class="p-3">Weeks</th><th class="p-3">Mode</th><th class="p-3">Gross</th><th class="p-3">Deduct</th><th class="p-3 font-bold text-indigo-600">Net</th><th class="p-3">Receipt Link</th><th class="p-3 font-bold text-center">Review Status</th><th class="p-3 max-w-xs">Dispute Notes</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-payments-history-table" class="divide-y divide-slate-50"></tbody>
+              </table>
+            </div>
           </div>
 
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -609,6 +650,13 @@
       });
     }
 
+    // Modal display generator matrix tool for taskers to load full screen proof screenshot vouchers
+    function openImagePreviewOverlayModal(base64Data) {
+      if (!base64Data) { alert("No receipt screenshot attached to this service transaction record line."); return; }
+      const newWin = window.open();
+      newWin.document.write(`<body style="margin:0; background:#0f172a; display:flex; justify-content:center; align-items:center; min-h:100vh;"><img src="${base64Data}" style="max-width:95%; max-height:95vh; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5); border-radius:12px;" /></body>`);
+    }
+
     function executeSelfPasswordChange() {
       const oldPass = document.getElementById('self-old-pass').value, newPass = document.getElementById('self-new-pass').value, confirmPass = document.getElementById('self-confirm-pass').value, fb = document.getElementById('self-pass-feedback');
       if (!oldPass || !newPass || !confirmPass) { alert("Compile entries."); return; }
@@ -733,24 +781,29 @@
       }
 
       let filteredPayments = (data.payments || []).filter(row => { return !(selectedTasker !== "ALL" && row.name !== selectedTasker); });
-      if(filteredPayments.length === 0) { payBody.innerHTML = '<tr><td colspan="10" class="p-3 text-center text-slate-400">No payouts.</td></tr>'; }
+      if(filteredPayments.length === 0) { payBody.innerHTML = '<tr><td colspan="11" class="p-3 text-center text-slate-400">No payouts.</td></tr>'; }
       else {
         filteredPayments.forEach(row => {
-          let statusBadge = "";
-          let actionButtons = "";
+          let statusBadge = ""; let actionButtons = "";
           if (row.status === "Acknowledged" || row.status === "Settled & Adjusted" || row.status === "Dispute Approved") {
             statusBadge = '<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[11px]">✓ ' + row.status + '</span>';
           } else if (row.status === "Disputed") {
             statusBadge = '<span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded text-[11px]">Disputed</span>';
-            actionButtons = '<div class="mt-1 flex justify-center gap-1"><button onclick="adminResolveDispute(\'' + row.payrollId + '\', \'Dispute Approved\', \'' + (row.disputeReason || '').replace(/'/g, "\\'") + '\')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-[10px] font-bold transition">Approve</button><button onclick="adminResolveDispute(\'' + row.payrollId + '\', \'Dispute Rejected\', \'' + (row.disputeReason || '').replace(/'/g, "\\'") + '\')" class="bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold transition">Reject</button></div>';
+            actionButtons = '<div class="mt-1 flex justify-center gap-1"><button onclick="adminResolveDispute(\'' + row.payrollId + '\', \'Dispute Approved\', \'' + (row.disputeReason || '').replace(/'/g, "\\'") + '\')" class="bg-emerald-600 text-white px-2 py-1 rounded text-[10px] font-bold">Approve</button><button onclick="adminResolveDispute(\'' + row.payrollId + '\', \'Dispute Rejected\', \'' + (row.disputeReason || '').replace(/'/g, "\\'") + '\')" class="bg-rose-600 text-white px-2 py-1 rounded text-[10px] font-bold">Reject</button></div>';
           } else if (row.status === "Dispute Rejected") {
             statusBadge = '<span class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded text-[11px]">Dispute Rejected</span>';
-          } else {
-            statusBadge = '<span class="bg-slate-100 text-slate-800 font-medium px-2 py-0.5 rounded text-[11px]">Unreviewed</span>';
-          }
-          const finalStatusCol = `<div class="text-center flex flex-col items-center">${statusBadge}${actionButtons}</div>`;
+          } else { statusBadge = '<span class="bg-slate-100 text-slate-800 font-medium px-2 py-0.5 rounded text-[11px]">Unreviewed</span>'; }
+          
+          let receiptBtn = row.receiptImage 
+            ? '<button onclick="openImagePreviewOverlayModal(\'' + row.receiptImage + '\')" class="text-indigo-600 hover:text-indigo-900 font-bold underline">View Photo</button>' 
+            : '<span class="text-slate-400 italic">No Upload</span>';
+          
+          let finalStatusCol = `<div class="text-center flex flex-col items-center">${statusBadge}${actionButtons}</div>`;
+          const paymentModeBadge = row.paymentMode === 'Cash' 
+            ? '<span class="bg-amber-100 text-amber-900 font-bold px-1.5 py-0.5 rounded text-[10px]">💵 Cash</span>' 
+            : '<span class="bg-indigo-100 text-indigo-900 font-bold px-1.5 py-0.5 rounded text-[10px]">⚡ E-Cash</span>';
 
-          payBody.innerHTML += '<tr class="border-b border-slate-100 text-xs"><td class="p-3 font-bold text-slate-900">' + row.name + '</td><td class="p-3 font-mono text-slate-500">' + row.userId + '</td><td class="p-3 text-indigo-700 text-xs">' + row.period + '</td><td class="p-3">' + row.weeks + ' wks</td><td class="p-3">₱' + row.gross.toFixed(2) + '</td><td class="p-3 text-rose-600">-₱' + row.deductions.toFixed(2) + '</td><td class="p-3 font-black text-emerald-600">₱' + row.net.toFixed(2) + '</td><td class="p-3 italic max-w-xs truncate">' + row.remarks + '</td><td class="p-3">' + finalStatusCol + '</td><td class="p-3 text-xs max-w-xs break-words whitespace-pre-wrap">' + (row.disputeReason || "-") + '</td></tr>';
+          payBody.innerHTML += '<tr class="border-b border-slate-100 text-xs"><td class="p-3 font-bold text-slate-900">' + row.name + '</td><td class="p-3 font-mono text-slate-500">' + row.userId + '</td><td class="p-3 text-indigo-700 text-xs">' + row.period + '</td><td class="p-3">' + row.weeks + ' wks</td><td class="p-3">' + paymentModeBadge + '</td><td class="p-3">₱' + row.gross.toFixed(2) + '</td><td class="p-3 text-rose-600">-₱' + row.deductions.toFixed(2) + '</td><td class="p-3 font-black text-emerald-600">₱' + row.net.toFixed(2) + '</td><td class="p-3 font-semibold text-center">' + receiptBtn + '</td><td class="p-3">' + finalStatusCol + '</td><td class="p-3 text-xs max-w-xs break-words whitespace-pre-wrap">' + (row.disputeReason || "-") + '</td></tr>';
         });
       }
 
@@ -803,12 +856,21 @@
             statusBadge = '<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[11px]">✓ Dispute Approved</span>';
           } else if (row.status === "Dispute Rejected") {
             statusBadge = '<div class="flex flex-col gap-1 items-center"><span class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded text-[11px]">❌ Dispute Rejected</span>' +
-                          '<button onclick="acknowledgePayment(\'' + row.payrollId + '\')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2 py-1 rounded text-[10px] transition">Acknowledge</button></div>';
+                          '<button onclick="acknowledgePayment(\'' + row.payrollId + '\')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2 py-1 rounded text-[10px]">Acknowledge</button></div>';
           } else {
-            statusBadge = '<div class="flex gap-1 justify-center"><button onclick="acknowledgePayment(\'' + row.payrollId + '\')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2 py-1 rounded text-[10px] transition">Acknowledge</button>' +
-                          '<button onclick="disputePayment(\'' + row.payrollId + '\')" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-2 py-1 rounded text-[10px] transition">Dispute</button></div>';
+            statusBadge = '<div class="flex gap-1 justify-center"><button onclick="acknowledgePayment(\'' + row.payrollId + '\')" class="bg-emerald-600 text-white font-bold px-2 py-1 rounded text-[10px]">Acknowledge</button>' +
+                          '<button onclick="disputePayment(\'' + row.payrollId + '\')" class="bg-rose-600 text-white font-bold px-2 py-1 rounded text-[10px]">Dispute</button></div>';
           }
-          tableBody.innerHTML += '<tr class="border-b border-slate-100"><td class="p-3 font-semibold text-slate-800">' + row.period + '</td><td class="p-3">' + row.weeks + ' wks</td><td class="p-3">₱' + row.rate.toFixed(2) + '</td><td class="p-3">₱' + row.gross.toFixed(2) + '</td><td class="p-3 text-rose-600">-₱' + row.deductions.toFixed(2) + '</td><td class="p-3 font-black text-indigo-700">₱' + row.net.toFixed(2) + '</td><td class="p-3 italic text-slate-500 max-w-[150px] truncate">' + (row.remarks || '-') + '</td><td class="p-3 text-center">' + statusBadge + '</td></tr>';
+
+          let receiptBtn = row.receiptImage 
+            ? '<button onclick="openImagePreviewOverlayModal(\'' + row.receiptImage + '\')" class="text-indigo-600 hover:text-indigo-900 font-bold underline">View Screenshot</button>' 
+            : '<span class="text-slate-400 italic">No Attachment</span>';
+
+          const paymentModeBadge = row.paymentMode === 'Cash' 
+            ? '<span class="bg-amber-100 text-amber-900 font-bold px-1.5 py-0.5 rounded text-[10px]">💵 Cash</span>' 
+            : '<span class="bg-indigo-100 text-indigo-900 font-bold px-1.5 py-0.5 rounded text-[10px]">⚡ E-Cash</span>';
+
+          tableBody.innerHTML += '<tr class="border-b border-slate-100"><td class="p-3 font-semibold text-slate-800">' + row.period + '</td><td class="p-3">' + row.weeks + ' wks</td><td class="p-3">' + paymentModeBadge + '</td><td class="p-3">₱' + row.gross.toFixed(2) + '</td><td class="p-3 text-rose-600">-₱' + row.deductions.toFixed(2) + '</td><td class="p-3 font-black text-indigo-700">₱' + row.net.toFixed(2) + '</td><td class="p-3 text-center font-semibold">' + receiptBtn + '</td><td class="p-3 text-center">' + statusBadge + '</td></tr>';
         });
       });
     }
@@ -817,10 +879,7 @@
       const reason = prompt("Please provide your reason for disputing this payment calculation:");
       if (!reason || reason.trim() === "") return;
       if (!confirm("Are you sure you want to submit this dispute?")) return;
-      callAPI('POST', '', { action: "disputePayment", paymentId: paymentId, reason: reason }, function(res) {
-        alert(res.message);
-        if (res.success) fetchUserPayrollData();
-      });
+      callAPI('POST', '', { action: "disputePayment", paymentId: paymentId, reason: reason }, function(res) { alert(res.message); if (res.success) fetchUserPayrollData(); });
     }
 
     function acknowledgePayment(paymentId) {
@@ -832,10 +891,7 @@
       const notes = prompt("Marking as: " + status + "\n\nTasker's Reason: " + currentReason + "\n\nEnter your resolution notes (Optional):");
       if (notes === null) return;
       const finalReason = currentReason + (notes ? "\nAdmin Note: " + notes : "");
-      callAPI('POST', '', { action: "updatePayrollReviewStatus", payrollId: paymentId, status: status, disputeReason: finalReason }, function(res) {
-        alert(res.message);
-        if (res.success) fetchGlobalAdminLogs();
-      });
+      callAPI('POST', '', { action: "updatePayrollReviewStatus", payrollId: paymentId, status: status, disputeReason: finalReason }, function(res) { alert(res.message); if (res.success) fetchGlobalAdminLogs(); });
     }
 
     function executeAdminCreateUser() {
@@ -861,29 +917,48 @@
       });
     }
 
+    // Handles screenshot parsing and transfers to backend
     function submitPayrollForm() {
       const fb = document.getElementById('payroll-feedback');
-      const payload = {
-        action: "disbursePayroll",
-        targetUserId: document.getElementById('p-uid').value,
-        targetName: document.getElementById('p-name').value,
-        rate: parseFloat(document.getElementById('p-rate').value),
-        weeks: parseFloat(document.getElementById('p-hours').value),
-        deductions: parseFloat(document.getElementById('p-deduct').value || 0),
-        period: document.getElementById('p-month').value,
-        remarks: document.getElementById('p-remarks').value
+      const fileInput = document.getElementById('p-file');
+      
+      const executePost = (base64String = '') => {
+        const payload = {
+          action: "disbursePayroll",
+          targetUserId: document.getElementById('p-uid').value,
+          targetName: document.getElementById('p-name').value,
+          rate: parseFloat(document.getElementById('p-rate').value),
+          weeks: parseFloat(document.getElementById('p-hours').value),
+          deductions: parseFloat(document.getElementById('p-deduct').value || 0),
+          period: document.getElementById('p-month').value,
+          remarks: document.getElementById('p-remarks').value,
+          paymentMode: document.getElementById('p-mode').value,
+          receiptImage: base64String
+        };
+
+        if (!payload.targetUserId || !payload.rate || !payload.weeks || !payload.period) { alert("Please complete all required payroll configuration inputs."); return; }
+        fb.className = "text-xs font-bold p-2 rounded bg-amber-50 text-amber-800 block"; fb.innerText = "Disbursing payout entry...";
+
+        callAPI('POST', '', payload, function(res) {
+          fb.innerText = res.message; fb.className = res.success ? "text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800 block" : "text-xs font-bold p-2 rounded bg-rose-50 text-rose-800 block";
+          if (res.success) { ['p-uid', 'p-name', 'p-rate', 'p-hours', 'p-deduct', 'p-month', 'p-remarks', 'p-file'].forEach(id => { if (id !== 'p-file') document.getElementById(id).value = id === 'p-deduct' ? '0' : ''; else document.getElementById(id).value = ''; }); fetchGlobalAdminLogs(); }
+        });
       };
-      if (!payload.targetUserId || !payload.rate || !payload.weeks || !payload.period) { alert("Please complete all required payroll configuration inputs."); return; }
-      fb.className = "text-xs font-bold p-2 rounded bg-amber-50 text-amber-800 block"; fb.innerText = "Disbursing payout entry...";
-      callAPI('POST', '', payload, function(res) {
-        fb.innerText = res.message; fb.className = res.success ? "text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800 block" : "text-xs font-bold p-2 rounded bg-rose-50 text-rose-800 block";
-        if (res.success) { ['p-uid', 'p-name', 'p-rate', 'p-hours', 'p-deduct', 'p-month', 'p-remarks'].forEach(id => { document.getElementById(id).value = id === 'p-deduct' ? '0' : ''; }); fetchGlobalAdminLogs(); }
-      });
+
+      if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) { executePost(e.target.result); };
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        executePost('');
+      }
     }
 
-    function executeAdminMakeRestDayDecision(requestId, status) {
-      const notes = prompt("Provide operational feedback notes for " + status + " status mapping:"); if (notes === null) return;
-      callAPI('POST', '', { action: "processRestDayAction", requestId: requestId, status: status, feedback: notes }, function(res) { alert(res.message); if (res.success) fetchGlobalAdminLogs(); });
+    function submitScheduleAdjustment(isPermanent) {
+      const targetUserId = document.getElementById('sched-target-uid').value, shiftStart = document.getElementById('sched-shift-start').value, shiftEnd = document.getElementById('sched-shift-end').value;
+      const maxMeal = document.getElementById('sched-max-meal').value, maxBreak = document.getElementById('sched-max-break').value;
+      if (!targetUserId || !shiftStart || !shiftEnd || !maxMeal || !maxBreak) { alert("Please complete required scheduling selections."); return; }
+      callAPI('POST', '', { action: isPermanent ? "updatePermanentSchedule" : "updateDailyScheduleAdjustment", targetUserId: targetUserId, shiftStart: shiftStart, shiftEnd: shiftEnd, maxBreak: maxBreak, maxMeal: maxMeal, date: new Date().toLocaleDateString('en-US') }, function(res) { alert(res.message); fetchGlobalAdminLogs(); });
     }
 
     function applyGlobalFilters() { if (cachedAdminMasterData) renderFilteredGrids(cachedAdminMasterData); }
