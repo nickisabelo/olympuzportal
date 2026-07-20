@@ -194,42 +194,14 @@
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4 h-fit">
               <h2 class="text-xl font-bold text-slate-800">📈 Submit Referral Tally</h2>
-              
-              <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">Referral Source</label>
-                <select id="ref-source" onchange="toggleRefSource()" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50 font-bold">
-                  <option value="">-- Select Source --</option>
-                  <option value="Boss Job">Boss Job</option>
-                  <option value="Threads">Threads</option>
-                  <option value="Facebook">Facebook</option>
-                  <option value="LinkedIn">LinkedIn</option>
-                  <option value="Others">Others (Specify)</option>
-                </select>
-              </div>
-              <div id="ref-source-other-container" class="hidden">
-                <label class="block text-xs font-bold text-slate-500 mb-1">Specify Source</label>
-                <input type="text" id="ref-source-other" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50">
-              </div>
-    
-              <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">Number of Referrals</label>
-                <input type="number" id="ref-count" min="0" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50">
-              </div>
-    
-              <div class="flex items-center gap-2 pt-2">
-                <input type="checkbox" id="ref-is-covering" onchange="toggleRefCovering()" class="w-4 h-4 text-indigo-600 rounded">
-                <label class="text-xs font-bold text-slate-700">Taking over someone else's source?</label>
-              </div>
-              
-              <div id="ref-covering-container" class="hidden">
-                <label class="block text-xs font-bold text-slate-500 mb-1">Tasker Account Name</label>
-                <input type="text" id="ref-covering-name" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="Name of tasker you're covering...">
-              </div>
-    
+              <div><label class="block text-xs font-bold text-slate-500 mb-1">Referral Source</label><select id="ref-source" onchange="toggleRefSource()" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50 font-bold"><option value="">-- Select Source --</option><option value="Boss Job">Boss Job</option><option value="Threads">Threads</option><option value="Facebook">Facebook</option><option value="LinkedIn">LinkedIn</option><option value="Others">Others (Specify)</option></select></div>
+              <div id="ref-source-other-container" class="hidden"><label class="block text-xs font-bold text-slate-500 mb-1">Specify Source</label><input type="text" id="ref-source-other" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50"></div>
+              <div><label class="block text-xs font-bold text-slate-500 mb-1">Number of Referrals</label><input type="number" id="ref-count" min="0" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50"></div>
+              <div class="flex items-center gap-2 pt-2"><input type="checkbox" id="ref-is-covering" onchange="toggleRefCovering()" class="w-4 h-4 text-indigo-600 rounded"><label class="text-xs font-bold text-slate-700">Taking over someone else's source?</label></div>
+              <div id="ref-covering-container" class="hidden"><label class="block text-xs font-bold text-slate-500 mb-1">Tasker Account Name</label><input type="text" id="ref-covering-name" class="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="Name of tasker you're covering..."></div>
               <button onclick="submitReferralReport()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg font-bold text-sm shadow transition">Submit Tally</button>
               <p id="ref-feedback" class="text-center font-bold text-xs p-2 rounded hidden"></p>
             </div>
-    
             <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col">
               <h2 class="text-xl font-bold text-slate-800 mb-1">📋 Referral Tally Feed</h2>
               <div class="flex-1 overflow-y-auto max-h-[500px] border border-slate-100 rounded-lg p-4 bg-slate-50/50 space-y-3" id="referral-reports-feed"></div>
@@ -248,7 +220,6 @@
           <p id="self-pass-feedback" class="text-center font-bold text-xs p-2 rounded hidden"></p>
         </section>
 
-        <!-- MODULE: ADMIN CONTROL - PAYROLL DISBURSEMENT -->
         <section id="admin-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-6 max-w-2xl">
           <h2 class="text-xl font-bold text-indigo-700 border-b pb-2">Admin Control: Issue Fixed Weekly Payment</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -259,7 +230,6 @@
             <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Prerogative Deductions (₱)</label><input id="p-deduct" type="number" class="w-full p-2 border border-slate-200 text-sm rounded-lg" value="0"></div>
             <div><label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Service Billing Period</label><input id="p-month" type="text" class="w-full p-2 border border-slate-200 text-sm rounded-lg" placeholder="Week 1 - July 2026"></div>
             
-            <!-- Payment Mode and File Attachment Selectors -->
             <div>
               <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Payment Mode Matrix</label>
               <select id="p-mode" class="w-full p-2 border border-slate-200 text-sm rounded-lg bg-slate-50 font-bold text-indigo-900">
@@ -283,18 +253,7 @@
           <h2 class="text-xl font-bold text-slate-800 border-b pb-2">My Service Payment Ledgers</h2>
           <div class="overflow-x-auto rounded-lg border border-slate-100">
             <table class="w-full text-left border-collapse text-sm">
-              <thead>
-                <tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold">
-                  <th class="p-3">Service Period</th>
-                  <th class="p-3">Weeks Logged</th>
-                  <th class="p-3">Mode</th>
-                  <th class="p-3">Gross Base</th>
-                  <th class="p-3">Deductions</th>
-                  <th class="p-3 font-bold text-indigo-700">Net Credited</th>
-                  <th class="p-3 text-center">Receipt Document</th>
-                  <th class="p-3 text-center">Status Actions</th>
-                </tr>
-              </thead>
+              <thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Service Period</th><th class="p-3">Weeks Logged</th><th class="p-3">Mode</th><th class="p-3">Gross Base</th><th class="p-3">Deductions</th><th class="p-3 font-bold text-indigo-700">Net Credited</th><th class="p-3 text-center">Receipt Document</th><th class="p-3 text-center">Status Actions</th></tr></thead>
               <tbody id="user-payroll-table" class="divide-y divide-slate-50"></tbody>
             </table>
           </div>
@@ -329,21 +288,13 @@
               <div><label class="font-bold text-slate-600">Email Address</label><input type="email" id="add-u-email" class="w-full p-2 border rounded mt-1 bg-slate-50"></div>
               <div><label class="font-bold text-slate-600">Initial Password</label><input type="text" id="add-u-pass" class="w-full p-2 border rounded mt-1 bg-slate-50" placeholder="ChangeMe123"></div>
               <div><label class="font-bold text-slate-600">Permission Role</label><select id="add-u-role" onchange="toggleFormScheduleVisibility()" class="w-full p-2 border rounded mt-1 bg-slate-50 font-bold text-indigo-700"><option value="Employee">Employee (Standard Tasker)</option><option value="Admin">Admin (Full Workspace Override)</option></select></div>
-              
               <div><label class="font-bold text-slate-600">Shift Window Start</label><input type="time" id="add-u-shift-start" class="w-full p-2 border rounded mt-1 bg-slate-50" value="09:00"></div>
               <div><label class="font-bold text-slate-600">Shift Window End</label><input type="time" id="add-u-shift-end" class="w-full p-2 border rounded mt-1 bg-slate-50" value="18:00"></div>
               <div><label class="font-bold text-slate-600">Days Off Allotment</label><input type="text" id="add-u-off" class="w-full p-2 border rounded mt-1 bg-slate-50" value="Saturday, Sunday"></div>
               <div><label class="font-bold text-slate-600">Leave Balance</label><input type="number" id="add-u-leaves" class="w-full p-2 border rounded mt-1 bg-slate-50" value="15"></div>
-              
               <div><label class="font-bold text-slate-600 text-rose-600">Quick Break Total (Mins)</label><input type="number" id="add-u-max-break" class="w-full p-2 border rounded mt-1 bg-slate-50" value="15"></div>
               <div><label class="font-bold text-slate-600 text-rose-600">Meal Break Total (Mins)</label><input type="number" id="add-u-max-meal" class="w-full p-2 border rounded mt-1 bg-slate-50" value="60"></div>
-              
-              <div>
-                <label class="font-bold text-slate-600 text-emerald-600">Half Day Setting</label>
-                <select id="add-u-half" class="w-full p-2 border rounded mt-1 bg-slate-50 font-bold">
-                  <option value="">None</option><option value="Monday">Monday</option><option value="Tuesday">Tuesday</option><option value="Wednesday">Wednesday</option><option value="Thursday">Thursday</option><option value="Friday">Friday</option><option value="Saturday">Saturday</option><option value="Sunday">Sunday</option>
-                </select>
-              </div>
+              <div><label class="font-bold text-slate-600 text-emerald-600">Half Day Setting</label><select id="add-u-half" class="w-full p-2 border rounded mt-1 bg-slate-50 font-bold"><option value="">None</option><option value="Monday">Monday</option><option value="Tuesday">Tuesday</option><option value="Wednesday">Wednesday</option><option value="Thursday">Thursday</option><option value="Friday">Friday</option><option value="Saturday">Saturday</option><option value="Sunday">Sunday</option></select></div>
             </div>
             <button onclick="executeAdminCreateUser()" class="bg-indigo-600 text-white font-bold text-xs px-4 py-2 rounded shadow hover:bg-indigo-700 transition mt-2">Register Tasker Profile</button>
             <p id="admin-create-feedback" class="text-xs font-bold p-2 rounded hidden mt-2"></p>
@@ -457,6 +408,34 @@
       localStorage.setItem("olympuz_device_id", deviceId);
     }
     let tempLoginEmail = "";
+
+    // ─── IMAGE COMPRESSION HELPER ─────────────────────────────────────────
+    // This perfectly resizes and crushes huge images so the database never crashes
+    function compressImage(file, callback) {
+      if (!file || !file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = function(e) { callback(e.target.result); };
+        reader.readAsDataURL(file);
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          let w = img.width, h = img.height;
+          const MAX_DIM = 800;
+          if (w > h && w > MAX_DIM) { h = h * (MAX_DIM / w); w = MAX_DIM; }
+          else if (h > MAX_DIM) { w = w * (MAX_DIM / h); h = MAX_DIM; }
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          callback(canvas.toDataURL('image/jpeg', 0.6));
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
 
     function callAPI(method, urlParams, payload, callback) {
       let token = localStorage.getItem("olympuz_token");
@@ -785,6 +764,7 @@
       });
     }
 
+    // CA FORM WITH COMPRESSION INJECTED
     function submitCAForm() {
       const amt = parseFloat(document.getElementById('ca-amount').value);
       const reason = document.getElementById('ca-reason').value;
@@ -803,9 +783,9 @@
       };
 
       if (fileInput && fileInput.files && fileInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) { executePost(e.target.result); };
-        reader.readAsDataURL(fileInput.files[0]);
+        compressImage(fileInput.files[0], function(compressedData) {
+            executePost(compressedData);
+        });
       } else { executePost(''); }
     }
 
@@ -820,6 +800,7 @@
       document.getElementById('ca-decision-modal').classList.add('hidden');
     }
 
+    // CA DECISION WITH COMPRESSION INJECTED
     function submitCADecision(status) {
       const reqId = document.getElementById('ca-modal-req-id').value;
       const feedback = document.getElementById('ca-modal-feedback').value;
@@ -836,9 +817,9 @@
       };
 
       if (status === 'Approved' && fileInput.files && fileInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) { executePost(e.target.result); };
-        reader.readAsDataURL(fileInput.files[0]);
+        compressImage(fileInput.files[0], function(compressedData) {
+            executePost(compressedData);
+        });
       } else { executePost(''); }
     }
 
@@ -900,7 +881,7 @@
         const filterSelect = document.getElementById('public-filter-tasker'), currentSelection = filterSelect.value;
         filterSelect.innerHTML = '<option value="ALL">-- Show Everyone\'s Reports --</option>';
         const uniqueNames = [...new Set((cachedPublicReports).map(r => r.name))].sort();
-        uniqueNames.forEach(name => { filterSelect.innerHTML += '<option value="' + name + '">' + name + '</option>'; });
+        uniqueNames.forEach(name => { filterSelect.innerHTML += `<option value="${name}">${name}</option>`; });
         filterSelect.value = currentSelection; renderFilteredPublicReports();
       });
     }
@@ -950,6 +931,7 @@
       });
     }
 
+    // LEAVE FORM WITH COMPRESSION INJECTED
     function submitLeaveForm() {
       const date = document.getElementById('l-date').value, reason = document.getElementById('l-reason').value, fb = document.getElementById('leave-feedback'), fileInput = document.getElementById('l-file');
       if(!date || !reason) { alert("Compile fields."); return; } 
@@ -963,9 +945,9 @@
       };
 
       if (fileInput && fileInput.files && fileInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) { executePost(e.target.result); };
-        reader.readAsDataURL(fileInput.files[0]);
+        compressImage(fileInput.files[0], function(compressedData) {
+            executePost(compressedData);
+        });
       } else { executePost(''); }
     }
 
@@ -1221,6 +1203,7 @@
       });
     }
 
+    // PAYROLL FORM WITH COMPRESSION INJECTED
     function submitPayrollForm() {
       const fb = document.getElementById('payroll-feedback');
       const fileInput = document.getElementById('p-file');
@@ -1248,13 +1231,11 @@
         });
       };
 
-      if (fileInput.files && fileInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) { executePost(e.target.result); };
-        reader.readAsDataURL(fileInput.files[0]);
-      } else {
-        executePost('');
-      }
+      if (fileInput && fileInput.files && fileInput.files[0]) {
+        compressImage(fileInput.files[0], function(compressedData) {
+            executePost(compressedData);
+        });
+      } else { executePost(''); }
     }
 
     function submitScheduleAdjustment(isPermanent) {
