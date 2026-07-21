@@ -1431,7 +1431,8 @@
         });
       }
 
-      (data.absences || []).filter(r => !(selectedTasker !== "ALL" && r.name !== selectedTasker)).forEach(row => {
+      // EXCLUDE ADMINS FROM ABSENCE METRICS TABLE 
+      (data.absences || []).filter(r => r.role !== 'Admin' && !(selectedTasker !== "ALL" && r.name !== selectedTasker)).forEach(row => {
         const missClass = row.absents > 0 ? 'text-rose-600 bg-rose-50/30' : 'text-emerald-600';
         absBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 text-slate-500">${row.id}</td><td class="p-3 font-medium text-slate-900">${row.name}</td><td class="p-3 text-slate-500">${row.daysOff}</td><td class="p-3 text-indigo-600">${row.halfDay}</td><td class="p-3 font-black ${missClass}">${row.absents} days missed</td><td class="p-3 text-center space-x-1 whitespace-nowrap"><button onclick="executeAdminTagUserAbsent('${row.id}', '${row.name}')" class="text-xs bg-rose-600 text-white font-bold px-2 py-1 rounded">Tag Absent</button><button onclick="executeAdminOverridePassword('${row.id}')" class="text-xs bg-indigo-50 text-indigo-700 font-semibold px-2 py-1 rounded border">Reset Pass</button><button onclick="executeAdminRemoveUser('${row.id}', '${row.name}')" class="text-xs bg-rose-50 text-rose-600 font-bold px-2 py-1 rounded border">Purge</button></td></tr>`;
       });
