@@ -451,17 +451,30 @@
                   <div><label class="font-bold text-slate-600 text-rose-600">Quick Break Max (Mins)</label><input type="number" id="sched-max-break" class="w-full p-2 border rounded mt-1 bg-white" value="15"></div>
                   <div><label class="font-bold text-slate-600 text-rose-600">Meal Break Max (Mins)</label><input type="number" id="sched-max-meal" class="w-full p-2 border rounded mt-1 bg-white" value="60"></div>
                 </div>
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   <div>
-                    <label class="font-bold text-slate-600 text-emerald-600">Is Half Day?</label>
-                    <select id="sched-half-day" class="w-full p-2 border rounded mt-1 bg-white font-bold">
+                    <label class="font-bold text-slate-600 text-emerald-600">Temp Half Day?</label>
+                    <select id="sched-half-day-temp" class="w-full p-2 border rounded mt-1 bg-white font-bold text-xs">
                       <option value="false">No (Regular Shift)</option>
-                      <option value="true">Yes (Half Day)</option>
+                      <option value="true">Yes (Today Only)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="font-bold text-slate-600 text-emerald-600">Perm Half Day</label>
+                    <select id="sched-half-day-perm" class="w-full p-2 border rounded mt-1 bg-white font-bold text-xs">
+                      <option value="">None</option>
+                      <option value="Monday">Monday</option>
+                      <option value="Tuesday">Tuesday</option>
+                      <option value="Wednesday">Wednesday</option>
+                      <option value="Thursday">Thursday</option>
+                      <option value="Friday">Friday</option>
+                      <option value="Saturday">Saturday</option>
+                      <option value="Sunday">Sunday</option>
                     </select>
                   </div>
                   <div>
                     <label class="font-bold text-slate-600 text-emerald-600">Half Day Hrs</label>
-                    <input type="number" step="0.5" id="sched-half-hrs" class="w-full p-2 border rounded mt-1 bg-white" value="4">
+                    <input type="number" step="0.5" id="sched-half-hrs" class="w-full p-2 border rounded mt-1 bg-white text-xs" value="4">
                   </div>
                 </div>
                 <div class="pt-2 flex gap-2">
@@ -551,6 +564,11 @@
       localStorage.setItem("olympuz_device_id", deviceId);
     }
     let tempLoginEmail = "";
+
+    function getManilaDateString() {
+      const d = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
 
     // ─── IMAGE COMPRESSION HELPER ─────────────────────────────────────────
     function compressImage(file, callback) {
@@ -1113,11 +1131,38 @@
     }
 
     function submitScheduleAdjustment(isPermanent) {
-      const targetUserId = document.getElementById('sched-target-uid').value, shiftStart = document.getElementById('sched-shift-start').value, shiftEnd = document.getElementById('sched-shift-end').value;
-      const maxMeal = document.getElementById('sched-max-meal').value, maxBreak = document.getElementById('sched-max-break').value;
-      const isHalfDay = document.getElementById('sched-half-day').value, halfDayHrs = document.getElementById('sched-half-hrs').value;
-      if (!targetUserId || !shiftStart || !shiftEnd || !maxMeal || !maxBreak) { alert("Please complete required scheduling selections."); return; }
-      callAPI('POST', '', { action: isPermanent ? "updatePermanentSchedule" : "updateDailyScheduleAdjustment", targetUserId: targetUserId, shiftStart: shiftStart, shiftEnd: shiftEnd, maxBreak: maxBreak, maxMeal: maxMeal, isHalfDay: isHalfDay, halfDayHours: halfDayHrs, date: new Date().toLocaleDateString('en-US') }, function(res) { alert(res.message || res.error || "Updated"); fetchGlobalAdminLogs(); });
+      const targetUserId = document.getElementById('sched-target-uid').value, 
+            shiftStart = document.getElementById('sched-shift-start').value, 
+            shiftEnd = document.getElementById('sched-shift-end').value;
+      const maxMeal = document.getElementById('sched-max-meal').value, 
+            maxBreak = document.getElementById('sched-max-break').value;
+      const isHalfDayTemp = document.getElementById('sched-half-day-temp').value;
+      const halfDayPerm = document.getElementById('sched-half-day-perm').value;
+      const halfDayHrs = document.getElementById('sched-half-hrs').value;
+      
+      if (!targetUserId || !shiftStart || !shiftEnd || !maxMeal || !maxBreak) { 
+        alert("Please complete required scheduling selections."); 
+        return; 
+      }
+      
+      callAPI('POST', '', { 
+        action: isPermanent ? "updatePermanentSchedule" : "updateDailyScheduleAdjustment", 
+        targetUserId: targetUserId, 
+        shiftStart: shiftStart, 
+        shiftEnd: shiftEnd, 
+        maxBreak: maxBreak, 
+        maxMeal: maxMeal, 
+        isHalfDay: isHalfDayTemp, 
+        halfDay: halfDayPerm,
+        halfDayHours: halfDayHrs, 
+        date: getManilaDateString() 
+      }, function(res) { 
+        alert(res.message || res.error || "Updated"); 
+        if (res.success) {
+          fetchGlobalAdminLogs(); 
+          loadGlobalStatusFeed(); // Automatically syncs Workspace Feed to the new logic
+        }
+      });
     }
 
     function toggleFormScheduleVisibility() {
@@ -1329,7 +1374,7 @@
 
       (data.absences || []).forEach(u => {
         const ps = u.permanentSchedule;
-        const hdStr = ps.halfDay ? `${ps.halfDay} (${ps.halfDayHours || 4}h)` : "None";
+        const hdStr = ps.half_day_config ? `${ps.half_day_config} (${ps.half_day_hours || 4}h)` : "None";
         auditList.innerHTML += `<div class="py-2 flex justify-between items-center text-xs"><div><div class="font-bold text-slate-800">${u.name} <span class="text-slate-400 font-mono">(${u.id})</span></div><div class="text-[10px] text-slate-500 mt-0.5">Shift: ${ps.shiftStart} - ${ps.shiftEnd} | Half-Day: ${hdStr}</div><div class="text-[10px] text-indigo-600 font-medium">Max Q-Break: ${ps.maxBreak}m | Max Meal: ${ps.maxMeal}m</div></div></div>`;
       });
 
@@ -1566,14 +1611,6 @@
             executePost(compressedData);
         });
       } else { executePost(''); }
-    }
-
-    function submitScheduleAdjustment(isPermanent) {
-      const targetUserId = document.getElementById('sched-target-uid').value, shiftStart = document.getElementById('sched-shift-start').value, shiftEnd = document.getElementById('sched-shift-end').value;
-      const maxMeal = document.getElementById('sched-max-meal').value, maxBreak = document.getElementById('sched-max-break').value;
-      const isHalfDay = document.getElementById('sched-half-day').value, halfDayHrs = document.getElementById('sched-half-hrs').value;
-      if (!targetUserId || !shiftStart || !shiftEnd || !maxMeal || !maxBreak) { alert("Please complete required scheduling selections."); return; }
-      callAPI('POST', '', { action: isPermanent ? "updatePermanentSchedule" : "updateDailyScheduleAdjustment", targetUserId: targetUserId, shiftStart: shiftStart, shiftEnd: shiftEnd, maxBreak: maxBreak, maxMeal: maxMeal, isHalfDay: isHalfDay, halfDayHours: halfDayHrs, date: new Date().toLocaleDateString('en-US') }, function(res) { alert(res.message || res.error || "Updated"); fetchGlobalAdminLogs(); });
     }
 
     function applyGlobalFilters() { if (cachedAdminMasterData) renderFilteredGrids(cachedAdminMasterData); }
