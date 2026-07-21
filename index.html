@@ -77,7 +77,7 @@
               <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center"><div class="text-xs text-slate-500 font-bold uppercase tracking-wider">Meal Break Duration</div><div id="stat-lunch" class="text-3xl font-black text-orange-600 mt-1">0 mins</div></div>
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-2">
-              <button onclick="triggerAttendance('Time In')" class="bg-emerald-600 text-white p-4 rounded-xl font-bold text-sm hover:bg-emerald-700 transition">Clock In</button>
+              <button onclick="triggerAttendance('Time In')" class="bg-emerald-600 text-white p-4 rounded-xl font-bold text-sm hover:bg-emerald-700 transition">Productive</button>
               <button onclick="triggerAttendance('Break Start')" class="bg-amber-500 text-white p-4 rounded-xl font-bold text-sm hover:bg-amber-600 transition">Quick Break</button>
               <button onclick="triggerAttendance('Break End')" class="bg-amber-600 text-white p-4 rounded-xl font-bold text-sm hover:bg-amber-700 transition">Quick Break Return</button>
               <button id="btn-lunch-s" onclick="triggerAttendance('Lunch Start')" class="bg-orange-500 text-white p-4 rounded-xl font-bold text-sm hover:bg-orange-600 transition block">Meal Break</button>
@@ -86,7 +86,7 @@
             </div>
             <p id="attendance-feedback" class="text-center font-bold text-sm p-3 rounded-lg hidden"></p>
           </div>
-          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100"><h3 class="text-md font-bold text-slate-900 border-b pb-2 mb-3">My Personal Attendance History</h3><div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Logged Date</th><th class="p-3">Clock In</th><th class="p-3">Clock Out</th><th class="p-3">Q-Break Duration</th><th class="p-3">Meal Duration</th><th class="p-3">Exception Status</th></tr></thead><tbody id="personal-history-table" class="divide-y divide-slate-50"></tbody></table></div></div>
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100"><h3 class="text-md font-bold text-slate-900 border-b pb-2 mb-3">My Personal Attendance History</h3><div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Logged Date</th><th class="p-3">Productive</th><th class="p-3">Clock Out</th><th class="p-3">Q-Break Duration</th><th class="p-3">Meal Duration</th><th class="p-3">Exception Status</th></tr></thead><tbody id="personal-history-table" class="divide-y divide-slate-50"></tbody></table></div></div>
         </section>
 
         <section id="global-feed-sec" class="hidden space-y-6 max-w-6xl">
@@ -100,7 +100,8 @@
                 <thead>
                   <tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold text-xs uppercase">
                     <th class="p-3">Tasker Profile</th>
-                    <th class="p-3">Clock In</th>
+                    <th class="p-3 font-bold text-indigo-700">Live Activity</th>
+                    <th class="p-3">Productive</th>
                     <th class="p-3">Time Logged In (Live)</th>
                     <th class="p-3">Target Shift Remaining</th>
                     <th class="p-3">Meal State</th>
@@ -110,7 +111,7 @@
                   </tr>
                 </thead>
                 <tbody id="global-feed-table" class="divide-y divide-slate-100 text-xs font-medium text-slate-700">
-                  <tr><td colspan="8" class="p-4 text-center text-slate-400">Loading synchronization grids...</td></tr>
+                  <tr><td colspan="9" class="p-4 text-center text-slate-400">Loading synchronization grids...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -479,7 +480,7 @@
 
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-slate-800 border-b pb-2 mb-3">Master Attendance & Overage Dashboard</h2>
-            <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Name</th><th class="p-3">Date/Type</th><th class="p-3">Clock In</th><th class="p-3">Clock Out</th><th class="p-3">Q-Break Duration</th><th class="p-3">Meal Duration</th><th class="p-3">Exception Status</th></tr></thead><tbody id="admin-attendance-table" class="divide-y divide-slate-50"></tbody></table></div>
+            <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold"><th class="p-3">Name</th><th class="p-3">Date/Type</th><th class="p-3">Productive</th><th class="p-3">Clock Out</th><th class="p-3">Q-Break Duration</th><th class="p-3">Meal Duration</th><th class="p-3">Exception Status</th></tr></thead><tbody id="admin-attendance-table" class="divide-y divide-slate-50"></tbody></table></div>
           </div>
 
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -849,7 +850,7 @@
 
       const feedBody = document.getElementById('global-feed-table');
       if (window.cachedGlobalFeed.length === 0) {
-        feedBody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-400">No logs today.</td></tr>';
+        feedBody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400">No logs today.</td></tr>';
         return;
       }
       
@@ -891,8 +892,22 @@
            }
         }
 
+        let liveTag = "";
+        if (row.currentSessionType === "DUTY") {
+            liveTag = '<span class="bg-indigo-100 text-indigo-800 px-2 py-1 rounded text-[10px] font-black uppercase tracking-wider animate-pulse flex items-center w-max gap-1"><span>⚡</span> Productive</span>';
+        } else if (row.currentSessionType === "QUICK BREAK") {
+            liveTag = '<span class="bg-amber-100 text-amber-800 px-2 py-1 rounded text-[10px] font-black uppercase tracking-wider animate-pulse flex items-center w-max gap-1"><span>☕</span> Quick Break</span>';
+        } else if (row.currentSessionType === "MEAL BREAK") {
+            liveTag = '<span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-[10px] font-black uppercase tracking-wider animate-pulse flex items-center w-max gap-1"><span>🍽️</span> Meal Break</span>';
+        } else if (row.timeOut !== "-") {
+            liveTag = '<span class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-[10px] font-black uppercase tracking-wider flex items-center w-max gap-1">🏁 Shift Ended</span>';
+        } else {
+            liveTag = '<span class="bg-slate-100 text-slate-400 px-2 py-1 rounded text-[10px] font-black uppercase tracking-wider flex items-center w-max gap-1">💤 Offline</span>';
+        }
+
         html += `<tr class="border-b border-slate-100 hover:bg-slate-50/50 transition">
           <td class="p-3 font-bold text-slate-900">${row.name}</td>
+          <td class="p-3">${liveTag}</td>
           <td class="p-3 text-emerald-600 font-mono">${row.timeIn}</td>
           <td class="p-3 font-mono text-slate-700">${loggedStr}</td>
           <td class="p-3 font-mono text-slate-700">${remainingStr}</td>
