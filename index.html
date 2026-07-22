@@ -1247,10 +1247,11 @@
       });
     }
 
-    function openImagePreviewOverlayModal(base64Data) {
-      if (!base64Data) { alert("No receipt screenshot attached to this service transaction record line."); return; }
+    function openImagePreviewOverlayModal(imageUrl) {
+      if (!imageUrl) { alert("No file attachment or screenshot mapped to this transaction line."); return; }
       const newWin = window.open();
-      newWin.document.write(`<body style="margin:0; background:#0f172a; display:flex; justify-content:center; align-items:center; min-h:100vh;"><img src="${base64Data}" style="max-width:95%; max-height:95vh; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5); border-radius:12px;" /></body>`);
+      // Works cleanly whether the DB holds an old Base64 buffer or a new Cloudflare R2 public URL
+      newWin.document.write(`<body style="margin:0; background:#0f172a; display:flex; justify-content:center; align-items:center; min-h:100vh;"><img src="${imageUrl}" style="max-width:95%; max-height:95vh; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5); border-radius:12px;" /></body>`);
     }
 
     function executeSelfPasswordChange() {
