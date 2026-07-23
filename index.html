@@ -98,7 +98,6 @@
           </div>
         </section>
 
-        <!-- Modals and Inputs -->
         <section id="leave-request-sec" class="hidden space-y-6 max-w-4xl">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4">
@@ -117,7 +116,6 @@
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100"><div class="overflow-x-auto rounded-lg"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b"><th class="p-3">Date</th><th class="p-3">Reason</th><th class="p-3">Proof</th><th class="p-3">Status</th><th class="p-3">Notes</th></tr></thead><tbody id="personal-leave-table" class="divide-y divide-slate-50"></tbody></table></div></div>
         </section>
 
-        <!-- REST DAY / OT -->
         <section id="restday-request-sec" class="hidden space-y-6 max-w-5xl">
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4 max-w-md">
             <h2 class="text-xl font-bold text-slate-800">Rest Day OT / Cov.</h2>
@@ -129,7 +127,6 @@
           <div class="bg-white p-6 rounded-xl shadow-sm"><div class="overflow-x-auto"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b"><th class="p-3">Target Date</th><th class="p-3">Purpose</th><th class="p-3">Status</th><th class="p-3">Notes</th></tr></thead><tbody id="personal-restday-table" class="divide-y divide-slate-50"></tbody></table></div></div>
         </section>
 
-        <!-- CA REQUEST -->
         <section id="ca-request-sec" class="hidden space-y-6 max-w-5xl">
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4 max-w-md">
             <h2 class="text-xl font-bold text-emerald-700">Cash Advance</h2>
@@ -142,7 +139,6 @@
           <div class="bg-white p-6 rounded-xl shadow-sm"><div class="overflow-x-auto"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-slate-50 border-b"><th class="p-3">Date</th><th class="p-3">Amount</th><th class="p-3">Reason</th><th class="p-3">Proof</th><th class="p-3">Status</th><th class="p-3">Note</th><th class="p-3">Disbursed</th></tr></thead><tbody id="personal-ca-table" class="divide-y divide-slate-50"></tbody></table></div></div>
         </section>
 
-        <!-- COACHING -->
         <section id="coaching-sec" class="hidden space-y-6 max-w-6xl">
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold text-rose-800 border-b pb-2 mb-3">Coaching Logs</h2>
@@ -150,7 +146,6 @@
           </div>
         </section>
 
-        <!-- FEEDBACK REPORT -->
         <section id="feedback-submit-sec" class="hidden space-y-6 max-w-4xl">
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-4">
             <h2 class="text-xl font-bold text-amber-700">Submit Feedback</h2>
@@ -165,7 +160,6 @@
           </div>
         </section>
 
-        <!-- TASK REPORTS -->
         <section id="task-report-sec" class="hidden space-y-6 max-w-6xl">
           <div class="bg-white p-4 rounded-xl shadow-sm flex justify-between items-center"><h3 class="text-sm font-bold">Critical Tasks Feed</h3><select id="public-filter-tasker" onchange="applyPublicReportFilter()" class="w-64 p-2 border rounded-lg text-xs"><option value="ALL">All Reports</option></select></div>
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -180,7 +174,6 @@
           </div>
         </section>
 
-        <!-- OTHER TASK REPORTS -->
         <section id="other-task-report-sec" class="hidden space-y-6 max-w-6xl">
           <div class="bg-white p-4 rounded-xl shadow-sm flex justify-between items-center"><h3 class="text-sm font-bold">Other Tasks Feed</h3><select id="other-public-filter-tasker" onchange="applyOtherReportFilter()" class="w-64 p-2 border rounded-lg text-xs"><option value="ALL">All Reports</option></select></div>
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -195,7 +188,6 @@
           </div>
         </section>
 
-        <!-- REFERRAL REPORTS -->
         <section id="referral-report-sec" class="hidden space-y-6 max-w-6xl">
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="bg-white p-6 rounded-xl shadow-sm h-fit space-y-4">
@@ -212,7 +204,6 @@
           </div>
         </section>
 
-        <!-- ACCOUNT SETTINGS -->
         <section id="account-settings-sec" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-100 max-w-md space-y-4">
           <h2 class="text-xl font-bold border-b pb-2">⚙️ Account Security</h2>
           <input type="password" id="self-old-pass" class="w-full p-2.5 border rounded-lg" placeholder="Old Password">
@@ -222,7 +213,6 @@
           <p id="self-pass-feedback" class="text-center text-xs p-2 rounded hidden"></p>
         </section>
 
-        <!-- PAYROLL ADMIN -->
         <section id="admin-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm space-y-6 max-w-2xl">
           <h2 class="text-xl font-bold text-indigo-700 border-b pb-2">Admin: Disburse Payroll</h2>
           <div class="grid grid-cols-2 gap-4 text-xs">
@@ -240,13 +230,11 @@
           <p id="payroll-feedback" class="text-emerald-600 bg-emerald-50 text-xs font-bold p-2 rounded-lg hidden"></p>
         </section>
 
-        <!-- USER PAYROLL -->
         <section id="user-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm max-w-7xl">
           <h2 class="text-xl font-bold border-b pb-2 mb-4">Payment Ledgers</h2>
           <div class="overflow-x-auto"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b"><th class="p-3">Period</th><th class="p-3">Weeks</th><th class="p-3">Mode</th><th class="p-3">Gross</th><th class="p-3">Deduct</th><th class="p-3">Net</th><th class="p-3">Receipt</th><th class="p-3 text-center">Status</th></tr></thead><tbody id="user-payroll-table" class="divide-y divide-slate-50"></tbody></table></div>
         </section>
 
-        <!-- ADMIN DASHBOARD -->
         <section id="admin-sec" class="hidden space-y-8 max-w-6xl">
           <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
             <h3 class="text-sm font-bold uppercase mb-2">🔍 Data Filters</h3>
@@ -341,6 +329,20 @@
     window.cachedGlobalFeed = []; window.serverTimeOffset = 0; 
     let deviceId = localStorage.getItem("olympuz_device_id"); if (!deviceId) { deviceId = "DEV-" + crypto.randomUUID(); localStorage.setItem("olympuz_device_id", deviceId); }
     let tempLoginEmail = "";
+
+    function parseToMinutes(timeStr) {
+      if (!timeStr || typeof timeStr !== 'string') return null;
+      try {
+        const clean = timeStr.replace(/\s*[AP]M\s*/i, '').trim();
+        const parts = clean.split(':');
+        if (parts.length < 2) return null;
+        let hours = parseInt(parts[0], 10), minutes = parseInt(parts[1], 10);
+        if (isNaN(hours) || isNaN(minutes)) return null;
+        if (timeStr.toLowerCase().includes('pm') && hours < 12) hours += 12;
+        if (timeStr.toLowerCase().includes('am') && hours === 12) hours = 0;
+        return (hours * 60) + minutes;
+      } catch { return null; }
+    }
 
     function getManilaDateString() { const d = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila' })); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
     function compressImage(file, callback) { if (!file || !file.type.startsWith('image/')) { const r = new FileReader(); r.onload = e => callback(e.target.result); r.readAsDataURL(file); return; } const r = new FileReader(); r.onload = e => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); let w = img.width, h = img.height; const MAX = 800; if (w > h && w > MAX) { h *= MAX/w; w = MAX; } else if (h > MAX) { w *= MAX/h; h = MAX; } canvas.width=w; canvas.height=h; canvas.getContext('2d').drawImage(img,0,0,w,h); callback(canvas.toDataURL('image/jpeg',0.6)); }; img.src = e.target.result; }; r.readAsDataURL(file); }
