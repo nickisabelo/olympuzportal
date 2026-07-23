@@ -6,6 +6,21 @@
   <title>Olympuz Operations Portal</title>
   <link rel="icon" type="image/png" href="Logo New.png">
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script>
+    function parseToMinutes(timeStr) {
+      if (!timeStr || typeof timeStr !== 'string') return null;
+      try {
+        const clean = timeStr.replace(/\s*[AP]M\s*/i, '').trim();
+        const parts = clean.split(':');
+        if (parts.length < 2) return null;
+        let hours = parseInt(parts[0], 10), minutes = parseInt(parts[1], 10);
+        if (isNaN(hours) || isNaN(minutes)) return null;
+        if (timeStr.toLowerCase().includes('pm') && hours < 12) hours += 12;
+        if (timeStr.toLowerCase().includes('am') && hours === 12) hours = 0;
+        return (hours * 60) + minutes;
+      } catch { return null; }
+    }
+  </script>
 </head>
 <body class="bg-slate-50 font-sans text-slate-800">
 
@@ -889,8 +904,8 @@
           const lHrs = Math.floor(netWorkedMs / (1000 * 60 * 60));
           loggedStr = `<span class="text-indigo-600 font-bold">${lHrs.toString().padStart(2, '0')}:${lMins.toString().padStart(2, '0')}:${lSecs.toString().padStart(2, '0')}</span>`;
           
-          if (row.targetLimitMs) {
-            const deltaMs = row.targetLimitMs - netWorkedMs;
+          if (row.requiredEndMs) {
+            const deltaMs = row.requiredEndMs - syncedNow;
             if (deltaMs <= 0) {
               remainingStr = "Shift Target Met";
             } else {
@@ -902,12 +917,16 @@
           }
         } else if (row.timeOut !== "-") {
            loggedStr = row.staticLoggedTime || "-";
-           if (row.targetLimitMs) remainingStr = "Completed";
+           if (row.requiredEndMs) remainingStr = "Completed";
         } else {
-           if (row.targetLimitMs) {
-              const rHrs = Math.floor(row.targetLimitMs / 3600000);
-              const rMins = Math.floor((row.targetLimitMs / 60000) % 60);
-              remainingStr = `${rHrs.toString().padStart(2, '0')}:${rMins.toString().padStart(2, '0')}:00`;
+           if (row.permanentSchedule) {
+              const startMin = parseToMinutes(row.permanentSchedule.shiftStart) || 0;
+              const endMin = parseToMinutes(row.permanentSchedule.shiftEnd) || 0;
+              const rHrs = row.permanentSchedule.halfDay ? (row.permanentSchedule.halfDayHours || 4) : 
+                 Math.max(0, (endMin - startMin - (row.permanentSchedule.maxMeal || 60)) / 60);
+              const rh = Math.floor(rHrs);
+              const rm = Math.floor((rHrs - rh) * 60);
+              remainingStr = `${rh.toString().padStart(2, '0')}:${rm.toString().padStart(2, '0')}:00`;
            }
         }
 
@@ -1486,138 +1505,4 @@
       });
 
       let filteredLeaves = (data.leaves || []).filter(row => { return !(selectedTasker !== "ALL" && row.name !== selectedTasker); });
-      if(filteredLeaves.length === 0) { lBody.innerHTML = '<tr><td colspan="6" class="p-3 text-center text-slate-400">Clean queue.</td></tr>'; }
-      filteredLeaves.forEach(row => {
-        let controls = `<span class="text-slate-400 italic text-xs">Closed Logs</span>`;
-        if (row.status === "Pending") { controls = `<button onclick="adminExecuteLeave('${row.id}','Approved')" class="bg-emerald-600 text-white font-bold text-xs px-2.5 py-0.5 rounded mr-1">Approve</button><button onclick="adminExecuteLeave('${row.id}','Denied')" class="bg-rose-600 text-white font-bold text-xs px-2.5 py-0.5 rounded">Deny</button>`; }
-        const sc = row.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600';
-        let attachBtn = row.attachment ? `<button onclick="openImagePreviewOverlayModal('${row.attachment}')" class="text-indigo-600 hover:text-indigo-900 font-bold underline text-xs">View</button>` : `<span class="text-slate-400 italic text-xs">None</span>`;
-        lBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 font-medium">${row.name}</td><td class="p-3 text-slate-500">${row.date}</td><td class="p-3 text-slate-600">${row.reason}</td><td class="p-3 text-center">${attachBtn}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${sc}">${row.status}</span></td><td class="p-3 text-center">${controls}</td></tr>`;
-      });
-    }
-
-    function routePayrollSection() {
-      if (!currentUser) return;
-      if (currentUser.role === 'Admin') { showSection('admin-payroll-sec'); } 
-      else { showSection('user-payroll-sec'); fetchUserPayrollData(); }
-    }
-
-    function fetchUserPayrollData() {
-      if (!currentUser) return;
-      const tableBody = document.getElementById('user-payroll-table');
-      tableBody.innerHTML = '<tr><td colspan="8" class="p-3 text-center text-slate-400">Loading payout records...</td></tr>';
-      callAPI('GET', "?action=getUserPayroll&userId=" + currentUser.id, null, function(payments) {
-        tableBody.innerHTML = "";
-        if (!payments || payments.error || payments.length === 0) { tableBody.innerHTML = '<tr><td colspan="8" class="p-3 text-center text-slate-400">No payment records found.</td></tr>'; return; }
-        payments.forEach(row => {
-          let statusBadge = "";
-          if (row.status === "Acknowledged" || row.status === "Settled & Adjusted") {
-            statusBadge = `<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[11px]">✓ ${row.status}</span>`;
-          } else if (row.status === "Disputed") {
-            statusBadge = `<span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded text-[11px]">⏳ Pending Dispute</span>`;
-          } else if (row.status === "Dispute Approved") {
-            statusBadge = `<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[11px]">✓ Dispute Approved</span>`;
-          } else if (row.status === "Dispute Rejected") {
-            statusBadge = `<div class="flex flex-col gap-1 items-center"><span class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded text-[11px]">❌ Dispute Rejected</span>` +
-                          `<button onclick="acknowledgePayment('${row.payrollId}')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2 py-1 rounded text-[10px]">Acknowledge</button></div>`;
-          } else {
-            statusBadge = `<div class="flex gap-1 justify-center"><button onclick="acknowledgePayment('${row.payrollId}')" class="bg-emerald-600 text-white font-bold px-2 py-1 rounded text-[10px] transition">Acknowledge</button>` +
-                          `<button onclick="disputePayment('${row.payrollId}')" class="bg-rose-600 text-white font-bold px-2 py-1 rounded text-[10px] transition">Dispute</button></div>`;
-          }
-
-          let receiptBtn = row.receiptImage 
-            ? `<button onclick="openImagePreviewOverlayModal('${row.receiptImage}')" class="text-indigo-600 hover:text-indigo-900 font-bold underline">View Screenshot</button>` 
-            : `<span class="text-slate-400 italic">No Attachment</span>`;
-
-          const paymentModeBadge = row.paymentMode === 'Cash' 
-            ? `<span class="bg-amber-100 text-amber-900 font-bold px-1.5 py-0.5 rounded text-[10px]">💵 Cash</span>` 
-            : `<span class="bg-indigo-100 text-indigo-900 font-bold px-1.5 py-0.5 rounded text-[10px]">⚡ E-Cash</span>`;
-
-          tableBody.innerHTML += `<tr class="border-b border-slate-100"><td class="p-3 font-semibold text-slate-800">${row.period}</td><td class="p-3">${row.weeks} wks</td><td class="p-3">${paymentModeBadge}</td><td class="p-3">₱${row.gross.toFixed(2)}</td><td class="p-3 text-rose-600">-₱${row.deductions.toFixed(2)}</td><td class="p-3 font-black text-indigo-700">₱${row.net.toFixed(2)}</td><td class="p-3 text-center font-semibold">${receiptBtn}</td><td class="p-3 text-center">${statusBadge}</td></tr>`;
-        });
-      });
-    }
-
-    function disputePayment(paymentId) {
-      const reason = prompt("Please provide your reason for disputing this payment calculation:");
-      if (!reason || reason.trim() === "") return;
-      if (!confirm("Are you sure you want to submit this dispute?")) return;
-      callAPI('POST', '', { action: "disputePayment", paymentId: paymentId, reason: reason }, function(res) { alert(res.message || res.error || "Processed"); if (res.success) fetchUserPayrollData(); });
-    }
-
-    function acknowledgePayment(paymentId) {
-      if (!confirm("Confirm acknowledgment of this payout statement?")) return;
-      callAPI('POST', '', { action: "acknowledgePayment", paymentId: paymentId, userId: currentUser.id }, function(res) { alert(res.message || res.error || "Processed"); if (res.success) fetchUserPayrollData(); });
-    }
-
-    function adminResolveDispute(paymentId, status, currentReason) {
-      const notes = prompt("Marking as: " + status + "\n\nTasker's Reason: " + currentReason + "\n\nEnter your resolution notes (Optional):");
-      if (notes === null) return;
-      const finalReason = currentReason + (notes ? "\nAdmin Note: " + notes : "");
-      callAPI('POST', '', { action: "updatePayrollReviewStatus", payrollId: paymentId, status: status, disputeReason: finalReason }, function(res) { alert(res.message || res.error || "Processed"); if (res.success) fetchGlobalAdminLogs(); });
-    }
-
-    function executeAdminCreateUser() {
-      const fb = document.getElementById('admin-create-feedback');
-      const payload = {
-        action: "adminCreateUser",
-        name: document.getElementById('add-u-name').value,
-        email: document.getElementById('add-u-email').value,
-        password: document.getElementById('add-u-pass').value || "ChangeMe123",
-        role: document.getElementById('add-u-role').value,
-        shiftStart: document.getElementById('add-u-shift-start').value,
-        shiftEnd: document.getElementById('add-u-shift-end').value,
-        daysOff: document.getElementById('add-u-off').value,
-        leaveAllowance: document.getElementById('add-u-leaves').value,
-        maxBreak: document.getElementById('add-u-max-break').value,
-        maxMeal: document.getElementById('add-u-max-meal').value,
-        halfDay: document.getElementById('add-u-half').value,
-        halfDayHours: document.getElementById('add-u-half-hrs').value
-      };
-      if (!payload.name || !payload.email) { alert("Please compile both Legal Name and Email fields."); return; }
-      fb.className = "text-xs font-bold p-2 rounded bg-amber-50 text-amber-800 block mt-2"; fb.innerText = "Registering user profile line...";
-      callAPI('POST', '', payload, function(res) {
-        fb.innerText = res.message || res.error || "Processed"; fb.className = res.success ? "text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800 block mt-2" : "text-xs font-bold p-2 rounded bg-rose-50 text-rose-800 block mt-2";
-        if (res.success) { ['add-u-name', 'add-u-email', 'add-u-pass'].forEach(id => document.getElementById(id).value = ""); fetchGlobalAdminLogs(); }
-      });
-    }
-
-    function submitPayrollForm() {
-      const fb = document.getElementById('payroll-feedback');
-      const fileInput = document.getElementById('p-file');
-      
-      const executePost = (base64String = '') => {
-        const payload = {
-          action: "disbursePayroll",
-          targetUserId: document.getElementById('p-uid').value,
-          targetName: document.getElementById('p-name').value,
-          rate: parseFloat(document.getElementById('p-rate').value),
-          weeks: parseFloat(document.getElementById('p-hours').value),
-          deductions: parseFloat(document.getElementById('p-deduct').value || 0),
-          period: document.getElementById('p-month').value,
-          remarks: document.getElementById('p-remarks').value,
-          paymentMode: document.getElementById('p-mode').value,
-          receiptImage: base64String
-        };
-
-        if (!payload.targetUserId || !payload.rate || !payload.weeks || !payload.period) { alert("Please complete all required payroll configuration inputs."); return; }
-        fb.className = "text-xs font-bold p-2 rounded bg-amber-50 text-amber-800 block"; fb.innerText = "Disbursing payout entry...";
-
-        callAPI('POST', '', payload, function(res) {
-          fb.innerText = res.message || res.error || "Processed"; fb.className = res.success ? "text-xs font-bold p-2 rounded bg-emerald-50 text-emerald-800 block" : "text-xs font-bold p-2 rounded bg-rose-50 text-rose-800 block";
-          if (res.success) { ['p-uid', 'p-name', 'p-rate', 'p-hours', 'p-deduct', 'p-month', 'p-remarks', 'p-file'].forEach(id => { if (id !== 'p-file') document.getElementById(id).value = id === 'p-deduct' ? '0' : ''; else document.getElementById(id).value = ''; }); fetchGlobalAdminLogs(); }
-        });
-      };
-
-      if (fileInput && fileInput.files && fileInput.files[0]) {
-        compressImage(fileInput.files[0], function(compressedData) {
-            executePost(compressedData);
-        });
-      } else { executePost(''); }
-    }
-
-    function applyGlobalFilters() { if (cachedAdminMasterData) renderFilteredGrids(cachedAdminMasterData); }
-    function clearGlobalFilters() { document.getElementById('filter-tasker').value = "ALL"; document.getElementById('filter-from-date').value = ""; document.getElementById('filter-to-date').value = ""; if (cachedAdminMasterData) renderFilteredGrids(cachedAdminMasterData); }
-  </script>
-</body>
-</html>
+      if(filteredLeaves.length === 0) { lBody.innerHTML = '<tr><td colspan="6" class="pI encountered an error doing what you asked. Could you try again?
