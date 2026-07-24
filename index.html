@@ -404,13 +404,15 @@
           const ded = ((r.acc_break || 0) + (r.acc_lunch || 0)) * 60000;
           const net = Math.max(0, sNow - eLog - ded);
           ls = `<span class="text-indigo-600 font-bold">${Math.floor(net/3600000).toString().padStart(2,'0')}:${Math.floor((net/60000)%60).toString().padStart(2,'0')}:${Math.floor((net/1000)%60).toString().padStart(2,'0')}</span>`;
-          if (r.targetLimitMs) {
-            const dMs = r.targetLimitMs - net;
-            if (dMs <= 0) rs = "Shift Target Met";
+          
+          if (r.finalRequiredEndMs) {
+            const dMs = r.finalRequiredEndMs - sNow;
+            if (dMs <= 0) rs = "Ready to Clock Out";
             else rs = `<span class="text-emerald-600 font-bold animate-pulse">${Math.floor(dMs/3600000).toString().padStart(2,'0')}:${Math.floor((dMs/60000)%60).toString().padStart(2,'0')}:${Math.floor((dMs/1000)%60).toString().padStart(2,'0')}</span>`;
           }
-        } else if (r.timeOut !== "-") { ls = r.staticLoggedTime || "-"; if (r.targetLimitMs) rs = "Completed"; }
+        } else if (r.timeOut !== "-") { ls = r.staticLoggedTime || "-"; if (r.finalRequiredEndMs) rs = "Completed"; }
         else { if (r.permanentSchedule) { const sM=parseToMinutes(r.permanentSchedule.shiftStart)||0, eM=parseToMinutes(r.permanentSchedule.shiftEnd)||0; const rh=r.permanentSchedule.halfDay?(r.permanentSchedule.halfDayHours||4):Math.max(0,(eM-sM-(r.permanentSchedule.maxMeal||60))/60); rs=`${Math.floor(rh).toString().padStart(2,'0')}:${Math.floor((rh-Math.floor(rh))*60).toString().padStart(2,'0')}:00`; } }
+        
         let lt = r.currentSessionType === "DUTY" ? '<span class="bg-indigo-100 text-indigo-800 px-2 py-1 rounded text-[10px] font-black uppercase animate-pulse">⚡ Productive</span>' : r.currentSessionType === "QUICK BREAK" ? '<span class="bg-amber-100 text-amber-800 px-2 py-1 rounded text-[10px] font-black uppercase animate-pulse">☕ Quick Break</span>' : r.currentSessionType === "MEAL BREAK" ? '<span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-[10px] font-black uppercase animate-pulse">🍽️ Meal Break</span>' : r.timeOut !== "-" ? '<span class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-[10px] font-black uppercase">🏁 Shift Ended</span>' : '<span class="bg-slate-100 text-slate-400 px-2 py-1 rounded text-[10px] font-black uppercase">💤 Offline</span>';
         h += `<tr class="border-b"><td class="p-3 font-bold">${r.name}</td><td class="p-3">${lt}</td><td class="p-3 text-emerald-600 font-mono">${r.timeIn}</td><td class="p-3 font-mono">${ls}</td><td class="p-3 font-mono">${rs}</td><td class="p-3 font-mono">${r.lunchText}</td><td class="p-3 font-mono">${r.breakText}</td><td class="p-3 text-rose-600 font-mono">${r.timeOut}</td><td class="p-3 text-center"><span class="px-2 py-0.5 rounded text-[11px] font-bold ${getStatusBadgeStyle(r.status)}">${r.status}</span></td></tr>`;
       }); f.innerHTML = h;
