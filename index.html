@@ -216,8 +216,7 @@
         <section id="admin-payroll-sec" class="hidden bg-white p-6 rounded-xl shadow-sm space-y-6 max-w-2xl">
           <h2 class="text-xl font-bold text-indigo-700 border-b pb-2">Admin: Disburse Payroll</h2>
           <div class="grid grid-cols-2 gap-4 text-xs">
-            <input id="p-uid" type="text" class="w-full p-2 border rounded-lg" placeholder="User ID">
-            <input id="p-name" type="text" class="w-full p-2 border rounded-lg" placeholder="Name">
+            <select id="p-target-user" class="col-span-2 w-full p-2 border rounded-lg"><option value="">Select Tasker</option></select>
             <input id="p-rate" type="number" class="w-full p-2 border rounded-lg" placeholder="Weekly Rate">
             <input id="p-hours" type="number" step="0.1" class="w-full p-2 border rounded-lg" placeholder="Weeks Logged">
             <input id="p-deduct" type="number" class="w-full p-2 border rounded-lg" placeholder="Deductions" value="0">
@@ -451,8 +450,31 @@
     function executeAdminTagUserAbsent(id,nm) { const d=prompt("Date YYYY-MM-DD:", new Date().toISOString().split('T')[0]); if(!d)return; callAPI('POST','',{action:"adminTagAbsent",targetUserId:id,targetName:nm,absentDate:d}, r=>{ alert(r.message); if(r.success) fetchGlobalAdminLogs(); }); }
     function showSection(id) { ['attendance-sec','global-feed-sec','leave-request-sec','restday-request-sec','task-report-sec','other-task-report-sec','referral-report-sec','ca-request-sec','coaching-sec','feedback-submit-sec','account-settings-sec','admin-payroll-sec','user-payroll-sec','admin-sec'].forEach(s=>{document.getElementById(s).className='hidden';}); const t=document.getElementById(id); if(t) t.className=id==='account-settings-sec'?'bg-white p-6 rounded-xl shadow-sm border max-w-md space-y-4':'space-y-6 max-w-6xl'; if(id==='task-report-sec'){document.getElementById('rep-date').value=new Date().toISOString().split('T')[0]; loadPublicTaskReportsFeed();} if(id==='other-task-report-sec'){document.getElementById('other-rep-date').value=new Date().toISOString().split('T')[0]; loadOtherTaskReportsFeed();} if(id==='referral-report-sec')loadReferralReportsFeed(); if(id==='feedback-submit-sec'||id==='global-feed-sec')loadGlobalStatusFeed(); if(id==='admin-sec')fetchGlobalAdminLogs(); if(['attendance-sec','leave-request-sec','ca-request-sec','coaching-sec','account-settings-sec','restday-request-sec'].includes(id))refreshUserTimers(); }
     function logout() { currentUser=null; clearTimeout(inactivityTimer); clearInterval(liveTimerTickerInterval); localStorage.removeItem("olympuz_active_session"); localStorage.removeItem("olympuz_token"); location.reload(); }
+    
     function fetchGlobalAdminLogs() { callAPI('GET','?action=getAdminDashboardData',null,d=>{ if(d&&!d.error){ cachedAdminMasterData=d; if(d.serverTime)window.serverTimeOffset=Date.now()-d.serverTime; populateTaskerDropdownOptions(d.absences||[]); renderFilteredGrids(d); }}); }
-    function populateTaskerDropdownOptions(a) { const f=document.getElementById('filter-tasker'), v=f.value; f.innerHTML='<option value="ALL">All</option>'; a.forEach(t=>f.innerHTML+=`<option value="${t.name}">${t.name}</option>`); f.value=v; const tg=document.getElementById('sched-target-uid'); tg.innerHTML='<option value="">Target Tasker</option>'; a.forEach(t=>tg.innerHTML+=`<option value="${t.id}">${t.name}</option>`); const ct=document.getElementById('admin-coach-target'); if(ct){ ct.innerHTML='<option value="">Target</option>'; a.forEach(t=>ct.innerHTML+=`<option value="${t.id}">${t.name}</option>`); } }
+    
+    function populateTaskerDropdownOptions(a) { 
+      const f=document.getElementById('filter-tasker'), v=f.value; 
+      f.innerHTML='<option value="ALL">All</option>'; 
+      a.forEach(t=>f.innerHTML+=`<option value="${t.name}">${t.name}</option>`); 
+      f.value=v; 
+      
+      const tg=document.getElementById('sched-target-uid'); 
+      tg.innerHTML='<option value="">Target Tasker</option>'; 
+      a.forEach(t=>tg.innerHTML+=`<option value="${t.id}">${t.name}</option>`); 
+      
+      const ct=document.getElementById('admin-coach-target'); 
+      if(ct){ ct.innerHTML='<option value="">Target</option>'; a.forEach(t=>ct.innerHTML+=`<option value="${t.id}">${t.name}</option>`); } 
+      
+      // New Payroll Dropdown Population
+      const pt=document.getElementById('p-target-user'); 
+      if(pt){ 
+        const pVal = pt.value; 
+        pt.innerHTML='<option value="">Select Tasker</option>'; 
+        a.forEach(t=>pt.innerHTML+=`<option value="${t.id}|${t.name}">${t.name}</option>`); 
+        if (pVal) pt.value = pVal; 
+      } 
+    }
     
     function renderFilteredGrids(d) {
       const st=document.getElementById('filter-tasker').value, fd=document.getElementById('filter-from-date').value, td=document.getElementById('filter-to-date').value;
@@ -478,7 +500,43 @@
     function acknowledgePayment(id) { if(!confirm("Acknowledge?"))return; callAPI('POST','',{action:"acknowledgePayment",paymentId:id,userId:currentUser.id}, r=>{ alert(r.message); fetchUserPayrollData(); }); }
     function adminResolveDispute(id,st,rs) { const n=prompt("Notes:"); if(n===null)return; callAPI('POST','',{action:"updatePayrollReviewStatus",payrollId:id,status:st,disputeReason:rs+(n?"\nNote: "+n:"")}, r=>{ alert(r.message); fetchGlobalAdminLogs(); }); }
     function executeAdminCreateUser() { const p={action:"adminCreateUser",name:document.getElementById('add-u-name').value,email:document.getElementById('add-u-email').value,password:document.getElementById('add-u-pass').value||"ChangeMe123",role:document.getElementById('add-u-role').value,shiftStart:document.getElementById('add-u-shift-start').value,shiftEnd:document.getElementById('add-u-shift-end').value,daysOff:document.getElementById('add-u-off').value,leaveAllowance:document.getElementById('add-u-leaves').value,maxBreak:document.getElementById('add-u-max-break').value,maxMeal:document.getElementById('add-u-max-meal').value,halfDay:document.getElementById('add-u-half').value,halfDayHours:document.getElementById('add-u-half-hrs').value,halfDayMeal:document.getElementById('add-u-half-meal').value}; if(!p.name||!p.email)return alert("Compile fields."); callAPI('POST','',p, r=>{ alert(r.message); if(r.success)fetchGlobalAdminLogs(); }); }
-    function submitPayrollForm() { const p={action:"disbursePayroll",targetUserId:document.getElementById('p-uid').value,targetName:document.getElementById('p-name').value,rate:parseFloat(document.getElementById('p-rate').value),weeks:parseFloat(document.getElementById('p-hours').value),deductions:parseFloat(document.getElementById('p-deduct').value||0),period:document.getElementById('p-month').value,remarks:document.getElementById('p-remarks').value,paymentMode:document.getElementById('p-mode').value}; const fi=document.getElementById('p-file'); if(!p.targetUserId||!p.rate||!p.weeks||!p.period)return alert("Incomplete"); const ex=b=>{ p.receiptImage=b; callAPI('POST','',p, r=>{ alert(r.message); if(r.success)fetchGlobalAdminLogs(); }); }; if(fi&&fi.files[0]) compressImage(fi.files[0], ex); else ex(''); }
+    
+    function submitPayrollForm() { 
+      const pt = document.getElementById('p-target-user').value; 
+      if(!pt) return alert("Select a Tasker first."); 
+      const [tId, tNm] = pt.split('|'); 
+      const p = { 
+        action: "disbursePayroll", 
+        targetUserId: tId, 
+        targetName: tNm, 
+        rate: parseFloat(document.getElementById('p-rate').value), 
+        weeks: parseFloat(document.getElementById('p-hours').value), 
+        deductions: parseFloat(document.getElementById('p-deduct').value||0), 
+        period: document.getElementById('p-month').value, 
+        remarks: document.getElementById('p-remarks').value, 
+        paymentMode: document.getElementById('p-mode').value 
+      }; 
+      const fi = document.getElementById('p-file'); 
+      if(!p.targetUserId || isNaN(p.rate) || isNaN(p.weeks) || !p.period) return alert("Incomplete form parameters."); 
+      const ex = b => { 
+        p.receiptImage = b; 
+        callAPI('POST', '', p, r => { 
+          alert(r.message); 
+          if(r.success) {
+            document.getElementById('p-rate').value=''; 
+            document.getElementById('p-hours').value=''; 
+            document.getElementById('p-deduct').value='0'; 
+            document.getElementById('p-month').value=''; 
+            document.getElementById('p-remarks').value=''; 
+            document.getElementById('p-target-user').value=''; 
+            if(fi) fi.value=''; 
+            fetchGlobalAdminLogs(); 
+          }
+        }); 
+      }; 
+      if(fi && fi.files[0]) compressImage(fi.files[0], ex); else ex(''); 
+    }
+    
     function applyGlobalFilters() { if(cachedAdminMasterData) renderFilteredGrids(cachedAdminMasterData); }
     function clearGlobalFilters() { document.getElementById('filter-tasker').value="ALL"; document.getElementById('filter-from-date').value=""; document.getElementById('filter-to-date').value=""; applyGlobalFilters(); }
   </script>
