@@ -356,7 +356,7 @@
     function handleLogin() { const e = document.getElementById('email').value, p = document.getElementById('password').value, err = document.getElementById('login-err'); err.classList.add('hidden'); if (!e || !p) { err.innerText = "Complete all fields."; err.classList.remove('hidden'); return; } tempLoginEmail = e; callAPI('POST', '', { action: "loginUser", email: e, password: p, deviceId }, function(r) { if (r.success) { if (r.requireOtp) { document.getElementById('credentials-form').classList.add('hidden'); document.getElementById('otp-form').classList.remove('hidden'); document.getElementById('otp-code').value = ""; if (r.message) alert(r.message); } else { if (r.token) localStorage.setItem("olympuz_token", r.token); currentUser = r.user; bootPortalSession(); } } else { err.innerText = r.message || r.error || "Login failed."; err.classList.remove('hidden'); } }); }
     function handleVerifyOTP() { const c = document.getElementById('otp-code').value, err = document.getElementById('login-err'); err.classList.add('hidden'); if (!c || c.length < 6) return alert("Provide code."); callAPI('POST', '', { action: "verifyLoginOTP", email: tempLoginEmail, code: c, deviceId }, function(r) { if (r.success) { if (r.token) localStorage.setItem("olympuz_token", r.token); currentUser = r.user; bootPortalSession(); } else { err.innerText = r.message || r.error || "Failed."; err.classList.remove('hidden'); alert(r.message || r.error); } }); }
     function cancelOTPFlow() { document.getElementById('otp-form').classList.add('hidden'); document.getElementById('credentials-form').classList.remove('hidden'); }
-    function getStatusBadgeStyle(t) { if (!t) return 'bg-slate-50 text-slate-500'; const n = t.trim().toLowerCase(); if (n.startsWith('on time') || n === 'completed' || n === 'rest day ot') return 'bg-emerald-50 text-emerald-600'; if (n === 'undertime' || n === 'late' || n.includes('over break') || n.includes('over lunch') || n === 'absent') return 'bg-rose-50 text-rose-600'; if (n === 'on leave' || n === 'day off') return 'bg-indigo-50 text-indigo-600'; return 'bg-amber-50 text-amber-600'; }
+    function getStatusBadgeStyle(t) { if (!t) return 'bg-slate-50 text-slate-500'; const n = t.trim().toLowerCase(); if (n.startsWith('on time') || n === 'completed' || n === 'rest day ot') return 'bg-emerald-50 text-emerald-600'; if (n === 'undertime' || n === 'late' || n.includes('over break') || n.includes('over lunch') || n === 'absent') return 'bg-rose-50 text-rose-600'; if (n === 'on leave' || n === 'day off' || n === 'no schedule') return 'bg-indigo-50 text-indigo-600'; return 'bg-amber-50 text-amber-600'; }
 
     function bootPortalSession() {
       document.getElementById('login-page').classList.add('hidden'); document.getElementById('app-page').classList.remove('hidden'); document.getElementById('user-display').innerText = currentUser.name + " | " + currentUser.role;
@@ -397,7 +397,9 @@
       if (!Array.isArray(window.cachedGlobalFeed)) window.cachedGlobalFeed = []; const f = document.getElementById('global-feed-table'); if (window.cachedGlobalFeed.length === 0) { f.innerHTML = '<tr><td colspan="9" class="p-4 text-center">No logs.</td></tr>'; return; }
       let h = ""; window.cachedGlobalFeed.forEach(r => {
         let ls = "00:00:00", rs = "00:00:00";
-        if (r.isLiveTracking && r.rawLoginMs) {
+        if (r.status === 'Day Off' || r.status === 'On Leave' || r.status === 'No Schedule' || r.status === 'Absent') {
+          ls = "-"; rs = "-";
+        } else if (r.isLiveTracking && r.rawLoginMs) {
           const sNow = Date.now() - window.serverTimeOffset;
           const eLog = r.shiftStartMs ? Math.max(r.rawLoginMs, r.shiftStartMs) : r.rawLoginMs;
           const ded = ((r.acc_break || 0) + (r.acc_lunch || 0)) * 60000;
@@ -409,8 +411,25 @@
             if (dMs <= 0) rs = "Ready to Clock Out";
             else rs = `<span class="text-emerald-600 font-bold animate-pulse">${Math.floor(dMs/3600000).toString().padStart(2,'0')}:${Math.floor((dMs/60000)%60).toString().padStart(2,'0')}:${Math.floor((dMs/1000)%60).toString().padStart(2,'0')}</span>`;
           }
-        } else if (r.timeOut !== "-") { ls = r.staticLoggedTime || "-"; if (r.finalRequiredEndMs) rs = "Completed"; }
-        else { if (r.permanentSchedule) { const sM=parseToMinutes(r.permanentSchedule.shiftStart)||0, eM=parseToMinutes(r.permanentSchedule.shiftEnd)||0; const rh=r.permanentSchedule.halfDay?(r.permanentSchedule.halfDayHours||4):Math.max(0,(eM-sM-(r.permanentSchedule.maxMeal||60))/60); rs=`${Math.floor(rh).toString().padStart(2,'0')}:${Math.floor((rh-Math.floor(rh))*60).toString().padStart(2,'0')}:00`; } }
+        } else if (r.timeOut !== "-") { 
+          ls = r.staticLoggedTime || "-"; 
+          if (r.finalRequiredEndMs) rs = "Completed"; 
+        } else { 
+          if (r.permanentSchedule) { 
+            const sM = parseToMinutes(r.permanentSchedule.shiftStart) || 0;
+            const eM = parseToMinutes(r.permanentSchedule.shiftEnd) || 0;
+            let rh = 0;
+            if (r.permanentSchedule.halfDay) {
+                rh = r.permanentSchedule.halfDayHours || 4;
+            } else {
+                let diffM = eM - sM;
+                if (diffM < 0) diffM += 1440; // Safely handle shifts crossing midnight
+                rh = Math.max(0, (diffM - (r.permanentSchedule.maxMeal || 60)) / 60);
+            }
+            if (rh > 0) rs = `${Math.floor(rh).toString().padStart(2,'0')}:${Math.floor((rh - Math.floor(rh)) * 60).toString().padStart(2,'0')}:00`;
+            else rs = "-";
+          } 
+        }
         
         let lt = r.currentSessionType === "DUTY" ? '<span class="bg-indigo-100 text-indigo-800 px-2 py-1 rounded text-[10px] font-black uppercase animate-pulse">⚡ Productive</span>' : r.currentSessionType === "QUICK BREAK" ? '<span class="bg-amber-100 text-amber-800 px-2 py-1 rounded text-[10px] font-black uppercase animate-pulse">☕ Quick Break</span>' : r.currentSessionType === "MEAL BREAK" ? '<span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-[10px] font-black uppercase animate-pulse">🍽️ Meal Break</span>' : r.timeOut !== "-" ? '<span class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-[10px] font-black uppercase">🏁 Shift Ended</span>' : '<span class="bg-slate-100 text-slate-400 px-2 py-1 rounded text-[10px] font-black uppercase">💤 Offline</span>';
         h += `<tr class="border-b"><td class="p-3 font-bold">${r.name}</td><td class="p-3">${lt}</td><td class="p-3 text-emerald-600 font-mono">${r.timeIn}</td><td class="p-3 font-mono">${ls}</td><td class="p-3 font-mono">${rs}</td><td class="p-3 font-mono">${r.lunchText}</td><td class="p-3 font-mono">${r.breakText}</td><td class="p-3 text-rose-600 font-mono">${r.timeOut}</td><td class="p-3 text-center"><span class="px-2 py-0.5 rounded text-[11px] font-bold ${getStatusBadgeStyle(r.status)}">${r.status}</span></td></tr>`;
@@ -447,7 +466,24 @@
     function executeAdminUntagAbsentLog(id,nm,dt) { if(!confirm("Remove?"))return; callAPI('POST','',{action:"adminUntagAbsent",absentId:id}, r=>{ alert(r.message); fetchGlobalAdminLogs(); }); }
     function executeAdminOverridePassword(id) { const p=prompt("New pass:"); if(!p||p.trim()==="")return; callAPI('POST','',{action:"adminChangePassword",targetUserId:id,newPassword:p}, r=>alert(r.message)); }
     function executeAdminRemoveUser(id,nm) { if(!confirm("Purge?"))return; callAPI('POST','',{action:"adminDeleteUser",targetUserId:id}, r=>{ alert(r.message); fetchGlobalAdminLogs(); }); }
-    function executeAdminTagUserAbsent(id,nm) { const d=prompt("Date YYYY-MM-DD:", new Date().toISOString().split('T')[0]); if(!d)return; callAPI('POST','',{action:"adminTagAbsent",targetUserId:id,targetName:nm,absentDate:d}, r=>{ alert(r.message); if(r.success) fetchGlobalAdminLogs(); }); }
+    
+    function executeAdminTagStatus(id, nm) {
+      const d = prompt("Date YYYY-MM-DD:", new Date().toISOString().split('T')[0]);
+      if (!d) return;
+      const type = prompt("Select Tag:\n1 = Absent\n2 = On Leave\n3 = No Schedule", "1");
+      if (!type) return;
+      let action = "";
+      if (type === "1") action = "adminTagAbsent";
+      else if (type === "2") action = "adminTagLeave";
+      else if (type === "3") action = "adminTagNoSchedule";
+      else { alert("Invalid selection."); return; }
+
+      callAPI('POST','',{action: action, targetUserId:id, targetName:nm, targetDate:d}, r=>{
+        alert(r.message);
+        if(r.success) fetchGlobalAdminLogs();
+      });
+    }
+
     function showSection(id) { ['attendance-sec','global-feed-sec','leave-request-sec','restday-request-sec','task-report-sec','other-task-report-sec','referral-report-sec','ca-request-sec','coaching-sec','feedback-submit-sec','account-settings-sec','admin-payroll-sec','user-payroll-sec','admin-sec'].forEach(s=>{document.getElementById(s).className='hidden';}); const t=document.getElementById(id); if(t) t.className=id==='account-settings-sec'?'bg-white p-6 rounded-xl shadow-sm border max-w-md space-y-4':'space-y-6 max-w-6xl'; if(id==='task-report-sec'){document.getElementById('rep-date').value=new Date().toISOString().split('T')[0]; loadPublicTaskReportsFeed();} if(id==='other-task-report-sec'){document.getElementById('other-rep-date').value=new Date().toISOString().split('T')[0]; loadOtherTaskReportsFeed();} if(id==='referral-report-sec')loadReferralReportsFeed(); if(id==='feedback-submit-sec'||id==='global-feed-sec')loadGlobalStatusFeed(); if(id==='admin-sec')fetchGlobalAdminLogs(); if(['attendance-sec','leave-request-sec','ca-request-sec','coaching-sec','account-settings-sec','restday-request-sec'].includes(id))refreshUserTimers(); }
     function logout() { currentUser=null; clearTimeout(inactivityTimer); clearInterval(liveTimerTickerInterval); localStorage.removeItem("olympuz_active_session"); localStorage.removeItem("olympuz_token"); location.reload(); }
     
@@ -466,7 +502,6 @@
       const ct=document.getElementById('admin-coach-target'); 
       if(ct){ ct.innerHTML='<option value="">Target</option>'; a.forEach(t=>ct.innerHTML+=`<option value="${t.id}">${t.name}</option>`); } 
       
-      // New Payroll Dropdown Population
       const pt=document.getElementById('p-target-user'); 
       if(pt){ 
         const pVal = pt.value; 
@@ -490,7 +525,7 @@
       flt(d.cashAdvances||[]).forEach(r=>{ const cnt=r.status==="Pending"?`<button onclick="openCAModal('${r.id}')" class="bg-indigo-600 text-white px-2 py-1">Review</button>`:`Evaluated`; caAdmin.innerHTML+=`<tr class="border-b"><td class="p-3">${r.name}</td><td class="p-3">${r.requestDate}</td><td class="p-3 text-emerald-600 font-bold">₱${r.amount}</td><td class="p-3">${r.reason}</td><td class="p-3">${r.attachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.attachment}')" class="text-indigo-600 underline">View</a>`:'-'}</td><td class="p-3 font-bold">${r.status}</td><td class="p-3">${r.adminAttachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.adminAttachment}')" class="text-emerald-600 underline">View Note</a>`:'-'}</td><td class="p-3">${cnt}</td></tr>`; });
       flt(d.coachingReports||[]).forEach(r=>{ coach.innerHTML+=`<tr class="border-b"><td class="p-3 font-bold">${r.user_name}</td><td class="p-3">${r.timestamp}</td><td class="p-3">${r.admin_name}</td><td class="p-3 font-bold text-rose-600">${r.status}</td><td class="p-3 text-xs">${r.coaching_text}</td><td class="p-3">${r.admin_attachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.admin_attachment}')" class="text-indigo-600 underline">View</a>`:'-'}</td><td class="p-3 text-xs">${r.tasker_reply||'-'}</td><td class="p-3">${r.tasker_attachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.tasker_attachment}')" class="text-indigo-600 underline">View</a>`:'-'}</td><td class="p-3">${r.is_acknowledged?'Yes':'No'}</td></tr>`; });
       flt(d.feedbackReports||[]).forEach(r=>{ fb.innerHTML+=`<tr class="border-b"><td class="p-3">${r.timestamp}</td><td class="p-3">${r.reporter_name}</td><td class="p-3 font-bold">${r.target_user_name}</td><td class="p-3 font-bold text-amber-700">${r.category}</td><td class="p-3 text-xs">${r.reason}</td><td class="p-3">${r.attachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.attachment}')" class="text-indigo-600 underline">View</a>`:'-'}</td></tr>`; });
-      d.absences.filter(r=>r.role!=='Admin').forEach(r=>{ if(st!=="ALL"&&r.name!==st)return; abs.innerHTML+=`<tr class="border-b"><td class="p-3">${r.id}</td><td class="p-3 font-bold">${r.name}</td><td class="p-3">${r.daysOff}</td><td class="p-3">${r.halfDay}</td><td class="p-3 font-bold ${r.absents>0?'text-rose-600':'text-emerald-600'}">${r.absents} days</td><td class="p-3 font-bold ${r.lostHoursWeek>0?'text-orange-600':'text-slate-500'}">${r.lostHoursWeek} hrs</td><td class="p-3"><button onclick="executeAdminTagUserAbsent('${r.id}', '${r.name}')" class="text-[10px] bg-rose-600 text-white px-2 py-1 mr-1">Absent</button><button onclick="executeAdminOverridePassword('${r.id}')" class="text-[10px] bg-slate-200 px-2 py-1 mr-1">Pass</button><button onclick="executeAdminRemoveUser('${r.id}', '${r.name}')" class="text-[10px] bg-rose-100 text-rose-600 px-2 py-1">Purge</button></td></tr>`; });
+      d.absences.filter(r=>r.role!=='Admin').forEach(r=>{ if(st!=="ALL"&&r.name!==st)return; abs.innerHTML+=`<tr class="border-b"><td class="p-3">${r.id}</td><td class="p-3 font-bold">${r.name}</td><td class="p-3">${r.daysOff}</td><td class="p-3">${r.halfDay}</td><td class="p-3 font-bold ${r.absents>0?'text-rose-600':'text-emerald-600'}">${r.absents} days</td><td class="p-3 font-bold ${r.lostHoursWeek>0?'text-orange-600':'text-slate-500'}">${r.lostHoursWeek} hrs</td><td class="p-3"><button onclick="executeAdminTagStatus('${r.id}', '${r.name}')" class="text-[10px] bg-indigo-600 text-white px-2 py-1 mr-1">Tag Status</button><button onclick="executeAdminOverridePassword('${r.id}')" class="text-[10px] bg-slate-200 px-2 py-1 mr-1">Pass</button><button onclick="executeAdminRemoveUser('${r.id}', '${r.name}')" class="text-[10px] bg-rose-100 text-rose-600 px-2 py-1">Purge</button></td></tr>`; });
       flt(d.leaves||[]).forEach(r=>{ const cnt=r.status==="Pending"?`<button onclick="adminExecuteLeave('${r.id}','Approved')" class="bg-emerald-600 text-white px-2 py-1 mr-1">Approve</button><button onclick="adminExecuteLeave('${r.id}','Denied')" class="bg-rose-600 text-white px-2 py-1">Deny</button>`:`Evaluated`; lvs.innerHTML+=`<tr class="border-b"><td class="p-3 font-bold">${r.name}</td><td class="p-3">${r.date}</td><td class="p-3 text-xs">${r.reason}</td><td class="p-3">${r.attachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.attachment}')" class="text-indigo-600 underline">View</a>`:'-'}</td><td class="p-3 font-bold">${r.status}</td><td class="p-3">${cnt}</td></tr>`; });
     }
     
