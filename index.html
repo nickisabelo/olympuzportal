@@ -301,7 +301,7 @@
             </div>
           </div>
 
-          <div class="bg-white p-6 rounded-xl shadow-sm"><h2 class="text-xl font-bold border-b pb-2 mb-3">Attendance Dashboard</h2><div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead><tr class="bg-slate-50 border-b"><th class="p-3">Name</th><th class="p-3">Date</th><th class="p-3">In</th><th class="p-3">Out</th><th class="p-3">Break</th><th class="p-3">Meal</th><th class="p-3">Status</th></tr></thead><tbody id="admin-attendance-table"></tbody></table></div></div>
+          <div class="bg-white p-6 rounded-xl shadow-sm"><h2 class="text-xl font-bold border-b pb-2 mb-3">Attendance Dashboard</h2><div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead><tr class="bg-slate-50 border-b"><th class="p-3">Name</th><th class="p-3">Date</th><th class="p-3">In</th><th class="p-3">Out</th><th class="p-3">Break</th><th class="p-3">Meal</th><th class="p-3">Status</th><th class="p-3 text-center">Action</th></tr></thead><tbody id="admin-attendance-table"></tbody></table></div></div>
           <div class="bg-white p-6 rounded-xl shadow-sm"><h2 class="text-xl font-bold border-b pb-2 mb-3">Rest Day OT Queue</h2><div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead><tr class="bg-slate-50 border-b"><th class="p-3">Name</th><th class="p-3">Date</th><th class="p-3">Reason</th><th class="p-3">Status</th><th class="p-3">Control</th></tr></thead><tbody id="admin-restday-table"></tbody></table></div></div>
           <div class="bg-white p-6 rounded-xl shadow-sm"><h2 class="text-xl font-bold border-b pb-2 mb-3">Absences Registry</h2><div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead><tr class="bg-slate-50 border-b"><th class="p-3">ID</th><th class="p-3">Name</th><th class="p-3">Date</th><th class="p-3">Type</th><th class="p-3">Control</th></tr></thead><tbody id="admin-explicit-absents-table"></tbody></table></div></div>
           <div class="bg-white p-6 rounded-xl shadow-sm"><h2 class="text-xl font-bold border-b pb-2 mb-3">Payroll Distribution</h2><div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead><tr class="bg-slate-50 border-b"><th class="p-3">Name</th><th class="p-3">ID</th><th class="p-3">Period</th><th class="p-3">Wks</th><th class="p-3">Mode</th><th class="p-3">Gross</th><th class="p-3">Deduct</th><th class="p-3">Net</th><th class="p-3">Receipt</th><th class="p-3">Status</th><th class="p-3">Notes</th></tr></thead><tbody id="admin-payments-history-table"></tbody></table></div></div>
@@ -320,6 +320,18 @@
       <input type="file" id="ca-modal-file" accept="image/*" class="w-full text-xs">
       <div class="flex gap-2"><button onclick="submitCADecision('Approved')" class="flex-1 bg-emerald-600 text-white font-bold py-2 rounded-lg">Approve</button><button onclick="submitCADecision('Denied')" class="flex-1 bg-rose-600 text-white font-bold py-2 rounded-lg">Deny</button></div>
       <button onclick="closeCAModal()" class="w-full bg-slate-100 text-slate-600 font-bold py-2 rounded-lg">Cancel</button>
+    </div>
+  </div>
+
+  <div id="break-edit-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 px-4">
+    <div class="bg-white p-6 rounded-xl shadow-xl w-full max-w-sm space-y-4">
+      <h3 class="text-lg font-bold border-b pb-2">Edit Break Durations</h3>
+      <p id="break-edit-info" class="text-xs font-bold text-indigo-700"></p>
+      <input type="hidden" id="break-edit-id">
+      <div><label class="block text-xs font-bold text-slate-500 mb-1">Quick Break (Minutes)</label><input type="number" step="1" id="break-edit-quick" class="w-full p-2.5 border rounded-lg"></div>
+      <div><label class="block text-xs font-bold text-slate-500 mb-1">Meal Break (Minutes)</label><input type="number" step="1" id="break-edit-meal" class="w-full p-2.5 border rounded-lg"></div>
+      <button onclick="submitBreakEdit()" class="w-full bg-indigo-600 hover:bg-indigo-700 transition text-white font-bold py-2.5 rounded-lg text-sm">Save Changes</button>
+      <button onclick="closeBreakEditModal()" class="w-full bg-slate-100 hover:bg-slate-200 transition text-slate-600 font-bold py-2 rounded-lg text-xs">Cancel</button>
     </div>
   </div>
 
@@ -484,6 +496,34 @@
       });
     }
 
+    // Modal Control logic for manual break durations modification
+    function openBreakEditModal(attId, name, date, currentQuick, currentMeal) {
+      document.getElementById('break-edit-id').value = attId;
+      document.getElementById('break-edit-info').innerText = `${name} | Shift Date: ${date}`;
+      document.getElementById('break-edit-quick').value = currentQuick || 0;
+      document.getElementById('break-edit-meal').value = currentMeal || 0;
+      document.getElementById('break-edit-modal').classList.remove('hidden');
+    }
+    
+    function closeBreakEditModal() {
+      document.getElementById('break-edit-modal').classList.add('hidden');
+    }
+
+    function submitBreakEdit() {
+      const id = document.getElementById('break-edit-id').value;
+      const qb = document.getElementById('break-edit-quick').value;
+      const mb = document.getElementById('break-edit-meal').value;
+      if (!id || qb === "" || mb === "") return alert("Please check your input values.");
+      
+      callAPI('POST', '', { action: "adminUpdateBreakDurations", attendanceId: id, newBreak: qb, newLunch: mb }, r => {
+        alert(r.message);
+        if (r.success) {
+          closeBreakEditModal();
+          fetchGlobalAdminLogs();
+        }
+      });
+    }
+
     function showSection(id) { ['attendance-sec','global-feed-sec','leave-request-sec','restday-request-sec','task-report-sec','other-task-report-sec','referral-report-sec','ca-request-sec','coaching-sec','feedback-submit-sec','account-settings-sec','admin-payroll-sec','user-payroll-sec','admin-sec'].forEach(s=>{document.getElementById(s).className='hidden';}); const t=document.getElementById(id); if(t) t.className=id==='account-settings-sec'?'bg-white p-6 rounded-xl shadow-sm border max-w-md space-y-4':'space-y-6 max-w-6xl'; if(id==='task-report-sec'){document.getElementById('rep-date').value=new Date().toISOString().split('T')[0]; loadPublicTaskReportsFeed();} if(id==='other-task-report-sec'){document.getElementById('other-rep-date').value=new Date().toISOString().split('T')[0]; loadOtherTaskReportsFeed();} if(id==='referral-report-sec')loadReferralReportsFeed(); if(id==='feedback-submit-sec'||id==='global-feed-sec')loadGlobalStatusFeed(); if(id==='admin-sec')fetchGlobalAdminLogs(); if(['attendance-sec','leave-request-sec','ca-request-sec','coaching-sec','account-settings-sec','restday-request-sec'].includes(id))refreshUserTimers(); }
     function logout() { currentUser=null; clearTimeout(inactivityTimer); clearInterval(liveTimerTickerInterval); localStorage.removeItem("olympuz_active_session"); localStorage.removeItem("olympuz_token"); location.reload(); }
     
@@ -518,7 +558,7 @@
       att.innerHTML=""; abs.innerHTML=""; lvs.innerHTML=""; pay.innerHTML=""; eAbs.innerHTML=""; rds.innerHTML=""; caAdmin.innerHTML=""; aud.innerHTML=""; coach.innerHTML=""; fb.innerHTML="";
       (d.absences||[]).forEach(u=>{ const ps=u.permanentSchedule; aud.innerHTML+=`<div class="py-2 text-xs border-b"><b>${u.name}</b><br>Shift: ${ps.shiftStart}-${ps.shiftEnd} | Half: ${ps.half_day_config?ps.half_day_config:'None'}<br>Q-Break: ${ps.maxBreak}m | Meal: ${ps.maxMeal}m | HD Meal: ${ps.half_day_meal||0}m</div>`; });
       const flt=a=>a.filter(r=>{ if(st!=="ALL"&&((r.name||r.user_name||r.target_user_name)!==st))return false; if(ft||tt){const rt=new Date(r.date||r.timestamp||r.requestDate||r.leave_date).getTime(); if(ft&&rt<ft)return false; if(tt&&rt>tt)return false;} return true; });
-      flt(d.attendance||[]).forEach(r=>{ att.innerHTML+=`<tr class="border-b"><td class="p-3">${r.name}</td><td class="p-3">${r.date}</td><td class="p-3 text-emerald-600">${r.timeIn}</td><td class="p-3 text-rose-600">${r.timeOut}</td><td class="p-3">${r.breakText} ${r.overBreak>0?'(+'+r.overBreak+'m)':''}</td><td class="p-3">${r.lunchText} ${r.overLunch>0?'(+'+r.overLunch+'m)':''}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${getStatusBadgeStyle(r.status)}">${r.status}</span></td></tr>`; });
+      flt(d.attendance||[]).forEach(r=>{ att.innerHTML+=`<tr class="border-b"><td class="p-3">${r.name}</td><td class="p-3">${r.date}</td><td class="p-3 text-emerald-600">${r.timeIn}</td><td class="p-3 text-rose-600">${r.timeOut}</td><td class="p-3">${r.breakText} ${r.overBreak>0?'(+'+r.overBreak+'m)':''}</td><td class="p-3">${r.lunchText} ${r.overLunch>0?'(+'+r.overLunch+'m)':''}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-[11px] font-bold ${getStatusBadgeStyle(r.status)}">${r.status}</span></td><td class="p-3 text-center"><button onclick="openBreakEditModal('${r.attendanceId}', '${r.name.replace(/'/g, "\\'")}', '${r.date}', ${r.acc_break}, ${r.acc_lunch})" class="text-[10px] bg-indigo-600 text-white px-2 py-1 rounded shadow-sm hover:bg-indigo-700">Edit</button></td></tr>`; });
       flt(d.explicitAbsents||[]).forEach(r=>{ eAbs.innerHTML+=`<tr class="border-b"><td class="p-3">${r.userId}</td><td class="p-3 font-bold">${r.name}</td><td class="p-3 text-rose-600">${r.date}</td><td class="p-3 italic text-xs">${r.type}</td><td class="p-3"><button onclick="executeAdminUntagAbsentLog('${r.absentId}')" class="text-xs bg-slate-100 p-1 border">Remove</button></td></tr>`; });
       flt(d.payments||[]).forEach(r=>{ pay.innerHTML+=`<tr class="border-b"><td class="p-3 font-bold">${r.name}</td><td class="p-3 text-xs">${r.userId}</td><td class="p-3">${r.period}</td><td class="p-3">${r.weeks}</td><td class="p-3">${r.paymentMode}</td><td class="p-3">₱${r.gross}</td><td class="p-3 text-rose-600">-₱${r.deductions}</td><td class="p-3 font-bold text-emerald-600">₱${r.net}</td><td class="p-3">${r.receiptImage?`<a href="#" onclick="openImagePreviewOverlayModal('${r.receiptImage}')" class="text-indigo-600 underline">View</a>`:'-'}</td><td class="p-3 font-bold">${r.status}</td><td class="p-3 text-xs">${r.disputeReason||'-'}</td></tr>`; });
       flt(d.restDays||[]).forEach(r=>{ const cnt=r.status==="Pending"?`<button onclick="executeAdminMakeRestDayDecision('${r.requestId}','Approved')" class="bg-emerald-600 text-white px-2 py-1 mr-1">Approve</button><button onclick="executeAdminMakeRestDayDecision('${r.requestId}','Denied')" class="bg-rose-600 text-white px-2 py-1">Deny</button>`:`Evaluated`; rds.innerHTML+=`<tr class="border-b"><td class="p-3">${r.name}</td><td class="p-3">${r.date}</td><td class="p-3">${r.comments}</td><td class="p-3">${r.status}</td><td class="p-3">${cnt}</td></tr>`; });
