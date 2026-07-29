@@ -368,7 +368,7 @@
     function handleLogin() { const e = document.getElementById('email').value, p = document.getElementById('password').value, err = document.getElementById('login-err'); err.classList.add('hidden'); if (!e || !p) { err.innerText = "Complete all fields."; err.classList.remove('hidden'); return; } tempLoginEmail = e; callAPI('POST', '', { action: "loginUser", email: e, password: p, deviceId }, function(r) { if (r.success) { if (r.requireOtp) { document.getElementById('credentials-form').classList.add('hidden'); document.getElementById('otp-form').classList.remove('hidden'); document.getElementById('otp-code').value = ""; if (r.message) alert(r.message); } else { if (r.token) localStorage.setItem("olympuz_token", r.token); currentUser = r.user; bootPortalSession(); } } else { err.innerText = r.message || r.error || "Login failed."; err.classList.remove('hidden'); } }); }
     function handleVerifyOTP() { const c = document.getElementById('otp-code').value, err = document.getElementById('login-err'); err.classList.add('hidden'); if (!c || c.length < 6) return alert("Provide code."); callAPI('POST', '', { action: "verifyLoginOTP", email: tempLoginEmail, code: c, deviceId }, function(r) { if (r.success) { if (r.token) localStorage.setItem("olympuz_token", r.token); currentUser = r.user; bootPortalSession(); } else { err.innerText = r.message || r.error || "Failed."; err.classList.remove('hidden'); alert(r.message || r.error); } }); }
     function cancelOTPFlow() { document.getElementById('otp-form').classList.add('hidden'); document.getElementById('credentials-form').classList.remove('hidden'); }
-    function getStatusBadgeStyle(t) { if (!t) return 'bg-slate-50 text-slate-500'; const n = t.trim().toLowerCase(); if (n.startsWith('on time') || n === 'completed' || n === 'rest day ot') return 'bg-emerald-50 text-emerald-600'; if (n === 'undertime' || n === 'late' || n.includes('over break') || n.includes('over lunch') || n === 'absent') return 'bg-rose-50 text-rose-600'; if (n === 'on leave' || n === 'day off' || n === 'no schedule') return 'bg-indigo-50 text-indigo-600'; return 'bg-amber-50 text-amber-600'; }
+    function getStatusBadgeStyle(t) { if (!t) return 'bg-slate-50 text-slate-500'; const n = t.trim().toLowerCase(); if (n === 'suspended') return 'bg-rose-700 text-white'; if (n.startsWith('on time') || n === 'completed' || n === 'rest day ot') return 'bg-emerald-50 text-emerald-600'; if (n === 'undertime' || n === 'late' || n.includes('over break') || n.includes('over lunch') || n === 'absent') return 'bg-rose-50 text-rose-600'; if (n === 'on leave' || n === 'day off' || n === 'no schedule') return 'bg-indigo-50 text-indigo-600'; return 'bg-amber-50 text-amber-600'; }
 
     function bootPortalSession() {
       document.getElementById('login-page').classList.add('hidden'); document.getElementById('app-page').classList.remove('hidden'); document.getElementById('user-display').innerText = currentUser.name + " | " + currentUser.role;
@@ -409,7 +409,7 @@
       if (!Array.isArray(window.cachedGlobalFeed)) window.cachedGlobalFeed = []; const f = document.getElementById('global-feed-table'); if (window.cachedGlobalFeed.length === 0) { f.innerHTML = '<tr><td colspan="9" class="p-4 text-center">No logs.</td></tr>'; return; }
       let h = ""; window.cachedGlobalFeed.forEach(r => {
         let ls = "00:00:00", rs = "00:00:00";
-        if (r.status === 'Day Off' || r.status === 'On Leave' || r.status === 'No Schedule' || r.status === 'Absent') {
+        if (r.status === 'Day Off' || r.status === 'On Leave' || r.status === 'No Schedule' || r.status === 'Absent' || r.status === 'Suspended') {
           ls = "-"; rs = "-";
         } else if (r.isLiveTracking && r.rawLoginMs) {
           const sNow = Date.now() - window.serverTimeOffset;
@@ -496,6 +496,23 @@
       });
     }
 
+    function executeAdminSuspendUser(id) {
+      const d = prompt("Suspend until date (YYYY-MM-DD)? Leave blank for 'until further notice'.");
+      if (d === null) return;
+      callAPI('POST', '', {action: "adminTagSuspended", targetUserId: id, suspendedUntil: d.trim()}, r => {
+        alert(r.message);
+        if (r.success) fetchGlobalAdminLogs();
+      });
+    }
+
+    function executeAdminLiftSuspension(id) {
+      if (!confirm("Lift suspension for this tasker?")) return;
+      callAPI('POST', '', {action: "adminLiftSuspension", targetUserId: id}, r => {
+        alert(r.message);
+        if (r.success) fetchGlobalAdminLogs();
+      });
+    }
+
     // Modal Control logic for manual break durations modification
     function openBreakEditModal(attId, name, date, currentQuick, currentMeal) {
       document.getElementById('break-edit-id').value = attId;
@@ -565,7 +582,30 @@
       flt(d.cashAdvances||[]).forEach(r=>{ const cnt=r.status==="Pending"?`<button onclick="openCAModal('${r.id}')" class="bg-indigo-600 text-white px-2 py-1">Review</button>`:`Evaluated`; caAdmin.innerHTML+=`<tr class="border-b"><td class="p-3">${r.name}</td><td class="p-3">${r.requestDate}</td><td class="p-3 text-emerald-600 font-bold">₱${r.amount}</td><td class="p-3">${r.reason}</td><td class="p-3">${r.attachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.attachment}')" class="text-indigo-600 underline">View</a>`:'-'}</td><td class="p-3 font-bold">${r.status}</td><td class="p-3">${r.adminAttachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.adminAttachment}')" class="text-emerald-600 underline">View Note</a>`:'-'}</td><td class="p-3">${cnt}</td></tr>`; });
       flt(d.coachingReports||[]).forEach(r=>{ coach.innerHTML+=`<tr class="border-b"><td class="p-3 font-bold">${r.user_name}</td><td class="p-3">${r.timestamp}</td><td class="p-3">${r.admin_name}</td><td class="p-3 font-bold text-rose-600">${r.status}</td><td class="p-3 text-xs">${r.coaching_text}</td><td class="p-3">${r.admin_attachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.admin_attachment}')" class="text-indigo-600 underline">View</a>`:'-'}</td><td class="p-3 text-xs">${r.tasker_reply||'-'}</td><td class="p-3">${r.tasker_attachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.tasker_attachment}')" class="text-indigo-600 underline">View</a>`:'-'}</td><td class="p-3">${r.is_acknowledged?'Yes':'No'}</td></tr>`; });
       flt(d.feedbackReports||[]).forEach(r=>{ fb.innerHTML+=`<tr class="border-b"><td class="p-3">${r.timestamp}</td><td class="p-3">${r.reporter_name}</td><td class="p-3 font-bold">${r.target_user_name}</td><td class="p-3 font-bold text-amber-700">${r.category}</td><td class="p-3 text-xs">${r.reason}</td><td class="p-3">${r.attachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.attachment}')" class="text-indigo-600 underline">View</a>`:'-'}</td></tr>`; });
-      d.absences.filter(r=>r.role!=='Admin').forEach(r=>{ if(st!=="ALL"&&r.name!==st)return; abs.innerHTML+=`<tr class="border-b"><td class="p-3">${r.id}</td><td class="p-3 font-bold">${r.name}</td><td class="p-3">${r.daysOff}</td><td class="p-3">${r.halfDay}</td><td class="p-3 font-bold ${r.absents>0?'text-rose-600':'text-emerald-600'}">${r.absents} days</td><td class="p-3 font-bold ${r.lostHoursWeek>0?'text-orange-600':'text-slate-500'}">${r.lostHoursWeek} hrs</td><td class="p-3"><button onclick="executeAdminTagStatus('${r.id}', '${r.name}')" class="text-[10px] bg-indigo-600 text-white px-2 py-1 mr-1">Tag Status</button><button onclick="executeAdminOverridePassword('${r.id}')" class="text-[10px] bg-slate-200 px-2 py-1 mr-1">Pass</button><button onclick="executeAdminRemoveUser('${r.id}', '${r.name}')" class="text-[10px] bg-rose-100 text-rose-600 px-2 py-1">Purge</button></td></tr>`; });
+      
+      d.absences.filter(r=>r.role!=='Admin').forEach(r=>{ 
+        if(st!=="ALL"&&r.name!==st)return; 
+        
+        let susBtn = r.isSuspended
+          ? `<button onclick="executeAdminLiftSuspension('${r.id}')" class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-1 mr-1 mt-1">Lift Sus</button>`
+          : `<button onclick="executeAdminSuspendUser('${r.id}')" class="text-[10px] bg-amber-100 text-amber-700 px-2 py-1 mr-1 mt-1">Suspend</button>`;
+
+        abs.innerHTML+=`<tr class="border-b">
+          <td class="p-3">${r.id}</td>
+          <td class="p-3 font-bold">${r.name} ${r.isSuspended ? `<br><span class="text-[10px] bg-rose-600 text-white px-1.5 py-0.5 rounded uppercase shadow-sm">Suspended ${r.suspendedUntil ? 'until '+r.suspendedUntil : 'Indefinitely'}</span>` : ''}</td>
+          <td class="p-3">${r.daysOff}</td>
+          <td class="p-3">${r.halfDay}</td>
+          <td class="p-3 font-bold ${r.absents>0?'text-rose-600':'text-emerald-600'}">${r.absents} days</td>
+          <td class="p-3 font-bold ${r.lostHoursWeek>0?'text-orange-600':'text-slate-500'}">${r.lostHoursWeek} hrs</td>
+          <td class="p-3">
+            <button onclick="executeAdminTagStatus('${r.id}', '${r.name}')" class="text-[10px] bg-indigo-600 text-white px-2 py-1 mr-1 mt-1">Tag Status</button>
+            ${susBtn}
+            <button onclick="executeAdminOverridePassword('${r.id}')" class="text-[10px] bg-slate-200 px-2 py-1 mr-1 mt-1">Pass</button>
+            <button onclick="executeAdminRemoveUser('${r.id}', '${r.name}')" class="text-[10px] bg-rose-100 text-rose-600 px-2 py-1 mt-1">Purge</button>
+          </td>
+        </tr>`; 
+      });
+      
       flt(d.leaves||[]).forEach(r=>{ const cnt=r.status==="Pending"?`<button onclick="adminExecuteLeave('${r.id}','Approved')" class="bg-emerald-600 text-white px-2 py-1 mr-1">Approve</button><button onclick="adminExecuteLeave('${r.id}','Denied')" class="bg-rose-600 text-white px-2 py-1">Deny</button>`:`Evaluated`; lvs.innerHTML+=`<tr class="border-b"><td class="p-3 font-bold">${r.name}</td><td class="p-3">${r.date}</td><td class="p-3 text-xs">${r.reason}</td><td class="p-3">${r.attachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.attachment}')" class="text-indigo-600 underline">View</a>`:'-'}</td><td class="p-3 font-bold">${r.status}</td><td class="p-3">${cnt}</td></tr>`; });
     }
     
