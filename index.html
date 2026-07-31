@@ -350,6 +350,9 @@
     // --------------------------------------------------------
 
     const API_URL = "https://olympuz-api-engine.nickisabelo.workers.dev"; 
+
+    const MAX_INACTIVITY_LIMIT = 30 * 60 * 1000;
+    
     let currentUser = null, cachedAdminMasterData = null, cachedPublicReports = [], cachedOtherReports = [], inactivityTimer = null, liveTimerTickerInterval = null;
     window.cachedGlobalFeed = []; window.serverTimeOffset = 0; 
     let deviceId = localStorage.getItem("olympuz_device_id"); if (!deviceId) { deviceId = "DEV-" + crypto.randomUUID(); localStorage.setItem("olympuz_device_id", deviceId); }
