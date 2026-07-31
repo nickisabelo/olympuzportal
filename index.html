@@ -6,9 +6,15 @@
   <title>Olympuz Operations Portal</title>
   <link rel="icon" type="image/png" href="Logo New.png">
   <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
 </head>
 <body class="bg-slate-50 font-sans text-slate-800">
 
+  <!-- ==================== UI BLOCKS (No structural changes made) ==================== -->
+  
   <div id="login-page" class="flex min-h-screen items-center justify-center px-4">
     <div class="w-full max-w-md p-8 bg-white rounded-xl shadow-xl border border-slate-100">
       <div class="text-center mb-8">
@@ -92,7 +98,7 @@
           <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-4">
               <h2 class="text-xl font-bold text-slate-800">🌐 Workspace Feed</h2>
-              <button onclick="loadGlobalStatusFeed()" class="text-xs font-bold bg-indigo-50 border border-indigo-200 text-indigo-700 px-3 py-1.5 rounded-lg">🔄 Refresh</button>
+              <button onclick="loadGlobalStatusFeed()" class="text-xs font-bold bg-indigo-50 border border-indigo-200 text-indigo-700 px-3 py-1.5 rounded-lg">🔄 Sync Database</button>
             </div>
             <div class="overflow-x-auto rounded-lg border border-slate-100"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 border-b border-slate-100 text-slate-600 font-semibold text-xs uppercase"><th class="p-3">Tasker</th><th class="p-3">Live Activity</th><th class="p-3">In</th><th class="p-3">Logged (Live)</th><th class="p-3">Remaining</th><th class="p-3">Meal</th><th class="p-3">Break</th><th class="p-3">Out</th><th class="p-3 text-center">Status</th></tr></thead><tbody id="global-feed-table" class="divide-y divide-slate-100 text-xs font-medium text-slate-700"></tbody></table></div>
           </div>
@@ -335,7 +341,18 @@
     </div>
   </div>
 
+  <!-- ==================== LOGIC INTEGRATION ==================== -->
+  
   <script>
+    // ---------------- FIREBASE CONFIGURATION ----------------
+    // ** IMPORTANT: REPLACE WITH YOUR FIREBASE PROJECT URL **
+    const firebaseConfig = {
+      databaseURL: "https://olympuz-portal-default-rtdb.asia-southeast1.firebasedatabase.app/", 
+    };
+    firebase.initializeApp(firebaseConfig);
+    const fbDatabase = firebase.database();
+    // --------------------------------------------------------
+
     const API_URL = "https://olympuz-api-engine.nickisabelo.workers.dev"; 
     let currentUser = null, cachedAdminMasterData = null, cachedPublicReports = [], cachedOtherReports = [], inactivityTimer = null, liveTimerTickerInterval = null;
     const MAX_INACTIVITY_LIMIT = 30 * 60 * 1000;
@@ -370,11 +387,46 @@
     function cancelOTPFlow() { document.getElementById('otp-form').classList.add('hidden'); document.getElementById('credentials-form').classList.remove('hidden'); }
     function getStatusBadgeStyle(t) { if (!t) return 'bg-slate-50 text-slate-500'; const n = t.trim().toLowerCase(); if (n === 'suspended') return 'bg-rose-700 text-white'; if (n.startsWith('on time') || n === 'completed' || n === 'rest day ot') return 'bg-emerald-50 text-emerald-600'; if (n === 'undertime' || n === 'late' || n.includes('over break') || n.includes('over lunch') || n === 'absent') return 'bg-rose-50 text-rose-600'; if (n === 'on leave' || n === 'day off' || n === 'no schedule') return 'bg-indigo-50 text-indigo-600'; return 'bg-amber-50 text-amber-600'; }
 
+    // ==========================================
+    // REALTIME FIREBASE INTEGRATION & UI RENDER
+    // ==========================================
+
     function bootPortalSession() {
       document.getElementById('login-page').classList.add('hidden'); document.getElementById('app-page').classList.remove('hidden'); document.getElementById('user-display').innerText = currentUser.name + " | " + currentUser.role;
       if (currentUser.role === 'Admin') { document.getElementById('sched-shift').innerText = "N/A (Admin Duty)"; document.getElementById('sched-limits').innerText = "Flexi"; document.getElementById('stat-leave-allow').innerText = "N/A"; document.getElementById('stat-leave-remain').innerText = "N/A"; document.getElementById('admin-dash-btn').classList.remove('hidden'); } else { document.getElementById('sched-shift').innerText = currentUser.schedule.shiftStart + " to " + currentUser.schedule.shiftEnd; document.getElementById('stat-leave-allow').innerText = currentUser.schedule.leaveAllowance; document.getElementById('stat-leave-remain').innerText = currentUser.schedule.remainingLeaves; if (currentUser.schedule.isHalfDayToday) { document.getElementById('halfday-banner').classList.remove('hidden'); document.getElementById('sched-limits').innerText = "Q-Break: " + currentUser.schedule.maxBreak + "m | Meal: " + currentUser.schedule.maxLunch + "m | Target: " + currentUser.schedule.halfDayHours + "h"; document.getElementById('btn-lunch-s').className = 'bg-orange-500 text-white p-4 rounded-xl font-bold text-sm hover:bg-orange-600'; document.getElementById('btn-lunch-e').className = 'bg-orange-600 text-white p-4 rounded-xl font-bold text-sm hover:bg-orange-700'; } else { document.getElementById('halfday-banner').classList.add('hidden'); document.getElementById('sched-limits').innerText = "Q-Break: " + currentUser.schedule.maxBreak + "m | Meal: " + currentUser.schedule.maxLunch + "m"; document.getElementById('btn-lunch-s').className = 'bg-orange-500 text-white p-4 rounded-xl font-bold text-sm hover:bg-orange-600'; document.getElementById('btn-lunch-e').className = 'bg-orange-600 text-white p-4 rounded-xl font-bold text-sm hover:bg-orange-700'; } }
       showSection('attendance-sec'); resetInactivityTracker();
-      setInterval(() => { if (currentUser) refreshUserTimers(); }, 30000); setInterval(() => { if (currentUser && !document.getElementById('global-feed-sec').classList.contains('hidden')) loadGlobalStatusFeed(); }, 15000); setInterval(() => { if (currentUser && !document.getElementById('task-report-sec').classList.contains('hidden')) loadPublicTaskReportsFeed(); }, 60000); setInterval(() => { if (currentUser && !document.getElementById('other-task-report-sec').classList.contains('hidden')) loadOtherTaskReportsFeed(); }, 60000); setInterval(() => { if (currentUser && currentUser.role === 'Admin' && !document.getElementById('admin-sec').classList.contains('hidden')) fetchGlobalAdminLogs(); }, 45000);
+      
+      // Attach Realtime Firebase Listeners (replaces ALL old setIntervals)
+      fbDatabase.ref('stats/' + currentUser.id).on('value', snap => {
+          if (snap.exists()) updateLiveUserStatsUI(snap.val()); else refreshUserTimers();
+      });
+
+      fbDatabase.ref('feed').on('value', snap => {
+          if (snap.exists()) updateGlobalStatusFeedUI(snap.val()); else loadGlobalStatusFeed();
+      });
+
+      if (currentUser.role === 'Admin') {
+          fbDatabase.ref('admin').on('value', snap => {
+              if (snap.exists()) updateAdminDashboardUI(snap.val()); else fetchGlobalAdminLogs();
+          });
+      }
+
+      fbDatabase.ref('taskReports').on('value', snap => {
+          if (snap.exists()) updatePublicTaskReportsUI(snap.val());
+      });
+
+      fbDatabase.ref('otherReports').on('value', snap => {
+          if (snap.exists()) updateOtherTaskReportsUI(snap.val());
+      });
+
+      fbDatabase.ref('referralReports').on('value', snap => {
+          if (snap.exists()) updateReferralReportsUI(snap.val());
+      });
+
+      fbDatabase.ref('payroll/' + currentUser.id).on('value', snap => {
+          if (snap.exists()) updateUserPayrollUI(snap.val());
+      });
+
       initializeRealtimeTicker();
     }
 
@@ -390,8 +442,13 @@
       }, 1000);
     }
 
+    // Force Cloudflare to regenerate cache. Firebase listener will handle the DOM update.
     function refreshUserTimers() {
-      if (!currentUser) return; callAPI('GET', "?action=getLiveUserStats&userId=" + currentUser.id, null, function(s) {
+      if (!currentUser) return; 
+      callAPI('GET', "?action=getLiveUserStats&userId=" + currentUser.id, null, () => {});
+    }
+
+    function updateLiveUserStatsUI(s) {
         if (!s || s.error || s.success === false) return; 
         document.getElementById('stat-hours').innerText = (s.clockedHours || "0.00") + " hrs"; document.getElementById('stat-break').innerText = (s.breakMinutes || 0) + " mins"; document.getElementById('stat-lunch').innerText = (s.lunchMinutes || 0) + " mins";
         const b = document.getElementById('live-timer-banner'); if (s.currentSessionType && s.currentSessionType !== 'NONE') { b.setAttribute('data-active-type', s.currentSessionType); b.setAttribute('data-active-stamp', s.currentSessionStart); } else { b.setAttribute('data-active-type', 'NONE'); b.removeAttribute('data-active-stamp'); }
@@ -400,10 +457,24 @@
         const rd = document.getElementById('personal-restday-table'); rd.innerHTML = ""; const rda = s.restDays || []; if (rda.length === 0) rd.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-slate-400">No requests</td></tr>'; else rda.forEach(r => { const sc = r.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : (r.status === 'Denied' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-800'); rd.innerHTML += `<tr><td class="p-3">${r.date}</td><td class="p-3">${r.comments}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${sc}">${r.status}</span></td><td class="p-3 text-slate-500">${r.feedback}</td></tr>`; });
         const ca = document.getElementById('personal-ca-table'); ca.innerHTML = ""; const caa = s.cashAdvances || []; if (caa.length === 0) ca.innerHTML = '<tr><td colspan="7" class="p-3 text-center text-slate-400">No requests</td></tr>'; else caa.forEach(r => { const sc = r.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' : (r.status === 'Denied' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-800'); let a1 = r.attachment ? `<button onclick="openImagePreviewOverlayModal('${r.attachment}')" class="text-indigo-600 underline">View</button>` : `-`; let a2 = r.adminAttachment ? `<button onclick="openImagePreviewOverlayModal('${r.adminAttachment}')" class="text-emerald-600 underline">View</button>` : `-`; ca.innerHTML += `<tr><td class="p-3">${r.requestDate}</td><td class="p-3 font-bold text-emerald-700">₱${r.amount}</td><td class="p-3">${r.reason}</td><td class="p-3">${a1}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${sc}">${r.status}</span></td><td class="p-3 text-slate-500">${r.feedback || '-'}</td><td class="p-3">${a2}</td></tr>`; });
         const cb = document.getElementById('personal-coaching-container'); cb.innerHTML = ""; const cba = s.coachingReports || []; if (cba.length === 0) cb.innerHTML = '<div class="text-slate-400 text-xs text-center py-4">No logs.</div>'; else cba.forEach(r => { let pb = r.penaltyTag ? `<span class="bg-rose-100 text-rose-800 px-2 rounded text-[10px] ml-2">${r.penaltyTag}</span>` : ''; let aa = r.adminAttachment ? `<br><button onclick="openImagePreviewOverlayModal('${r.adminAttachment}')" class="text-xs text-rose-600 underline">View Admin Proof</button>` : ''; let act = ""; if (r.isAcknowledged) { let ta = r.taskerAttachment ? `<br><button onclick="openImagePreviewOverlayModal('${r.taskerAttachment}')" class="text-xs text-indigo-600 underline">View Proof</button>` : ''; act = `<div class="bg-slate-50 p-3 rounded mt-3 border"><div class="text-xs font-bold text-emerald-700">✓ Acknowledged</div><p class="text-xs mt-1">${r.taskerReply}</p>${ta}</div>`; } else { act = `<div class="bg-slate-50 p-3 rounded mt-3 border space-y-2"><div class="text-xs font-bold text-amber-700">⚠️ Action Required</div><textarea id="cr-${r.id}" rows="2" class="w-full p-2 border text-xs" placeholder="Reply..."></textarea><input type="file" id="crf-${r.id}" accept="image/*" class="w-full text-xs"><button onclick="acknowledgeCoaching('${r.id}')" class="bg-indigo-600 text-white font-bold text-xs px-3 py-1.5 rounded">Submit</button></div>`; } cb.innerHTML += `<div class="p-4 border rounded-lg bg-white mb-4"><div class="flex justify-between pb-2 mb-2 border-b"><div><span class="font-bold text-rose-800">${r.status}</span>${pb}</div><div class="text-[10px] text-slate-500">By: ${r.adminName}<br>${r.timestamp}</div></div><p class="text-xs whitespace-pre-wrap">${r.text}</p>${aa}${act}</div>`; });
-      });
     }
 
-    function loadGlobalStatusFeed() { callAPI('GET', '?action=getWorkspaceStatusFeed', null, function(d) { if (d && !d.error) { window.cachedGlobalFeed = Array.isArray(d) ? d : d.feed || []; if (d.serverTime) window.serverTimeOffset = Date.now() - d.serverTime; renderLiveGlobalFeed(); const dr = document.getElementById('fb-target-user'); if (dr) { const v = dr.value; dr.innerHTML = '<option value="">Target Tasker</option>'; window.cachedGlobalFeed.forEach(t => { if(currentUser && t.id!==currentUser.id) dr.innerHTML+=`<option value="${t.id}|${t.name}">${t.name}</option>`; }); if(v) dr.value=v; } } }); }
+    // Force Cloudflare to regenerate cache for global feed.
+    function loadGlobalStatusFeed() { callAPI('GET', '?action=getWorkspaceStatusFeed', null, () => {}); }
+
+    function updateGlobalStatusFeedUI(d) {
+        if (d && !d.error) { 
+            window.cachedGlobalFeed = Array.isArray(d) ? d : d.feed || []; 
+            if (d.serverTime) window.serverTimeOffset = Date.now() - d.serverTime; 
+            renderLiveGlobalFeed(); 
+            const dr = document.getElementById('fb-target-user'); 
+            if (dr) { 
+                const v = dr.value; dr.innerHTML = '<option value="">Target Tasker</option>'; 
+                window.cachedGlobalFeed.forEach(t => { if(currentUser && t.id!==currentUser.id) dr.innerHTML+=`<option value="${t.id}|${t.name}">${t.name}</option>`; }); 
+                if(v) dr.value=v; 
+            } 
+        }
+    }
 
     function renderLiveGlobalFeed() {
       if (!Array.isArray(window.cachedGlobalFeed)) window.cachedGlobalFeed = []; const f = document.getElementById('global-feed-table'); if (window.cachedGlobalFeed.length === 0) { f.innerHTML = '<tr><td colspan="9" class="p-4 text-center">No logs.</td></tr>'; return; }
@@ -435,7 +506,7 @@
                 rh = r.permanentSchedule.halfDayHours || 4;
             } else {
                 let diffM = eM - sM;
-                if (diffM < 0) diffM += 1440; // Safely handle shifts crossing midnight
+                if (diffM < 0) diffM += 1440; 
                 rh = Math.max(0, (diffM - (r.permanentSchedule.maxMeal || 60)) / 60);
             }
             if (rh > 0) rs = `${Math.floor(rh).toString().padStart(2,'0')}:${Math.floor((rh - Math.floor(rh)) * 60).toString().padStart(2,'0')}:00`;
@@ -448,36 +519,65 @@
       }); f.innerHTML = h;
     }
 
+    // Force Cloudflare to regenerate cache for Admin
+    function fetchGlobalAdminLogs() { callAPI('GET','?action=getAdminDashboardData',null,() => {}); }
+    function updateAdminDashboardUI(d) {
+        if(d&&!d.error){ cachedAdminMasterData=d; if(d.serverTime)window.serverTimeOffset=Date.now()-d.serverTime; populateTaskerDropdownOptions(d.absences||[]); renderFilteredGrids(d); }
+    }
+
     function toggleRefSource() { document.getElementById('ref-source-other-container').classList[document.getElementById('ref-source').value==='Others'?'remove':'add']('hidden'); }
     function toggleRefCovering() { document.getElementById('ref-covering-name').classList[document.getElementById('ref-is-covering').checked?'remove':'add']('hidden'); }
+    
     function submitReferralReport() { let s = document.getElementById('ref-source').value; if(s==='Others') s=document.getElementById('ref-source-other').value.trim(); const c = parseInt(document.getElementById('ref-count').value); const ic=document.getElementById('ref-is-covering').checked, cn=document.getElementById('ref-covering-name').value.trim(); if(!s||isNaN(c)||c<0||(ic&&!cn)) return alert("Check inputs."); const fb = document.getElementById('ref-feedback'); fb.className="text-xs p-2 bg-amber-50 text-amber-800"; fb.innerText="Sending..."; fb.classList.remove('hidden'); callAPI('POST', '', {action:"submitReferralReport",userName:currentUser.name,source:s,numReferrals:c,coveringFor:ic?cn:""}, r=>{ fb.innerText=r.message||"Error"; fb.className=r.success?"text-xs p-2 bg-emerald-50 text-emerald-800":"text-xs p-2 bg-rose-50 text-rose-800"; if(r.success) { document.getElementById('ref-count').value=""; loadReferralReportsFeed(); } }); }
-    function submitFeedbackReport() { const v=document.getElementById('fb-target-user').value, c=document.getElementById('fb-category').value, r=document.getElementById('fb-reason').value, fi=document.getElementById('fb-file'); if(!v||!c||!r.trim()) return alert("Incomplete"); const [tId, tNm]=v.split('|'); const execute=b=>{ callAPI('POST','',{action:"submitFeedbackReport",targetUserId:tId,targetName:tNm,category:c,reason:r,attachment:b}, res=>{ if(res.success) { document.getElementById('fb-target-user').value=""; document.getElementById('fb-reason').value=""; if(fi) fi.value=""; alert("Sent!"); } }); }; if(fi&&fi.files[0]) compressImage(fi.files[0], execute); else execute(''); }
+    function submitFeedbackReport() { const v=document.getElementById('fb-target-user').value, c=document.getElementById('fb-category').value, r=document.getElementById('fb-reason').value, fi=document.getElementById('fb-file'); if(!v||!c||!r.trim()) return alert("Incomplete"); const [tId, tNm]=v.split('|'); const execute=b=>{ callAPI('POST','',{action:"submitFeedbackReport",targetUserId:tId,targetName:tNm,category:c,reason:r,attachment:b}, res=>{ if(res.success) { document.getElementById('fb-target-user').value=""; document.getElementById('fb-reason').value=""; if(fi) fi.value=""; fetchGlobalAdminLogs(); alert("Sent!"); } }); }; if(fi&&fi.files[0]) compressImage(fi.files[0], execute); else execute(''); }
     function toggleAdminCoachingPenalty() { document.getElementById('admin-coach-penalty').classList[document.getElementById('admin-coach-status').value==='Final Warning'?'remove':'add']('hidden'); }
     function submitCoachingReport() { const uid=document.getElementById('admin-coach-target').value, st=document.getElementById('admin-coach-status').value, pt=document.getElementById('admin-coach-penalty').value, txt=document.getElementById('admin-coach-text').value, fi=document.getElementById('admin-coach-file'); if(!uid||!txt.trim()) return alert("Required fields."); const tnm=document.getElementById('admin-coach-target').options[document.getElementById('admin-coach-target').selectedIndex].text.split(' [')[0]; const ex=b=>{ callAPI('POST','',{action:"submitCoachingReport",targetUserId:uid,targetName:tnm,status:st,penaltyTag:pt,coachingText:txt,adminAttachment:b}, r=>{ if(r.success){ document.getElementById('admin-coach-text').value=""; if(fi)fi.value=""; fetchGlobalAdminLogs(); } alert(r.message); }); }; if(fi&&fi.files[0]) compressImage(fi.files[0], ex); else ex(''); }
-    function acknowledgeCoaching(id) { const rep=document.getElementById('cr-'+id).value, fi=document.getElementById('crf-'+id); const ex=b=>{ callAPI('POST','',{action:"acknowledgeCoaching",coachingId:id,taskerReply:rep,taskerAttachment:b}, r=>{ alert(r.message); if(r.success) refreshUserTimers(); }); }; if(fi&&fi.files[0]) compressImage(fi.files[0], ex); else ex(''); }
-    function submitCAForm() { const a=parseFloat(document.getElementById('ca-amount').value), r=document.getElementById('ca-reason').value, fi=document.getElementById('ca-file'); if(isNaN(a)||a<=0||!r.trim()) return alert("Invalid."); const ex=b=>{ callAPI('POST','',{action:"submitCARequest",userName:currentUser.name,amount:a,reason:r,attachment:b}, res=>{ alert(res.message); if(res.success){ document.getElementById('ca-amount').value=""; document.getElementById('ca-reason').value=""; if(fi)fi.value=""; refreshUserTimers(); } }); }; if(fi&&fi.files[0]) compressImage(fi.files[0], ex); else ex(''); }
+    function acknowledgeCoaching(id) { const rep=document.getElementById('cr-'+id).value, fi=document.getElementById('crf-'+id); const ex=b=>{ callAPI('POST','',{action:"acknowledgeCoaching",coachingId:id,taskerReply:rep,taskerAttachment:b}, r=>{ alert(r.message); if(r.success) { refreshUserTimers(); fetchGlobalAdminLogs(); } }); }; if(fi&&fi.files[0]) compressImage(fi.files[0], ex); else ex(''); }
+    function submitCAForm() { const a=parseFloat(document.getElementById('ca-amount').value), r=document.getElementById('ca-reason').value, fi=document.getElementById('ca-file'); if(isNaN(a)||a<=0||!r.trim()) return alert("Invalid."); const ex=b=>{ callAPI('POST','',{action:"submitCARequest",userName:currentUser.name,amount:a,reason:r,attachment:b}, res=>{ alert(res.message); if(res.success){ document.getElementById('ca-amount').value=""; document.getElementById('ca-reason').value=""; if(fi)fi.value=""; refreshUserTimers(); fetchGlobalAdminLogs(); } }); }; if(fi&&fi.files[0]) compressImage(fi.files[0], ex); else ex(''); }
     function openCAModal(id) { document.getElementById('ca-modal-req-id').value=id; document.getElementById('ca-modal-feedback').value=""; document.getElementById('ca-modal-file').value=""; document.getElementById('ca-decision-modal').classList.remove('hidden'); }
     function closeCAModal() { document.getElementById('ca-decision-modal').classList.add('hidden'); }
-    function submitCADecision(st) { const rid=document.getElementById('ca-modal-req-id').value, f=document.getElementById('ca-modal-feedback').value, fi=document.getElementById('ca-modal-file'); if(st==='Denied'&&!f.trim()) return alert("Need feedback"); const ex=b=>{ callAPI('POST','',{action:"processCAAction",requestId:rid,status:st,feedback:f,adminAttachment:b}, res=>{ alert(res.message); closeCAModal(); if(res.success) fetchGlobalAdminLogs(); }); }; if(st==='Approved'&&fi.files[0]) compressImage(fi.files[0], ex); else ex(''); }
-    function loadReferralReportsFeed() { callAPI('GET', '?action=getAllReferralReports', null, d=>{ const c=document.getElementById('referral-reports-feed'); c.innerHTML=""; if(!d||!d.length) return c.innerHTML='<div class="text-slate-400 text-xs">No records</div>'; d.forEach(r=>{ c.innerHTML+=`<div class="bg-white p-3 rounded shadow-sm border text-xs"><div class="flex justify-between"><span class="font-bold">${r.user_name}</span><span>${r.timestamp}</span></div><div class="flex justify-between mt-2 pt-2 border-t text-indigo-700 font-bold"><span>Source: ${r.source} ${r.covering_for?'(Covering)':''}</span><span>${r.num_referrals} Refs</span></div></div>`; }); }); }
+    function submitCADecision(st) { const rid=document.getElementById('ca-modal-req-id').value, f=document.getElementById('ca-modal-feedback').value, fi=document.getElementById('ca-modal-file'); if(st==='Denied'&&!f.trim()) return alert("Need feedback"); const ex=b=>{ callAPI('POST','',{action:"processCAAction",requestId:rid,status:st,feedback:f,adminAttachment:b}, res=>{ alert(res.message); closeCAModal(); if(res.success) { refreshUserTimers(); fetchGlobalAdminLogs(); } }); }; if(st==='Approved'&&fi.files[0]) compressImage(fi.files[0], ex); else ex(''); }
+    
+    function loadReferralReportsFeed() { callAPI('GET', '?action=getAllReferralReports', null, () => {}); }
+    function updateReferralReportsUI(d) {
+        const c=document.getElementById('referral-reports-feed'); c.innerHTML=""; if(!d||!d.length) return c.innerHTML='<div class="text-slate-400 text-xs">No records</div>'; d.forEach(r=>{ c.innerHTML+=`<div class="bg-white p-3 rounded shadow-sm border text-xs"><div class="flex justify-between"><span class="font-bold">${r.user_name}</span><span>${r.timestamp}</span></div><div class="flex justify-between mt-2 pt-2 border-t text-indigo-700 font-bold"><span>Source: ${r.source} ${r.covering_for?'(Covering)':''}</span><span>${r.num_referrals} Refs</span></div></div>`; });
+    }
+
     function submitScheduleAdjustment(p) { const t=document.getElementById('sched-target-uid').value, ss=document.getElementById('sched-shift-start').value, se=document.getElementById('sched-shift-end').value, mb=document.getElementById('sched-max-break').value, mm=document.getElementById('sched-max-meal').value, hdt=document.getElementById('sched-half-day-temp').value, hdp=document.getElementById('sched-half-day-perm').value, hhr=document.getElementById('sched-half-hrs').value, hm=document.getElementById('sched-half-meal').value; if(!t||!ss||!se||!mb||!mm) return alert("Incomplete"); callAPI('POST','',{action:p?"updatePermanentSchedule":"updateDailyScheduleAdjustment",targetUserId:t,shiftStart:ss,shiftEnd:se,maxBreak:mb,maxMeal:mm,isHalfDay:hdt,halfDay:hdp,halfDayHours:hhr,halfDayMeal:hm,date:getManilaDateString()}, r=>{ alert(r.message); if(r.success) { fetchGlobalAdminLogs(); loadGlobalStatusFeed(); } }); }
     function toggleFormScheduleVisibility() { const o=document.getElementById('add-u-role').value==='Admin'?'0.35':'1', d=document.getElementById('add-u-role').value==='Admin'; ['add-u-shift-start','add-u-shift-end','add-u-off','add-u-max-break','add-u-max-meal','add-u-half','add-u-half-hrs','add-u-half-meal'].forEach(id=>{ const el=document.getElementById(id); el.closest('div').style.opacity=o; el.disabled=d; }); }
-    function loadPublicTaskReportsFeed() { callAPI('GET','?action=getAllTaskReports',null,d=>{ cachedPublicReports=d||[]; const f=document.getElementById('public-filter-tasker'); const v=f.value; f.innerHTML='<option value="ALL">All</option>'; [...new Set(cachedPublicReports.map(r=>r.name))].sort().forEach(n=>f.innerHTML+=`<option value="${n}">${n}</option>`); f.value=v; applyPublicReportFilter(); }); }
+    
+    function loadPublicTaskReportsFeed() { callAPI('GET','?action=getAllTaskReports',null,() => {}); }
+    function updatePublicTaskReportsUI(d) {
+        cachedPublicReports=d||[]; const f=document.getElementById('public-filter-tasker'); const v=f.value; f.innerHTML='<option value="ALL">All</option>'; [...new Set(cachedPublicReports.map(r=>r.name))].sort().forEach(n=>f.innerHTML+=`<option value="${n}">${n}</option>`); f.value=v; applyPublicReportFilter();
+    }
     function applyPublicReportFilter() { const c=document.getElementById('public-reports-feed'), v=document.getElementById('public-filter-tasker').value; const i=v==="ALL"?cachedPublicReports:cachedPublicReports.filter(r=>r.name===v); c.innerHTML=""; if(!i.length) return c.innerHTML="No reports"; i.forEach(r=>{ c.innerHTML+=`<div class="bg-white p-3 border rounded"><div class="flex justify-between text-xs font-bold"><span>${r.name}</span><span class="text-emerald-700">${r.date}</span></div><p class="text-xs mt-2 whitespace-pre-wrap">${r.summary}</p></div>`; }); }
     function submitDailyWorkReport() { const d=document.getElementById('rep-date').value, s=document.getElementById('rep-summary').value; if(!d||!s.trim()) return alert("Incomplete"); callAPI('POST','',{action:"submitDailyReport",userId:currentUser.id,userName:currentUser.name,reportDate:d,summary:s}, r=>{ alert(r.message); if(r.success){ document.getElementById('rep-summary').value=""; loadPublicTaskReportsFeed(); } }); }
-    function loadOtherTaskReportsFeed() { callAPI('GET','?action=getAllOtherTaskReports',null,d=>{ cachedOtherReports=d||[]; const f=document.getElementById('other-public-filter-tasker'); const v=f.value; f.innerHTML='<option value="ALL">All</option>'; [...new Set(cachedOtherReports.map(r=>r.name))].sort().forEach(n=>f.innerHTML+=`<option value="${n}">${n}</option>`); f.value=v; applyOtherReportFilter(); }); }
+    
+    function loadOtherTaskReportsFeed() { callAPI('GET','?action=getAllOtherTaskReports',null,() => {}); }
+    function updateOtherTaskReportsUI(d) {
+        cachedOtherReports=d||[]; const f=document.getElementById('other-public-filter-tasker'); const v=f.value; f.innerHTML='<option value="ALL">All</option>'; [...new Set(cachedOtherReports.map(r=>r.name))].sort().forEach(n=>f.innerHTML+=`<option value="${n}">${n}</option>`); f.value=v; applyOtherReportFilter();
+    }
     function applyOtherReportFilter() { const c=document.getElementById('other-public-reports-feed'), v=document.getElementById('other-public-filter-tasker').value; const i=v==="ALL"?cachedOtherReports:cachedOtherReports.filter(r=>r.name===v); c.innerHTML=""; if(!i.length) return c.innerHTML="No reports"; i.forEach(r=>{ c.innerHTML+=`<div class="bg-white p-3 border rounded"><div class="flex justify-between text-xs font-bold"><span>${r.name}</span><span class="text-emerald-700">${r.date}</span></div><p class="text-xs mt-2 whitespace-pre-wrap">${r.summary}</p></div>`; }); }
     function submitOtherWorkReport() { const d=document.getElementById('other-rep-date').value, s=document.getElementById('other-rep-summary').value; if(!d||!s.trim()) return alert("Incomplete"); callAPI('POST','',{action:"submitOtherTaskReport",userId:currentUser.id,userName:currentUser.name,reportDate:d,summary:s}, r=>{ alert(r.message); if(r.success){ document.getElementById('other-rep-summary').value=""; loadOtherTaskReportsFeed(); } }); }
+    
     function openImagePreviewOverlayModal(url) { if(!url)return alert("No image"); window.open().document.write(`<body style="margin:0; background:#0f172a; display:flex; justify-content:center; align-items:center; min-h:100vh;"><img src="${url}" style="max-width:95%; max-height:95vh; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5); border-radius:12px;" /></body>`); }
     function executeSelfPasswordChange() { const o=document.getElementById('self-old-pass').value, n=document.getElementById('self-new-pass').value, c=document.getElementById('self-confirm-pass').value; if(!o||!n||!c) return alert("Complete"); if(n!==c) return alert("Mismatch"); callAPI('POST','',{action:"changePasswordSelf",userId:currentUser.id,oldPassword:o,newPassword:n}, r=>{ alert(r.message); if(r.success){ document.getElementById('self-old-pass').value=""; document.getElementById('self-new-pass').value=""; document.getElementById('self-confirm-pass').value=""; } }); }
-    function triggerAttendance(p) { callAPI('POST','',{action:"logAttendance",userId:currentUser.id,userName:currentUser.name,actionType:p}, r=>{ alert(r.message); refreshUserTimers(); }); }
-    function submitLeaveForm() { const d=document.getElementById('l-date').value, r=document.getElementById('l-reason').value, fi=document.getElementById('l-file'); if(!d||!r) return alert("Complete fields."); const ex=b=>{ callAPI('POST','',{action:"submitLeaveRequest",userId:currentUser.id,userName:currentUser.name,leaveDate:d,reason:r,attachment:b}, res=>{ alert(res.message); if(res.success){ document.getElementById('l-date').value=""; document.getElementById('l-reason').value=""; if(fi)fi.value=""; refreshUserTimers(); } }); }; if(fi&&fi.files[0]) compressImage(fi.files[0], ex); else ex(''); }
-    function submitRestDayForm() { const d=document.getElementById('rd-date').value, c=document.getElementById('rd-comments').value; if(!d||!c) return alert("Complete fields."); callAPI('POST','',{action:"submitRestDayRequest",userId:currentUser.id,userName:currentUser.name,targetDate:d,comments:c}, res=>{ alert(res.message); if(res.success){ document.getElementById('rd-date').value=""; document.getElementById('rd-comments').value=""; refreshUserTimers(); } }); }
-    function adminExecuteLeave(id,st) { const c=prompt("Comments:"); if(c===null)return; callAPI('POST','',{action:"processLeaveAction",requestId:id,status:st,comment:c}, r=>{ alert(r.message); fetchGlobalAdminLogs(); }); }
-    function executeAdminMakeRestDayDecision(id,st) { const c=prompt("Comments:"); if(c===null)return; callAPI('POST','',{action:"processRestDayAction",requestId:id,status:st,feedback:c}, r=>{ alert(r.message); fetchGlobalAdminLogs(); }); }
+    
+    function triggerAttendance(p) { 
+        callAPI('POST','',{action:"logAttendance",userId:currentUser.id,userName:currentUser.name,actionType:p}, r=>{ 
+            alert(r.message); 
+            refreshUserTimers(); 
+            loadGlobalStatusFeed(); 
+        }); 
+    }
+    
+    function submitLeaveForm() { const d=document.getElementById('l-date').value, r=document.getElementById('l-reason').value, fi=document.getElementById('l-file'); if(!d||!r) return alert("Complete fields."); const ex=b=>{ callAPI('POST','',{action:"submitLeaveRequest",userId:currentUser.id,userName:currentUser.name,leaveDate:d,reason:r,attachment:b}, res=>{ alert(res.message); if(res.success){ document.getElementById('l-date').value=""; document.getElementById('l-reason').value=""; if(fi)fi.value=""; refreshUserTimers(); fetchGlobalAdminLogs(); } }); }; if(fi&&fi.files[0]) compressImage(fi.files[0], ex); else ex(''); }
+    function submitRestDayForm() { const d=document.getElementById('rd-date').value, c=document.getElementById('rd-comments').value; if(!d||!c) return alert("Complete fields."); callAPI('POST','',{action:"submitRestDayRequest",userId:currentUser.id,userName:currentUser.name,targetDate:d,comments:c}, res=>{ alert(res.message); if(res.success){ document.getElementById('rd-date').value=""; document.getElementById('rd-comments').value=""; refreshUserTimers(); fetchGlobalAdminLogs(); } }); }
+    function adminExecuteLeave(id,st) { const c=prompt("Comments:"); if(c===null)return; callAPI('POST','',{action:"processLeaveAction",requestId:id,status:st,comment:c}, r=>{ alert(r.message); fetchGlobalAdminLogs(); refreshUserTimers(); }); }
+    function executeAdminMakeRestDayDecision(id,st) { const c=prompt("Comments:"); if(c===null)return; callAPI('POST','',{action:"processRestDayAction",requestId:id,status:st,feedback:c}, r=>{ alert(r.message); fetchGlobalAdminLogs(); refreshUserTimers(); }); }
     function executeAdminUntagAbsentLog(id,nm,dt) { if(!confirm("Remove?"))return; callAPI('POST','',{action:"adminUntagAbsent",absentId:id}, r=>{ alert(r.message); fetchGlobalAdminLogs(); }); }
     function executeAdminOverridePassword(id) { const p=prompt("New pass:"); if(!p||p.trim()==="")return; callAPI('POST','',{action:"adminChangePassword",targetUserId:id,newPassword:p}, r=>alert(r.message)); }
-    function executeAdminRemoveUser(id,nm) { if(!confirm("Purge?"))return; callAPI('POST','',{action:"adminDeleteUser",targetUserId:id}, r=>{ alert(r.message); fetchGlobalAdminLogs(); }); }
+    function executeAdminRemoveUser(id,nm) { if(!confirm("Purge?"))return; callAPI('POST','',{action:"adminDeleteUser",targetUserId:id}, r=>{ alert(r.message); fetchGlobalAdminLogs(); loadGlobalStatusFeed(); }); }
     
     function executeAdminTagStatus(id, nm) {
       const d = prompt("Date YYYY-MM-DD:", new Date().toISOString().split('T')[0]);
@@ -492,7 +592,7 @@
 
       callAPI('POST','',{action: action, targetUserId:id, targetName:nm, targetDate:d}, r=>{
         alert(r.message);
-        if(r.success) fetchGlobalAdminLogs();
+        if(r.success) { fetchGlobalAdminLogs(); loadGlobalStatusFeed(); }
       });
     }
 
@@ -501,7 +601,7 @@
       if (d === null) return;
       callAPI('POST', '', {action: "adminTagSuspended", targetUserId: id, suspendedUntil: d.trim()}, r => {
         alert(r.message);
-        if (r.success) fetchGlobalAdminLogs();
+        if (r.success) { fetchGlobalAdminLogs(); loadGlobalStatusFeed(); }
       });
     }
 
@@ -509,11 +609,10 @@
       if (!confirm("Lift suspension for this tasker?")) return;
       callAPI('POST', '', {action: "adminLiftSuspension", targetUserId: id}, r => {
         alert(r.message);
-        if (r.success) fetchGlobalAdminLogs();
+        if (r.success) { fetchGlobalAdminLogs(); loadGlobalStatusFeed(); }
       });
     }
 
-    // Modal Control logic for manual break durations modification
     function openBreakEditModal(attId, name, date, currentQuick, currentMeal) {
       document.getElementById('break-edit-id').value = attId;
       document.getElementById('break-edit-info').innerText = `${name} | Shift Date: ${date}`;
@@ -522,9 +621,7 @@
       document.getElementById('break-edit-modal').classList.remove('hidden');
     }
     
-    function closeBreakEditModal() {
-      document.getElementById('break-edit-modal').classList.add('hidden');
-    }
+    function closeBreakEditModal() { document.getElementById('break-edit-modal').classList.add('hidden'); }
 
     function submitBreakEdit() {
       const id = document.getElementById('break-edit-id').value;
@@ -534,17 +631,12 @@
       
       callAPI('POST', '', { action: "adminUpdateBreakDurations", attendanceId: id, newBreak: qb, newLunch: mb }, r => {
         alert(r.message);
-        if (r.success) {
-          closeBreakEditModal();
-          fetchGlobalAdminLogs();
-        }
+        if (r.success) { closeBreakEditModal(); fetchGlobalAdminLogs(); loadGlobalStatusFeed(); }
       });
     }
 
     function showSection(id) { ['attendance-sec','global-feed-sec','leave-request-sec','restday-request-sec','task-report-sec','other-task-report-sec','referral-report-sec','ca-request-sec','coaching-sec','feedback-submit-sec','account-settings-sec','admin-payroll-sec','user-payroll-sec','admin-sec'].forEach(s=>{document.getElementById(s).className='hidden';}); const t=document.getElementById(id); if(t) t.className=id==='account-settings-sec'?'bg-white p-6 rounded-xl shadow-sm border max-w-md space-y-4':'space-y-6 max-w-6xl'; if(id==='task-report-sec'){document.getElementById('rep-date').value=new Date().toISOString().split('T')[0]; loadPublicTaskReportsFeed();} if(id==='other-task-report-sec'){document.getElementById('other-rep-date').value=new Date().toISOString().split('T')[0]; loadOtherTaskReportsFeed();} if(id==='referral-report-sec')loadReferralReportsFeed(); if(id==='feedback-submit-sec'||id==='global-feed-sec')loadGlobalStatusFeed(); if(id==='admin-sec')fetchGlobalAdminLogs(); if(['attendance-sec','leave-request-sec','ca-request-sec','coaching-sec','account-settings-sec','restday-request-sec'].includes(id))refreshUserTimers(); }
     function logout() { currentUser=null; clearTimeout(inactivityTimer); clearInterval(liveTimerTickerInterval); localStorage.removeItem("olympuz_active_session"); localStorage.removeItem("olympuz_token"); location.reload(); }
-    
-    function fetchGlobalAdminLogs() { callAPI('GET','?action=getAdminDashboardData',null,d=>{ if(d&&!d.error){ cachedAdminMasterData=d; if(d.serverTime)window.serverTimeOffset=Date.now()-d.serverTime; populateTaskerDropdownOptions(d.absences||[]); renderFilteredGrids(d); }}); }
     
     function populateTaskerDropdownOptions(a) { 
       const f=document.getElementById('filter-tasker'), v=f.value; 
@@ -610,11 +702,16 @@
     }
     
     function routePayrollSection() { if (!currentUser) return; if (currentUser.role === 'Admin') showSection('admin-payroll-sec'); else { showSection('user-payroll-sec'); fetchUserPayrollData(); } }
-    function fetchUserPayrollData() { if (!currentUser) return; callAPI('GET', "?action=getUserPayroll&userId=" + currentUser.id, null, p=>{ const tb=document.getElementById('user-payroll-table'); tb.innerHTML=""; if(!p||!p.length) return tb.innerHTML='<tr><td colspan="8" class="p-3 text-center">No records.</td></tr>'; p.forEach(r=>{ let sb=""; if(r.status==="Acknowledged"||r.status==="Settled & Adjusted"||r.status==="Dispute Approved")sb=`<span class="text-emerald-700 font-bold">✓ ${r.status}</span>`; else if(r.status==="Disputed")sb=`<span class="text-amber-600 font-bold">Pending Dispute</span>`; else if(r.status==="Dispute Rejected")sb=`<span class="text-rose-600 font-bold mb-1 block">❌ Rejected</span><button onclick="acknowledgePayment('${r.payrollId}')" class="bg-indigo-600 text-white px-2 py-1 text-xs">Acknowledge</button>`; else sb=`<button onclick="acknowledgePayment('${r.payrollId}')" class="bg-emerald-600 text-white px-2 py-1 text-[10px] mr-1">Acknowledge</button><button onclick="disputePayment('${r.payrollId}')" class="bg-rose-600 text-white px-2 py-1 text-[10px]">Dispute</button>`; tb.innerHTML+=`<tr class="border-b"><td class="p-3 font-bold">${r.period}</td><td class="p-3">${r.weeks} wks</td><td class="p-3">${r.paymentMode}</td><td class="p-3">₱${r.gross}</td><td class="p-3 text-rose-600">-₱${r.deductions}</td><td class="p-3 text-indigo-700 font-bold">₱${r.net}</td><td class="p-3">${r.receiptImage?`<a href="#" onclick="openImagePreviewOverlayModal('${r.receiptImage}')" class="text-indigo-600 underline">View</a>`:'-'}</td><td class="p-3 text-center">${sb}</td></tr>`; }); }); }
+    
+    function fetchUserPayrollData() { callAPI('GET', "?action=getUserPayroll&userId=" + currentUser.id, null, () => {}); }
+    function updateUserPayrollUI(p) {
+        const tb=document.getElementById('user-payroll-table'); tb.innerHTML=""; if(!p||!p.length) return tb.innerHTML='<tr><td colspan="8" class="p-3 text-center">No records.</td></tr>'; p.forEach(r=>{ let sb=""; if(r.status==="Acknowledged"||r.status==="Settled & Adjusted"||r.status==="Dispute Approved")sb=`<span class="text-emerald-700 font-bold">✓ ${r.status}</span>`; else if(r.status==="Disputed")sb=`<span class="text-amber-600 font-bold">Pending Dispute</span>`; else if(r.status==="Dispute Rejected")sb=`<span class="text-rose-600 font-bold mb-1 block">❌ Rejected</span><button onclick="acknowledgePayment('${r.payrollId}')" class="bg-indigo-600 text-white px-2 py-1 text-xs">Acknowledge</button>`; else sb=`<button onclick="acknowledgePayment('${r.payrollId}')" class="bg-emerald-600 text-white px-2 py-1 text-[10px] mr-1">Acknowledge</button><button onclick="disputePayment('${r.payrollId}')" class="bg-rose-600 text-white px-2 py-1 text-[10px]">Dispute</button>`; tb.innerHTML+=`<tr class="border-b"><td class="p-3 font-bold">${r.period}</td><td class="p-3">${r.weeks} wks</td><td class="p-3">${r.paymentMode}</td><td class="p-3">₱${r.gross}</td><td class="p-3 text-rose-600">-₱${r.deductions}</td><td class="p-3 text-indigo-700 font-bold">₱${r.net}</td><td class="p-3">${r.receiptImage?`<a href="#" onclick="openImagePreviewOverlayModal('${r.receiptImage}')" class="text-indigo-600 underline">View</a>`:'-'}</td><td class="p-3 text-center">${sb}</td></tr>`; });
+    }
+
     function disputePayment(id) { const rs=prompt("Dispute Reason:"); if(!rs)return; callAPI('POST','',{action:"disputePayment",paymentId:id,reason:rs}, r=>{ alert(r.message); fetchUserPayrollData(); }); }
     function acknowledgePayment(id) { if(!confirm("Acknowledge?"))return; callAPI('POST','',{action:"acknowledgePayment",paymentId:id,userId:currentUser.id}, r=>{ alert(r.message); fetchUserPayrollData(); }); }
     function adminResolveDispute(id,st,rs) { const n=prompt("Notes:"); if(n===null)return; callAPI('POST','',{action:"updatePayrollReviewStatus",payrollId:id,status:st,disputeReason:rs+(n?"\nNote: "+n:"")}, r=>{ alert(r.message); fetchGlobalAdminLogs(); }); }
-    function executeAdminCreateUser() { const p={action:"adminCreateUser",name:document.getElementById('add-u-name').value,email:document.getElementById('add-u-email').value,password:document.getElementById('add-u-pass').value||"ChangeMe123",role:document.getElementById('add-u-role').value,shiftStart:document.getElementById('add-u-shift-start').value,shiftEnd:document.getElementById('add-u-shift-end').value,daysOff:document.getElementById('add-u-off').value,leaveAllowance:document.getElementById('add-u-leaves').value,maxBreak:document.getElementById('add-u-max-break').value,maxMeal:document.getElementById('add-u-max-meal').value,halfDay:document.getElementById('add-u-half').value,halfDayHours:document.getElementById('add-u-half-hrs').value,halfDayMeal:document.getElementById('add-u-half-meal').value}; if(!p.name||!p.email)return alert("Compile fields."); callAPI('POST','',p, r=>{ alert(r.message); if(r.success)fetchGlobalAdminLogs(); }); }
+    function executeAdminCreateUser() { const p={action:"adminCreateUser",name:document.getElementById('add-u-name').value,email:document.getElementById('add-u-email').value,password:document.getElementById('add-u-pass').value||"ChangeMe123",role:document.getElementById('add-u-role').value,shiftStart:document.getElementById('add-u-shift-start').value,shiftEnd:document.getElementById('add-u-shift-end').value,daysOff:document.getElementById('add-u-off').value,leaveAllowance:document.getElementById('add-u-leaves').value,maxBreak:document.getElementById('add-u-max-break').value,maxMeal:document.getElementById('add-u-max-meal').value,halfDay:document.getElementById('add-u-half').value,halfDayHours:document.getElementById('add-u-half-hrs').value,halfDayMeal:document.getElementById('add-u-half-meal').value}; if(!p.name||!p.email)return alert("Compile fields."); callAPI('POST','',p, r=>{ alert(r.message); if(r.success)fetchGlobalAdminLogs(); loadGlobalStatusFeed(); }); }
     
     function submitPayrollForm() { 
       const pt = document.getElementById('p-target-user').value; 
