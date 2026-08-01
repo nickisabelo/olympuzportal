@@ -6,17 +6,17 @@
   <title>Olympuz Operations Portal</title>
   <link rel="icon" type="image/png" href="Logo New.png">
   
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Enforce Tailwind Class-based Dark Mode -->
+  <!-- Suppress Tailwind Production CDN Warning -->
   <script>
-    tailwind.config = {
+    window.tailwind = {
+      suppressWarnings: true,
       darkMode: 'class',
       theme: {
         extend: {}
       }
-    }
+    };
   </script>
+  <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Early Theme Initialization to Prevent Flash -->
   <script>
@@ -274,7 +274,9 @@
             <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 h-fit space-y-4 transition-colors">
               <h2 class="text-xl font-bold dark:text-slate-100">Referral Tally</h2>
               <select id="ref-source" onchange="toggleRefSource()" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none transition-colors dark:text-white"><option value="Boss Job">Boss Job</option><option value="Threads">Threads</option><option value="Facebook">Facebook</option><option value="LinkedIn">LinkedIn</option><option value="Others">Others</option></select>
-              <input type="text" id="ref-source-other" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg hidden outline-none transition-colors dark:text-white" placeholder="Source">
+              <div id="ref-source-other-container" class="hidden">
+                <input type="text" id="ref-source-other" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none transition-colors dark:text-white" placeholder="Source">
+              </div>
               <input type="number" id="ref-count" min="0" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none transition-colors dark:text-white" placeholder="Count">
               <div class="flex items-center gap-2 pt-2"><input type="checkbox" id="ref-is-covering" onchange="toggleRefCovering()" class="w-4 h-4"><label class="text-xs font-bold dark:text-slate-300">Covering someone?</label></div>
               <input type="text" id="ref-covering-name" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg hidden outline-none transition-colors dark:text-white" placeholder="Name of tasker">
@@ -427,7 +429,6 @@
 
   <script>
     // ---------------- FIREBASE CONFIGURATION ----------------
-    // ** IMPORTANT: REPLACE WITH YOUR FIREBASE PROJECT URL **
     const firebaseConfig = {
       databaseURL: "https://olympuz-portal-default-rtdb.asia-southeast1.firebasedatabase.app/", 
     };
@@ -450,23 +451,20 @@
       const isDark = html.classList.toggle('dark');
       localStorage.setItem('olympuz_theme', isDark ? 'dark' : 'light');
       
-      // Animate Icon Emoji
       const icons = document.querySelectorAll('.theme-icon');
       icons.forEach(icon => {
         icon.classList.remove('animate-spin-once');
-        void icon.offsetWidth; // Trigger DOM reflow to restart animation
+        void icon.offsetWidth;
         icon.innerText = isDark ? '🌞' : '🌙';
         icon.classList.add('animate-spin-once');
       });
     }
 
-    // Sync icons on load
     window.addEventListener('DOMContentLoaded', () => {
       const isDark = document.documentElement.classList.contains('dark');
       document.querySelectorAll('.theme-icon').forEach(i => i.innerText = isDark ? '🌞' : '🌙');
     });
 
-    // Dark Mode optimized Status Badge Generation
     function getStatusBadgeStyle(t) { 
       if (!t) return 'bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400'; 
       const n = t.trim().toLowerCase(); 
@@ -476,7 +474,6 @@
       if (n === 'on leave' || n === 'day off' || n === 'no schedule') return 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'; 
       return 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400'; 
     }
-    // ------------------------------------------------
 
     function parseToMinutes(timeStr) {
       if (!timeStr || typeof timeStr !== 'string') return null;
@@ -539,12 +536,10 @@
       showSection('attendance-sec'); 
       resetInactivityTracker();
       
-      // 1. Initial Load directly from Cloudflare D1 API (Populates immediate UI)
       refreshUserTimers();
       loadGlobalStatusFeed();
       if (currentUser.role === 'Admin') fetchGlobalAdminLogs();
 
-      // 2. Attach Realtime Firebase Listeners (Pushes live updates instantly)
       fbDatabase.ref('stats/' + currentUser.id).on('value', snap => {
           if (snap.exists()) updateLiveUserStatsUI(snap.val());
       });
@@ -590,7 +585,6 @@
       }, 1000);
     }
 
-    // Direct D1 Fetching Wrappers
     function refreshUserTimers() {
       if (!currentUser) return; 
       callAPI('GET', "?action=getLiveUserStats&userId=" + currentUser.id, null, stats => {
@@ -623,7 +617,6 @@
     function loadReferralReportsFeed() { callAPI('GET', '?action=getAllReferralReports', null, d => updateReferralReportsUI(d)); }
     function fetchUserPayrollData() { callAPI('GET', "?action=getUserPayroll&userId=" + currentUser.id, null, d => updateUserPayrollUI(d)); }
 
-    // UI Updater Functions with Dark Mode Template Fixes
     function updateLiveUserStatsUI(s) {
         if (!s || s.error || s.success === false) return; 
         document.getElementById('stat-hours').innerText = (s.clockedHours || "0.00") + " hrs"; document.getElementById('stat-break').innerText = (s.breakMinutes || 0) + " mins"; document.getElementById('stat-lunch').innerText = (s.lunchMinutes || 0) + " mins";
@@ -697,27 +690,29 @@
     }
 
     function updateReferralReportsUI(d) {
-        const c=document.getElementById('referral-reports-feed'); c.innerHTML=""; if(!d||!d.length) return c.innerHTML='<div class="text-slate-400 text-xs">No records</div>'; d.forEach(r=>{ c.innerHTML+=`<div class="bg-white dark:bg-slate-800 p-3 rounded shadow-sm border dark:border-slate-600 text-xs transition-colors"><div class="flex justify-between"><span class="font-bold">${r.user_name}</span><span>${r.timestamp}</span></div><div class="flex justify-between mt-2 pt-2 border-t dark:border-slate-700 text-indigo-700 dark:text-indigo-400 font-bold"><span>Source: ${r.source} ${r.covering_for?'(Covering)':''}</span><span>${r.num_referrals} Refs</span></div></div>`; });
+        const c=document.getElementById('referral-reports-feed'); if(!c) return; c.innerHTML=""; if(!d||!d.length) return c.innerHTML='<div class="text-slate-400 text-xs">No records</div>'; d.forEach(r=>{ c.innerHTML+=`<div class="bg-white dark:bg-slate-800 p-3 rounded shadow-sm border dark:border-slate-600 text-xs transition-colors"><div class="flex justify-between"><span class="font-bold">${r.user_name}</span><span>${r.timestamp}</span></div><div class="flex justify-between mt-2 pt-2 border-t dark:border-slate-700 text-indigo-700 dark:text-indigo-400 font-bold"><span>Source: ${r.source} ${r.covering_for?'(Covering)':''}</span><span>${r.num_referrals} Refs</span></div></div>`; });
     }
 
     function updatePublicTaskReportsUI(d) {
-        cachedPublicReports=d||[]; const f=document.getElementById('public-filter-tasker'); const v=f.value; f.innerHTML='<option value="ALL">All</option>'; [...new Set(cachedPublicReports.map(r=>r.name))].sort().forEach(n=>f.innerHTML+=`<option value="${n}">${n}</option>`); f.value=v; applyPublicReportFilter();
+        cachedPublicReports=d||[]; const f=document.getElementById('public-filter-tasker'); if(!f) return; const v=f.value; f.innerHTML='<option value="ALL">All</option>'; [...new Set(cachedPublicReports.map(r=>r.name))].sort().forEach(n=>f.innerHTML+=`<option value="${n}">${n}</option>`); f.value=v; applyPublicReportFilter();
     }
     
-    function applyPublicReportFilter() { const c=document.getElementById('public-reports-feed'), v=document.getElementById('public-filter-tasker').value; const i=v==="ALL"?cachedPublicReports:cachedPublicReports.filter(r=>r.name===v); c.innerHTML=""; if(!i.length) return c.innerHTML="No reports"; i.forEach(r=>{ c.innerHTML+=`<div class="bg-white dark:bg-slate-800 p-3 border dark:border-slate-600 rounded transition-colors"><div class="flex justify-between text-xs font-bold"><span>${r.name}</span><span class="text-emerald-700 dark:text-emerald-400">${r.date}</span></div><p class="text-xs mt-2 whitespace-pre-wrap dark:text-slate-300">${r.summary}</p></div>`; }); }
+    function applyPublicReportFilter() { const c=document.getElementById('public-reports-feed'), f=document.getElementById('public-filter-tasker'); if(!c||!f) return; const v=f.value; const i=v==="ALL"?cachedPublicReports:cachedPublicReports.filter(r=>r.name===v); c.innerHTML=""; if(!i.length) return c.innerHTML="No reports"; i.forEach(r=>{ c.innerHTML+=`<div class="bg-white dark:bg-slate-800 p-3 border dark:border-slate-600 rounded transition-colors"><div class="flex justify-between text-xs font-bold"><span>${r.name}</span><span class="text-emerald-700 dark:text-emerald-400">${r.date}</span></div><p class="text-xs mt-2 whitespace-pre-wrap dark:text-slate-300">${r.summary}</p></div>`; }); }
 
     function updateOtherTaskReportsUI(d) {
-        cachedOtherReports=d||[]; const f=document.getElementById('other-public-filter-tasker'); const v=f.value; f.innerHTML='<option value="ALL">All</option>'; [...new Set(cachedOtherReports.map(r=>r.name))].sort().forEach(n=>f.innerHTML+=`<option value="${n}">${n}</option>`); f.value=v; applyOtherReportFilter();
+        cachedOtherReports=d||[]; const f=document.getElementById('other-public-filter-tasker'); if(!f) return; const v=f.value; f.innerHTML='<option value="ALL">All</option>'; [...new Set(cachedOtherReports.map(r=>r.name))].sort().forEach(n=>f.innerHTML+=`<option value="${n}">${n}</option>`); f.value=v; applyOtherReportFilter();
     }
 
-    function applyOtherReportFilter() { const c=document.getElementById('other-public-reports-feed'), v=document.getElementById('other-public-filter-tasker').value; const i=v==="ALL"?cachedOtherReports:cachedOtherReports.filter(r=>r.name===v); c.innerHTML=""; if(!i.length) return c.innerHTML="No reports"; i.forEach(r=>{ c.innerHTML+=`<div class="bg-white dark:bg-slate-800 p-3 border dark:border-slate-600 rounded transition-colors"><div class="flex justify-between text-xs font-bold"><span>${r.name}</span><span class="text-emerald-700 dark:text-emerald-400">${r.date}</span></div><p class="text-xs mt-2 whitespace-pre-wrap dark:text-slate-300">${r.summary}</p></div>`; }); }
+    function applyOtherReportFilter() { const c=document.getElementById('other-public-reports-feed'), f=document.getElementById('other-public-filter-tasker'); if(!c||!f) return; const v=f.value; const i=v==="ALL"?cachedOtherReports:cachedOtherReports.filter(r=>r.name===v); c.innerHTML=""; if(!i.length) return c.innerHTML="No reports"; i.forEach(r=>{ c.innerHTML+=`<div class="bg-white dark:bg-slate-800 p-3 border dark:border-slate-600 rounded transition-colors"><div class="flex justify-between text-xs font-bold"><span>${r.name}</span><span class="text-emerald-700 dark:text-emerald-400">${r.date}</span></div><p class="text-xs mt-2 whitespace-pre-wrap dark:text-slate-300">${r.summary}</p></div>`; }); }
 
     function updateUserPayrollUI(p) {
-        const tb=document.getElementById('user-payroll-table'); tb.innerHTML=""; if(!p||!p.length) return tb.innerHTML='<tr><td colspan="8" class="p-3 text-center">No records.</td></tr>'; p.forEach(r=>{ let sb=""; if(r.status==="Acknowledged"||r.status==="Settled & Adjusted"||r.status==="Dispute Approved")sb=`<span class="text-emerald-700 dark:text-emerald-400 font-bold">✓ ${r.status}</span>`; else if(r.status==="Disputed")sb=`<span class="text-amber-600 dark:text-amber-400 font-bold">Pending Dispute</span>`; else if(r.status==="Dispute Rejected")sb=`<span class="text-rose-600 dark:text-rose-400 font-bold mb-1 block">❌ Rejected</span><button onclick="acknowledgePayment('${r.payrollId}')" class="bg-indigo-600 text-white px-2 py-1 text-xs rounded">Acknowledge</button>`; else sb=`<button onclick="acknowledgePayment('${r.payrollId}')" class="bg-emerald-600 text-white px-2 py-1 text-[10px] mr-1 rounded shadow">Acknowledge</button><button onclick="disputePayment('${r.payrollId}')" class="bg-rose-600 text-white px-2 py-1 text-[10px] rounded shadow">Dispute</button>`; tb.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3 font-bold">${r.period}</td><td class="p-3">${r.weeks} wks</td><td class="p-3">${r.paymentMode}</td><td class="p-3">₱${r.gross}</td><td class="p-3 text-rose-600 dark:text-rose-400">-₱${r.deductions}</td><td class="p-3 text-indigo-700 dark:text-indigo-400 font-bold">₱${r.net}</td><td class="p-3">${r.receiptImage?`<a href="#" onclick="openImagePreviewOverlayModal('${r.receiptImage}')" class="text-indigo-600 dark:text-indigo-400 underline">View</a>`:'-'}</td><td class="p-3 text-center">${sb}</td></tr>`; });
+        const tb=document.getElementById('user-payroll-table'); if(!tb) return; tb.innerHTML=""; if(!p||!p.length) return tb.innerHTML='<tr><td colspan="8" class="p-3 text-center">No records.</td></tr>'; p.forEach(r=>{ let sb=""; if(r.status==="Acknowledged"||r.status==="Settled & Adjusted"||r.status==="Dispute Approved")sb=`<span class="text-emerald-700 dark:text-emerald-400 font-bold">✓ ${r.status}</span>`; else if(r.status==="Disputed")sb=`<span class="text-amber-600 dark:text-amber-400 font-bold">Pending Dispute</span>`; else if(r.status==="Dispute Rejected")sb=`<span class="text-rose-600 dark:text-rose-400 font-bold mb-1 block">❌ Rejected</span><button onclick="acknowledgePayment('${r.payrollId}')" class="bg-indigo-600 text-white px-2 py-1 text-xs rounded">Acknowledge</button>`; else sb=`<button onclick="acknowledgePayment('${r.payrollId}')" class="bg-emerald-600 text-white px-2 py-1 text-[10px] mr-1 rounded shadow">Acknowledge</button><button onclick="disputePayment('${r.payrollId}')" class="bg-rose-600 text-white px-2 py-1 text-[10px] rounded shadow">Dispute</button>`; tb.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3 font-bold">${r.period}</td><td class="p-3">${r.weeks} wks</td><td class="p-3">${r.paymentMode}</td><td class="p-3">₱${r.gross}</td><td class="p-3 text-rose-600 dark:text-rose-400">-₱${r.deductions}</td><td class="p-3 text-indigo-700 dark:text-indigo-400 font-bold">₱${r.net}</td><td class="p-3">${r.receiptImage?`<a href="#" onclick="openImagePreviewOverlayModal('${r.receiptImage}')" class="text-indigo-600 dark:text-indigo-400 underline">View</a>`:'-'}</td><td class="p-3 text-center">${sb}</td></tr>`; });
     }
 
-    // Interactive Action Handlers
-    function toggleRefSource() { document.getElementById('ref-source-other-container').classList[document.getElementById('ref-source').value==='Others'?'remove':'add']('hidden'); }
+    function toggleRefSource() { 
+      const cont = document.getElementById('ref-source-other-container'); 
+      if (cont) cont.classList[document.getElementById('ref-source').value==='Others'?'remove':'add']('hidden'); 
+    }
     function toggleRefCovering() { document.getElementById('ref-covering-name').classList[document.getElementById('ref-is-covering').checked?'remove':'add']('hidden'); }
     
     function submitReferralReport() { let s = document.getElementById('ref-source').value; if(s==='Others') s=document.getElementById('ref-source-other').value.trim(); const c = parseInt(document.getElementById('ref-count').value); const ic=document.getElementById('ref-is-covering').checked, cn=document.getElementById('ref-covering-name').value.trim(); if(!s||isNaN(c)||c<0||(ic&&!cn)) return alert("Check inputs."); const fb = document.getElementById('ref-feedback'); fb.className="text-xs p-2 bg-amber-50 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400 rounded mt-2"; fb.innerText="Sending..."; fb.classList.remove('hidden'); callAPI('POST', '', {action:"submitReferralReport",userName:currentUser.name,source:s,numReferrals:c,coveringFor:ic?cn:""}, r=>{ fb.innerText=r.message||"Error"; fb.className=r.success?"text-xs p-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400 rounded mt-2":"text-xs p-2 bg-rose-50 dark:bg-rose-900/30 text-rose-800 dark:text-rose-400 rounded mt-2"; if(r.success) { document.getElementById('ref-count').value=""; loadReferralReportsFeed(); } }); }
@@ -735,7 +730,7 @@
     function submitCADecision(st) { const rid=document.getElementById('ca-modal-req-id').value, f=document.getElementById('ca-modal-feedback').value, fi=document.getElementById('ca-modal-file'); if(st==='Denied'&&!f.trim()) return alert("Need feedback"); const ex=b=>{ callAPI('POST','',{action:"processCAAction",requestId:rid,status:st,feedback:f,adminAttachment:b}, res=>{ alert(res.message); closeCAModal(); if(res.success) { refreshUserTimers(); fetchGlobalAdminLogs(); } }); }; if(st==='Approved'&&fi.files[0]) compressImage(fi.files[0], ex); else ex(''); }
     
     function submitScheduleAdjustment(p) { const t=document.getElementById('sched-target-uid').value, ss=document.getElementById('sched-shift-start').value, se=document.getElementById('sched-shift-end').value, mb=document.getElementById('sched-max-break').value, mm=document.getElementById('sched-max-meal').value, hdt=document.getElementById('sched-half-day-temp').value, hdp=document.getElementById('sched-half-day-perm').value, hhr=document.getElementById('sched-half-hrs').value, hm=document.getElementById('sched-half-meal').value; if(!t||!ss||!se||!mb||!mm) return alert("Incomplete"); callAPI('POST','',{action:p?"updatePermanentSchedule":"updateDailyScheduleAdjustment",targetUserId:t,shiftStart:ss,shiftEnd:se,maxBreak:mb,maxMeal:mm,isHalfDay:hdt,halfDay:hdp,halfDayHours:hhr,halfDayMeal:hm,date:getManilaDateString()}, r=>{ alert(r.message); if(r.success) { fetchGlobalAdminLogs(); loadGlobalStatusFeed(); } }); }
-    function toggleFormScheduleVisibility() { const o=document.getElementById('add-u-role').value==='Admin'?'0.35':'1', d=document.getElementById('add-u-role').value==='Admin'; ['add-u-shift-start','add-u-shift-end','add-u-off','add-u-max-break','add-u-max-meal','add-u-half','add-u-half-hrs','add-u-half-meal'].forEach(id=>{ const el=document.getElementById(id); el.closest('div').style.opacity=o; el.disabled=d; }); }
+    function toggleFormScheduleVisibility() { const o=document.getElementById('add-u-role').value==='Admin'?'0.35':'1', d=document.getElementById('add-u-role').value==='Admin'; ['add-u-shift-start','add-u-shift-end','add-u-off','add-u-max-break','add-u-max-meal','add-u-half','add-u-half-hrs','add-u-half-meal'].forEach(id=>{ const el=document.getElementById(id); if (el) { el.closest('div').style.opacity=o; el.disabled=d; } }); }
     
     function openImagePreviewOverlayModal(url) { if(!url)return alert("No image"); window.open().document.write(`<body style="margin:0; background:#0f172a; display:flex; justify-content:center; align-items:center; min-h:100vh;"><img src="${url}" style="max-width:95%; max-height:95vh; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5); border-radius:12px;" /></body>`); }
     function executeSelfPasswordChange() { const o=document.getElementById('self-old-pass').value, n=document.getElementById('self-new-pass').value, c=document.getElementById('self-confirm-pass').value; if(!o||!n||!c) return alert("Complete"); if(n!==c) return alert("Mismatch"); callAPI('POST','',{action:"changePasswordSelf",userId:currentUser.id,oldPassword:o,newPassword:n}, r=>{ alert(r.message); if(r.success){ document.getElementById('self-old-pass').value=""; document.getElementById('self-new-pass').value=""; document.getElementById('self-confirm-pass').value=""; } }); }
@@ -813,13 +808,20 @@
     }
 
     function showSection(id) { 
-      // Safely hide all sections
-      ['attendance-sec','global-feed-sec','leave-request-sec','restday-request-sec','task-report-sec','other-task-report-sec','referral-report-sec','ca-request-sec','coaching-sec','feedback-submit-sec','account-settings-sec','admin-payroll-sec','user-payroll-sec','admin-sec'].forEach(s => {
+      // Safely hide all section containers with null checks
+      const sectionIds = [
+        'attendance-sec','global-feed-sec','leave-request-sec','restday-request-sec',
+        'task-report-sec','other-task-report-sec','referral-report-sec','ca-request-sec',
+        'coaching-sec','feedback-submit-sec','account-settings-sec','admin-payroll-sec',
+        'user-payroll-sec','admin-sec'
+      ];
+      
+      sectionIds.forEach(s => {
         const el = document.getElementById(s);
         if (el) el.classList.add('hidden'); 
       }); 
 
-      // Show the targeted section safely
+      // Show targeted section safely
       const t = document.getElementById(id); 
       if (t) { 
         t.classList.remove('hidden'); 
@@ -830,8 +832,8 @@
         } 
       } 
       
-      if (id === 'task-report-sec') { document.getElementById('rep-date').value = new Date().toISOString().split('T')[0]; loadPublicTaskReportsFeed(); } 
-      if (id === 'other-task-report-sec') { document.getElementById('other-rep-date').value = new Date().toISOString().split('T')[0]; loadOtherTaskReportsFeed(); } 
+      if (id === 'task-report-sec') { const repDate = document.getElementById('rep-date'); if (repDate) repDate.value = new Date().toISOString().split('T')[0]; loadPublicTaskReportsFeed(); } 
+      if (id === 'other-task-report-sec') { const otherRepDate = document.getElementById('other-rep-date'); if (otherRepDate) otherRepDate.value = new Date().toISOString().split('T')[0]; loadOtherTaskReportsFeed(); } 
       if (id === 'referral-report-sec') loadReferralReportsFeed(); 
       if (id === 'feedback-submit-sec' || id === 'global-feed-sec') loadGlobalStatusFeed(); 
       if (id === 'admin-sec') fetchGlobalAdminLogs(); 
@@ -841,14 +843,19 @@
     function logout() { currentUser=null; clearTimeout(inactivityTimer); clearInterval(liveTimerTickerInterval); localStorage.removeItem("olympuz_active_session"); localStorage.removeItem("olympuz_token"); location.reload(); }
     
     function populateTaskerDropdownOptions(a) { 
-      const f=document.getElementById('filter-tasker'), v=f.value; 
-      f.innerHTML='<option value="ALL">All</option>'; 
-      a.forEach(t=>f.innerHTML+=`<option value="${t.name}">${t.name}</option>`); 
-      f.value=v; 
+      const f=document.getElementById('filter-tasker'); 
+      if(f) {
+        const v=f.value; 
+        f.innerHTML='<option value="ALL">All</option>'; 
+        a.forEach(t=>f.innerHTML+=`<option value="${t.name}">${t.name}</option>`); 
+        f.value=v; 
+      }
       
       const tg=document.getElementById('sched-target-uid'); 
-      tg.innerHTML='<option value="">Target Tasker</option>'; 
-      a.forEach(t=>tg.innerHTML+=`<option value="${t.id}">${t.name}</option>`); 
+      if(tg) {
+        tg.innerHTML='<option value="">Target Tasker</option>'; 
+        a.forEach(t=>tg.innerHTML+=`<option value="${t.id}">${t.name}</option>`); 
+      }
       
       const ct=document.getElementById('admin-coach-target'); 
       if(ct){ ct.innerHTML='<option value="">Target</option>'; a.forEach(t=>ct.innerHTML+=`<option value="${t.id}">${t.name}</option>`); } 
@@ -866,55 +873,54 @@
       const st=document.getElementById('filter-tasker').value, fd=document.getElementById('filter-from-date').value, td=document.getElementById('filter-to-date').value;
       const ft=fd?new Date(fd).setHours(0,0,0,0):null, tt=td?new Date(td).setHours(23,59,59,999):null;
       const att=document.getElementById('admin-attendance-table'), abs=document.getElementById('admin-absence-table'), lvs=document.getElementById('admin-leave-table'), pay=document.getElementById('admin-payments-history-table'), eAbs=document.getElementById('admin-explicit-absents-table'), rds=document.getElementById('admin-restday-table'), caAdmin=document.getElementById('admin-ca-table'), aud=document.getElementById('current-schedule-audit-list'), coach=document.getElementById('admin-coaching-table'), fb=document.getElementById('admin-feedback-table');
-      att.innerHTML=""; abs.innerHTML=""; lvs.innerHTML=""; pay.innerHTML=""; eAbs.innerHTML=""; rds.innerHTML=""; caAdmin.innerHTML=""; aud.innerHTML=""; coach.innerHTML=""; fb.innerHTML="";
+      
+      if(att) att.innerHTML=""; if(abs) abs.innerHTML=""; if(lvs) lvs.innerHTML=""; if(pay) pay.innerHTML=""; if(eAbs) eAbs.innerHTML=""; if(rds) rds.innerHTML=""; if(caAdmin) caAdmin.innerHTML=""; if(aud) aud.innerHTML=""; if(coach) coach.innerHTML=""; if(fb) fb.innerHTML="";
       
       (d.absences||[]).forEach(u=>{ 
         const ps = u.permanentSchedule || {}; 
-        aud.innerHTML+=`<div class="py-2 text-xs border-b dark:border-slate-700 dark:text-slate-200"><b>${u.name}</b><br>Shift: ${ps.shift_start||ps.shiftStart||'09:00'}-${ps.shift_end||ps.shiftEnd||'18:00'} | Half: ${ps.half_day_config?ps.half_day_config:'None'}<br>Q-Break: ${ps.max_break||ps.maxBreak||15}m | Meal: ${ps.max_lunch||ps.maxMeal||60}m | HD Meal: ${ps.half_day_meal||0}m</div>`; 
+        if (aud) aud.innerHTML+=`<div class="py-2 text-xs border-b dark:border-slate-700 dark:text-slate-200"><b>${u.name}</b><br>Shift: ${ps.shift_start||ps.shiftStart||'09:00'}-${ps.shift_end||ps.shiftEnd||'18:00'} | Half: ${ps.half_day_config?ps.half_day_config:'None'}<br>Q-Break: ${ps.max_break||ps.maxBreak||15}m | Meal: ${ps.max_lunch||ps.maxMeal||60}m | HD Meal: ${ps.half_day_meal||0}m</div>`; 
       });
       
       const flt=a=>a.filter(r=>{ if(st!=="ALL"&&((r.name||r.user_name||r.target_user_name)!==st))return false; if(ft||tt){const rt=new Date(r.date||r.timestamp||r.requestDate||r.leave_date).getTime(); if(ft&&rt<ft)return false; if(tt&&rt>tt)return false;} return true; });
-      flt(d.attendance||[]).forEach(r=>{ att.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3">${r.name}</td><td class="p-3">${r.date}</td><td class="p-3 text-emerald-600 dark:text-emerald-400">${r.timeIn}</td><td class="p-3 text-rose-600 dark:text-rose-400">${r.timeOut}</td><td class="p-3">${r.breakText} ${r.overBreak>0?'(+'+r.overBreak+'m)':''}</td><td class="p-3">${r.lunchText} ${r.overLunch>0?'(+'+r.overLunch+'m)':''}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-[11px] font-bold ${getStatusBadgeStyle(r.status)}">${r.status}</span></td><td class="p-3 text-center"><button onclick="openBreakEditModal('${r.attendanceId}', '${r.name.replace(/'/g, "\\'")}', '${r.date}', ${r.acc_break}, ${r.acc_lunch})" class="text-[10px] bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded shadow transition">Edit</button></td></tr>`; });
-      flt(d.explicitAbsents||[]).forEach(r=>{ eAbs.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3">${r.userId}</td><td class="p-3 font-bold">${r.name}</td><td class="p-3 text-rose-600 dark:text-rose-400">${r.date}</td><td class="p-3 italic text-xs">${r.type}</td><td class="p-3"><button onclick="executeAdminUntagAbsentLog('${r.absentId}')" class="text-xs bg-slate-100 dark:bg-slate-700 p-1 border dark:border-slate-600 rounded">Remove</button></td></tr>`; });
-      flt(d.payments||[]).forEach(r=>{ pay.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3 font-bold">${r.name}</td><td class="p-3 text-xs">${r.userId}</td><td class="p-3">${r.period}</td><td class="p-3">${r.weeks}</td><td class="p-3">${r.paymentMode}</td><td class="p-3">₱${r.gross}</td><td class="p-3 text-rose-600 dark:text-rose-400">-₱${r.deductions}</td><td class="p-3 font-bold text-emerald-600 dark:text-emerald-400">₱${r.net}</td><td class="p-3">${r.receiptImage?`<a href="#" onclick="openImagePreviewOverlayModal('${r.receiptImage}')" class="text-indigo-600 dark:text-indigo-400 underline">View</a>`:'-'}</td><td class="p-3 font-bold">${r.status}</td><td class="p-3 text-xs">${r.disputeReason||'-'}</td></tr>`; });
-      flt(d.restDays||[]).forEach(r=>{ const cnt=r.status==="Pending"?`<button onclick="executeAdminMakeRestDayDecision('${r.requestId}','Approved')" class="bg-emerald-600 text-white px-2 py-1 mr-1 rounded shadow">Approve</button><button onclick="executeAdminMakeRestDayDecision('${r.requestId}','Denied')" class="bg-rose-600 text-white px-2 py-1 rounded shadow">Deny</button>`:`Evaluated`; rds.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3">${r.name}</td><td class="p-3">${r.date}</td><td class="p-3">${r.comments}</td><td class="p-3">${r.status}</td><td class="p-3">${cnt}</td></tr>`; });
-      flt(d.cashAdvances||[]).forEach(r=>{ const cnt=r.status==="Pending"?`<button onclick="openCAModal('${r.id}')" class="bg-indigo-600 text-white px-2 py-1 rounded shadow">Review</button>`:`Evaluated`; caAdmin.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3">${r.name}</td><td class="p-3">${r.requestDate}</td><td class="p-3 text-emerald-600 dark:text-emerald-400 font-bold">₱${r.amount}</td><td class="p-3">${r.reason}</td><td class="p-3">${r.attachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.attachment}')" class="text-indigo-600 dark:text-indigo-400 underline">View</a>`:'-'}</td><td class="p-3 font-bold">${r.status}</td><td class="p-3">${r.adminAttachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.adminAttachment}')" class="text-emerald-600 dark:text-emerald-400 underline">Note</a>`:'-'}</td><td class="p-3">${cnt}</td></tr>`; });
-      flt(d.coachingReports||[]).forEach(r=>{ coach.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3 font-bold">${r.user_name}</td><td class="p-3">${r.timestamp}</td><td class="p-3">${r.admin_name}</td><td class="p-3 font-bold text-rose-600 dark:text-rose-400">${r.status}</td><td class="p-3 text-xs">${r.coaching_text}</td><td class="p-3">${r.admin_attachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.admin_attachment}')" class="text-indigo-600 dark:text-indigo-400 underline">View</a>`:'-'}</td><td class="p-3 text-xs">${r.tasker_reply||'-'}</td><td class="p-3">${r.tasker_attachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.tasker_attachment}')" class="text-indigo-600 dark:text-indigo-400 underline">View</a>`:'-'}</td><td class="p-3">${r.is_acknowledged?'Yes':'No'}</td></tr>`; });
-      flt(d.feedbackReports||[]).forEach(r=>{ fb.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3">${r.timestamp}</td><td class="p-3">${r.reporter_name}</td><td class="p-3 font-bold">${r.target_user_name}</td><td class="p-3 font-bold text-amber-700 dark:text-amber-500">${r.category}</td><td class="p-3 text-xs">${r.reason}</td><td class="p-3">${r.attachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.attachment}')" class="text-indigo-600 dark:text-indigo-400 underline">View</a>`:'-'}</td></tr>`; });
       
-      d.absences.filter(r=>r.role!=='Admin').forEach(r=>{ 
-        if(st!=="ALL"&&r.name!==st)return; 
-        
-        let susBtn = r.isSuspended
-          ? `<button onclick="executeAdminLiftSuspension('${r.id}')" class="text-[10px] bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-2 py-1 mr-1 mt-1 rounded shadow">Lift Sus</button>`
-          : `<button onclick="executeAdminSuspendUser('${r.id}')" class="text-[10px] bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-1 mr-1 mt-1 rounded shadow">Suspend</button>`;
+      if(att) flt(d.attendance||[]).forEach(r=>{ att.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3">${r.name}</td><td class="p-3">${r.date}</td><td class="p-3 text-emerald-600 dark:text-emerald-400">${r.timeIn}</td><td class="p-3 text-rose-600 dark:text-rose-400">${r.timeOut}</td><td class="p-3">${r.breakText} ${r.overBreak>0?'(+'+r.overBreak+'m)':''}</td><td class="p-3">${r.lunchText} ${r.overLunch>0?'(+'+r.overLunch+'m)':''}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-[11px] font-bold ${getStatusBadgeStyle(r.status)}">${r.status}</span></td><td class="p-3 text-center"><button onclick="openBreakEditModal('${r.attendanceId}', '${r.name.replace(/'/g, "\\'")}', '${r.date}', ${r.acc_break}, ${r.acc_lunch})" class="text-[10px] bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded shadow transition">Edit</button></td></tr>`; });
+      if(eAbs) flt(d.explicitAbsents||[]).forEach(r=>{ eAbs.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3">${r.userId}</td><td class="p-3 font-bold">${r.name}</td><td class="p-3 text-rose-600 dark:text-rose-400">${r.date}</td><td class="p-3 italic text-xs">${r.type}</td><td class="p-3"><button onclick="executeAdminUntagAbsentLog('${r.absentId}')" class="text-xs bg-slate-100 dark:bg-slate-700 p-1 border dark:border-slate-600 rounded">Remove</button></td></tr>`; });
+      if(pay) flt(d.payments||[]).forEach(r=>{ pay.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3 font-bold">${r.name}</td><td class="p-3 text-xs">${r.userId}</td><td class="p-3">${r.period}</td><td class="p-3">${r.weeks}</td><td class="p-3">${r.paymentMode}</td><td class="p-3">₱${r.gross}</td><td class="p-3 text-rose-600 dark:text-rose-400">-₱${r.deductions}</td><td class="p-3 font-bold text-emerald-600 dark:text-emerald-400">₱${r.net}</td><td class="p-3">${r.receiptImage?`<a href="#" onclick="openImagePreviewOverlayModal('${r.receiptImage}')" class="text-indigo-600 dark:text-indigo-400 underline">View</a>`:'-'}</td><td class="p-3 font-bold">${r.status}</td><td class="p-3 text-xs">${r.disputeReason||'-'}</td></tr>`; });
+      if(rds) flt(d.restDays||[]).forEach(r=>{ const cnt=r.status==="Pending"?`<button onclick="executeAdminMakeRestDayDecision('${r.requestId}','Approved')" class="bg-emerald-600 text-white px-2 py-1 mr-1 rounded shadow">Approve</button><button onclick="executeAdminMakeRestDayDecision('${r.requestId}','Denied')" class="bg-rose-600 text-white px-2 py-1 rounded shadow">Deny</button>`:`Evaluated`; rds.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3">${r.name}</td><td class="p-3">${r.date}</td><td class="p-3">${r.comments}</td><td class="p-3">${r.status}</td><td class="p-3">${cnt}</td></tr>`; });
+      if(caAdmin) flt(d.cashAdvances||[]).forEach(r=>{ const cnt=r.status==="Pending"?`<button onclick="openCAModal('${r.id}')" class="bg-indigo-600 text-white px-2 py-1 rounded shadow">Review</button>`:`Evaluated`; caAdmin.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3">${r.name}</td><td class="p-3">${r.requestDate}</td><td class="p-3 text-emerald-600 dark:text-emerald-400 font-bold">₱${r.amount}</td><td class="p-3">${r.reason}</td><td class="p-3">${r.attachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.attachment}')" class="text-indigo-600 dark:text-indigo-400 underline">View</a>`:'-'}</td><td class="p-3 font-bold">${r.status}</td><td class="p-3">${r.adminAttachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.adminAttachment}')" class="text-emerald-600 dark:text-emerald-400 underline">Note</a>`:'-'}</td><td class="p-3">${cnt}</td></tr>`; });
+      if(coach) flt(d.coachingReports||[]).forEach(r=>{ coach.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3 font-bold">${r.user_name}</td><td class="p-3">${r.timestamp}</td><td class="p-3">${r.admin_name}</td><td class="p-3 font-bold text-rose-600 dark:text-rose-400">${r.status}</td><td class="p-3 text-xs">${r.coaching_text}</td><td class="p-3">${r.admin_attachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.admin_attachment}')" class="text-indigo-600 dark:text-indigo-400 underline">View</a>`:'-'}</td><td class="p-3 text-xs">${r.tasker_reply||'-'}</td><td class="p-3">${r.tasker_attachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.tasker_attachment}')" class="text-indigo-600 dark:text-indigo-400 underline">View</a>`:'-'}</td><td class="p-3">${r.is_acknowledged?'Yes':'No'}</td></tr>`; });
+      if(fb) flt(d.feedbackReports||[]).forEach(r=>{ fb.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3">${r.timestamp}</td><td class="p-3">${r.reporter_name}</td><td class="p-3 font-bold">${r.target_user_name}</td><td class="p-3 font-bold text-amber-700 dark:text-amber-500">${r.category}</td><td class="p-3 text-xs">${r.reason}</td><td class="p-3">${r.attachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.attachment}')" class="text-indigo-600 dark:text-indigo-400 underline">View</a>`:'-'}</td></tr>`; });
+      
+      if(abs) {
+        d.absences.filter(r=>r.role!=='Admin').forEach(r=>{ 
+          if(st!=="ALL"&&r.name!==st)return; 
+          
+          let susBtn = r.isSuspended
+            ? `<button onclick="executeAdminLiftSuspension('${r.id}')" class="text-[10px] bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-2 py-1 mr-1 mt-1 rounded shadow">Lift Sus</button>`
+            : `<button onclick="executeAdminSuspendUser('${r.id}')" class="text-[10px] bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-1 mr-1 mt-1 rounded shadow">Suspend</button>`;
 
-        abs.innerHTML+=`<tr class="border-b dark:border-slate-700">
-          <td class="p-3">${r.id}</td>
-          <td class="p-3 font-bold">${r.name} ${r.isSuspended ? `<br><span class="text-[10px] bg-rose-600 text-white px-1.5 py-0.5 rounded uppercase shadow-sm">Suspended ${r.suspendedUntil ? 'until '+r.suspendedUntil : 'Indefinitely'}</span>` : ''}</td>
-          <td class="p-3">${r.daysOff}</td>
-          <td class="p-3">${r.halfDay}</td>
-          <td class="p-3 font-bold ${r.absents>0?'text-rose-600 dark:text-rose-400':'text-emerald-600 dark:text-emerald-400'}">${r.absents} days</td>
-          <td class="p-3 font-bold ${r.lostHoursWeek>0?'text-orange-600 dark:text-orange-400':'text-slate-500 dark:text-slate-400'}">${r.lostHoursWeek} hrs</td>
-          <td class="p-3">
-            <button onclick="executeAdminTagStatus('${r.id}', '${r.name}')" class="text-[10px] bg-indigo-600 text-white px-2 py-1 mr-1 mt-1 rounded shadow">Tag Status</button>
-            ${susBtn}
-            <button onclick="executeAdminOverridePassword('${r.id}')" class="text-[10px] bg-slate-200 dark:bg-slate-700 dark:text-white px-2 py-1 mr-1 mt-1 rounded shadow">Pass</button>
-            <button onclick="executeAdminRemoveUser('${r.id}', '${r.name}')" class="text-[10px] bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 px-2 py-1 mt-1 rounded shadow">Purge</button>
-          </td>
-        </tr>`; 
-      });
+          abs.innerHTML+=`<tr class="border-b dark:border-slate-700">
+            <td class="p-3">${r.id}</td>
+            <td class="p-3 font-bold">${r.name} ${r.isSuspended ? `<br><span class="text-[10px] bg-rose-600 text-white px-1.5 py-0.5 rounded uppercase shadow-sm">Suspended ${r.suspendedUntil ? 'until '+r.suspendedUntil : 'Indefinitely'}</span>` : ''}</td>
+            <td class="p-3">${r.daysOff}</td>
+            <td class="p-3">${r.halfDay}</td>
+            <td class="p-3 font-bold ${r.absents>0?'text-rose-600 dark:text-rose-400':'text-emerald-600 dark:text-emerald-400'}">${r.absents} days</td>
+            <td class="p-3 font-bold ${r.lostHoursWeek>0?'text-orange-600 dark:text-orange-400':'text-slate-500 dark:text-slate-400'}">${r.lostHoursWeek} hrs</td>
+            <td class="p-3">
+              <button onclick="executeAdminTagStatus('${r.id}', '${r.name}')" class="text-[10px] bg-indigo-600 text-white px-2 py-1 mr-1 mt-1 rounded shadow">Tag Status</button>
+              ${susBtn}
+              <button onclick="executeAdminOverridePassword('${r.id}')" class="text-[10px] bg-slate-200 dark:bg-slate-700 dark:text-white px-2 py-1 mr-1 mt-1 rounded shadow">Pass</button>
+              <button onclick="executeAdminRemoveUser('${r.id}', '${r.name}')" class="text-[10px] bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 px-2 py-1 mt-1 rounded shadow">Purge</button>
+            </td>
+          </tr>`; 
+        });
+      }
       
-      flt(d.leaves||[]).forEach(r=>{ const cnt=r.status==="Pending"?`<button onclick="adminExecuteLeave('${r.id}','Approved')" class="bg-emerald-600 text-white px-2 py-1 mr-1 rounded shadow">Approve</button><button onclick="adminExecuteLeave('${r.id}','Denied')" class="bg-rose-600 text-white px-2 py-1 rounded shadow">Deny</button>`:`Evaluated`; lvs.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3 font-bold">${r.name}</td><td class="p-3">${r.date}</td><td class="p-3 text-xs">${r.reason}</td><td class="p-3">${r.attachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.attachment}')" class="text-indigo-600 dark:text-indigo-400 underline">View</a>`:'-'}</td><td class="p-3 font-bold">${r.status}</td><td class="p-3">${cnt}</td></tr>`; });
+      if(lvs) flt(d.leaves||[]).forEach(r=>{ const cnt=r.status==="Pending"?`<button onclick="adminExecuteLeave('${r.id}','Approved')" class="bg-emerald-600 text-white px-2 py-1 mr-1 rounded shadow">Approve</button><button onclick="adminExecuteLeave('${r.id}','Denied')" class="bg-rose-600 text-white px-2 py-1 rounded shadow">Deny</button>`:`Evaluated`; lvs.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3 font-bold">${r.name}</td><td class="p-3">${r.date}</td><td class="p-3 text-xs">${r.reason}</td><td class="p-3">${r.attachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.attachment}')" class="text-indigo-600 dark:text-indigo-400 underline">View</a>`:'-'}</td><td class="p-3 font-bold">${r.status}</td><td class="p-3">${cnt}</td></tr>`; });
     }
     
     function routePayrollSection() { if (!currentUser) return; if (currentUser.role === 'Admin') showSection('admin-payroll-sec'); else { showSection('user-payroll-sec'); fetchUserPayrollData(); } }
     
-    function fetchUserPayrollData() { callAPI('GET', "?action=getUserPayroll&userId=" + currentUser.id, null, d => updateUserPayrollUI(d)); }
-    function updateUserPayrollUI(p) {
-        const tb=document.getElementById('user-payroll-table'); tb.innerHTML=""; if(!p||!p.length) return tb.innerHTML='<tr><td colspan="8" class="p-3 text-center">No records.</td></tr>'; p.forEach(r=>{ let sb=""; if(r.status==="Acknowledged"||r.status==="Settled & Adjusted"||r.status==="Dispute Approved")sb=`<span class="text-emerald-700 dark:text-emerald-400 font-bold">✓ ${r.status}</span>`; else if(r.status==="Disputed")sb=`<span class="text-amber-600 dark:text-amber-400 font-bold">Pending Dispute</span>`; else if(r.status==="Dispute Rejected")sb=`<span class="text-rose-600 dark:text-rose-400 font-bold mb-1 block">❌ Rejected</span><button onclick="acknowledgePayment('${r.payrollId}')" class="bg-indigo-600 text-white px-2 py-1 text-xs rounded shadow">Acknowledge</button>`; else sb=`<button onclick="acknowledgePayment('${r.payrollId}')" class="bg-emerald-600 text-white px-2 py-1 text-[10px] mr-1 rounded shadow">Acknowledge</button><button onclick="disputePayment('${r.payrollId}')" class="bg-rose-600 text-white px-2 py-1 text-[10px] rounded shadow">Dispute</button>`; tb.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3 font-bold">${r.period}</td><td class="p-3">${r.weeks} wks</td><td class="p-3">${r.paymentMode}</td><td class="p-3">₱${r.gross}</td><td class="p-3 text-rose-600 dark:text-rose-400">-₱${r.deductions}</td><td class="p-3 text-indigo-700 dark:text-indigo-400 font-bold">₱${r.net}</td><td class="p-3">${r.receiptImage?`<a href="#" onclick="openImagePreviewOverlayModal('${r.receiptImage}')" class="text-indigo-600 dark:text-indigo-400 underline">View</a>`:'-'}</td><td class="p-3 text-center">${sb}</td></tr>`; });
-    }
-
     function disputePayment(id) { const rs=prompt("Dispute Reason:"); if(!rs)return; callAPI('POST','',{action:"disputePayment",paymentId:id,reason:rs}, r=>{ alert(r.message); fetchUserPayrollData(); }); }
     function acknowledgePayment(id) { if(!confirm("Acknowledge?"))return; callAPI('POST','',{action:"acknowledgePayment",paymentId:id,userId:currentUser.id}, r=>{ alert(r.message); fetchUserPayrollData(); }); }
     function adminResolveDispute(id,st,rs) { const n=prompt("Notes:"); if(n===null)return; callAPI('POST','',{action:"updatePayrollReviewStatus",payrollId:id,status:st,disputeReason:rs+(n?"\nNote: "+n:"")}, r=>{ alert(r.message); fetchGlobalAdminLogs(); }); }
