@@ -97,7 +97,6 @@
       </nav>
 
       <main class="flex-1 p-4 md:p-8 overflow-y-auto relative transition-colors duration-300">
-        <!-- Add identical styling updates to all sections below via JS injection/templating logic -->
         
         <section id="attendance-sec" class="hidden space-y-6 max-w-4xl">
           <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)] border border-slate-100 dark:border-slate-700 transition-colors duration-300 space-y-6">
@@ -158,9 +157,9 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-4 transition-colors">
               <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100">Leave Request</h2>
-              <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Date</label><input type="date" id="l-date" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-sm transition-colors outline-none focus:ring-2 focus:ring-indigo-500"></div>
-              <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Reason</label><textarea id="l-reason" rows="3" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-sm transition-colors outline-none focus:ring-2 focus:ring-indigo-500"></textarea></div>
-              <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Attachment</label><input type="file" id="l-file" accept="image/*" class="w-full text-xs"></div>
+              <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Date</label><input type="date" id="l-date" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-sm transition-colors outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white"></div>
+              <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Reason</label><textarea id="l-reason" rows="3" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-sm transition-colors outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white"></textarea></div>
+              <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Attachment</label><input type="file" id="l-file" accept="image/*" class="w-full text-xs dark:text-white"></div>
               <button onclick="submitLeaveForm()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-2.5 rounded-lg font-bold text-sm shadow transition-all">Submit</button>
               <p id="leave-feedback" class="text-center font-bold text-xs p-2 rounded hidden"></p>
             </div>
@@ -179,12 +178,11 @@
           </div>
         </section>
 
-        <!-- Mirroring the same class updates for Rest Day, CA, Coaching, Feedback, Tasks, and Admin -->
         <section id="restday-request-sec" class="hidden space-y-6 max-w-5xl">
           <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-4 max-w-md transition-colors">
             <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100">Rest Day OT / Cov.</h2>
-            <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Date</label><input type="date" id="rd-date" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 rounded-lg text-sm bg-slate-50 dark:bg-slate-700 transition-colors focus:ring-2 focus:ring-indigo-500 outline-none"></div>
-            <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Comments</label><textarea id="rd-comments" rows="3" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 rounded-lg text-sm bg-slate-50 dark:bg-slate-700 transition-colors focus:ring-2 focus:ring-indigo-500 outline-none"></textarea></div>
+            <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Date</label><input type="date" id="rd-date" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 rounded-lg text-sm bg-slate-50 dark:bg-slate-700 transition-colors focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white"></div>
+            <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Comments</label><textarea id="rd-comments" rows="3" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 rounded-lg text-sm bg-slate-50 dark:bg-slate-700 transition-colors focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white"></textarea></div>
             <button onclick="submitRestDayForm()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg font-bold shadow transition-all">Request</button>
             <p id="rd-feedback-msg" class="text-center font-bold text-xs p-2 rounded hidden"></p>
           </div>
@@ -201,9 +199,9 @@
         <section id="ca-request-sec" class="hidden space-y-6 max-w-5xl">
           <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-4 max-w-md transition-colors">
             <h2 class="text-xl font-bold text-emerald-700 dark:text-emerald-400">Cash Advance</h2>
-            <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Amount</label><input type="number" id="ca-amount" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg transition-colors focus:ring-2 focus:ring-emerald-500 outline-none"></div>
-            <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Reason</label><textarea id="ca-reason" rows="3" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg transition-colors focus:ring-2 focus:ring-emerald-500 outline-none"></textarea></div>
-            <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Proof (Opt)</label><input type="file" id="ca-file" accept="image/*" class="w-full text-xs"></div>
+            <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Amount</label><input type="number" id="ca-amount" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg transition-colors focus:ring-2 focus:ring-emerald-500 outline-none dark:text-white"></div>
+            <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Reason</label><textarea id="ca-reason" rows="3" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg transition-colors focus:ring-2 focus:ring-emerald-500 outline-none dark:text-white"></textarea></div>
+            <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Proof (Opt)</label><input type="file" id="ca-file" accept="image/*" class="w-full text-xs dark:text-white"></div>
             <button onclick="submitCAForm()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white p-3 rounded-lg font-bold shadow transition-all">Submit</button>
             <p id="ca-feedback-msg" class="text-center font-bold text-xs p-2 rounded hidden"></p>
           </div>
@@ -228,27 +226,26 @@
           <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-4 transition-colors">
             <h2 class="text-xl font-bold text-amber-700 dark:text-amber-500">Submit Feedback</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Target Tasker</label><select id="fb-target-user" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg transition-colors focus:ring-2 focus:ring-amber-500 outline-none"></select></div>
-              <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Category</label><select id="fb-category" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg transition-colors focus:ring-2 focus:ring-amber-500 outline-none"><option value="Behavior">Behavior</option><option value="Work Avoidance">Work Avoidance</option><option value="Insubordination">Insubordination</option><option value="Others">Others</option></select></div>
+              <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Target Tasker</label><select id="fb-target-user" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg transition-colors focus:ring-2 focus:ring-amber-500 outline-none dark:text-white"></select></div>
+              <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Category</label><select id="fb-category" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg transition-colors focus:ring-2 focus:ring-amber-500 outline-none dark:text-white"><option value="Behavior">Behavior</option><option value="Work Avoidance">Work Avoidance</option><option value="Insubordination">Insubordination</option><option value="Others">Others</option></select></div>
             </div>
-            <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Details</label><textarea id="fb-reason" rows="4" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg transition-colors focus:ring-2 focus:ring-amber-500 outline-none"></textarea></div>
-            <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Proof</label><input type="file" id="fb-file" accept="image/*" class="w-full text-xs"></div>
+            <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Details</label><textarea id="fb-reason" rows="4" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg transition-colors focus:ring-2 focus:ring-amber-500 outline-none dark:text-white"></textarea></div>
+            <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Proof</label><input type="file" id="fb-file" accept="image/*" class="w-full text-xs dark:text-white"></div>
             <button onclick="submitFeedbackReport()" class="w-full bg-amber-600 hover:bg-amber-700 text-white p-3 rounded-lg font-bold shadow transition-all">Submit Confidential</button>
             <p id="fb-feedback-msg" class="text-center font-bold text-xs p-2 rounded hidden"></p>
           </div>
         </section>
 
-        <!-- Tasks and other admin sections receive identical dark mapping... -->
         <section id="task-report-sec" class="hidden space-y-6 max-w-6xl">
           <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 flex justify-between items-center transition-colors">
             <h3 class="text-sm font-bold dark:text-slate-100">Critical Tasks Feed</h3>
-            <select id="public-filter-tasker" onchange="applyPublicReportFilter()" class="w-64 p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-xs outline-none transition-colors"><option value="ALL">All Reports</option></select>
+            <select id="public-filter-tasker" onchange="applyPublicReportFilter()" class="w-64 p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-xs outline-none transition-colors dark:text-white"><option value="ALL">All Reports</option></select>
           </div>
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 h-fit space-y-4 transition-colors">
               <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100">Post Report</h2>
-              <input type="date" id="rep-date" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-sm outline-none transition-colors">
-              <textarea id="rep-summary" rows="6" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-sm outline-none transition-colors"></textarea>
+              <input type="date" id="rep-date" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-sm outline-none transition-colors dark:text-white">
+              <textarea id="rep-summary" rows="6" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-sm outline-none transition-colors dark:text-white"></textarea>
               <button onclick="submitDailyWorkReport()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg font-bold shadow transition-all">Publish</button>
               <p id="rep-feedback" class="text-center text-xs p-2 rounded hidden"></p>
             </div>
@@ -258,14 +255,13 @@
           </div>
         </section>
 
-        <!-- Simplified other HTML sections mirroring styling -->
         <section id="other-task-report-sec" class="hidden space-y-6 max-w-6xl">
-           <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex justify-between items-center transition-colors border border-slate-100 dark:border-slate-700"><h3 class="text-sm font-bold dark:text-slate-100">Other Tasks Feed</h3><select id="other-public-filter-tasker" onchange="applyOtherReportFilter()" class="w-64 p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-xs outline-none transition-colors"><option value="ALL">All Reports</option></select></div>
+           <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex justify-between items-center transition-colors border border-slate-100 dark:border-slate-700"><h3 class="text-sm font-bold dark:text-slate-100">Other Tasks Feed</h3><select id="other-public-filter-tasker" onchange="applyOtherReportFilter()" class="w-64 p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-xs outline-none transition-colors dark:text-white"><option value="ALL">All Reports</option></select></div>
            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
              <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 h-fit space-y-4 transition-colors">
                <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100">Post Other Report</h2>
-               <input type="date" id="other-rep-date" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-sm outline-none">
-               <textarea id="other-rep-summary" rows="6" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-sm outline-none"></textarea>
+               <input type="date" id="other-rep-date" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-sm outline-none dark:text-white">
+               <textarea id="other-rep-summary" rows="6" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-sm outline-none dark:text-white"></textarea>
                <button onclick="submitOtherWorkReport()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg font-bold shadow transition-all">Publish</button>
                <p id="other-rep-feedback" class="text-center text-xs p-2 rounded hidden"></p>
              </div>
@@ -273,20 +269,133 @@
            </div>
         </section>
 
-        <!-- Admin Dashboard Excerpt Styling Update -->
+        <section id="referral-report-sec" class="hidden space-y-6 max-w-6xl">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 h-fit space-y-4 transition-colors">
+              <h2 class="text-xl font-bold dark:text-slate-100">Referral Tally</h2>
+              <select id="ref-source" onchange="toggleRefSource()" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none transition-colors dark:text-white"><option value="Boss Job">Boss Job</option><option value="Threads">Threads</option><option value="Facebook">Facebook</option><option value="LinkedIn">LinkedIn</option><option value="Others">Others</option></select>
+              <input type="text" id="ref-source-other" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg hidden outline-none transition-colors dark:text-white" placeholder="Source">
+              <input type="number" id="ref-count" min="0" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none transition-colors dark:text-white" placeholder="Count">
+              <div class="flex items-center gap-2 pt-2"><input type="checkbox" id="ref-is-covering" onchange="toggleRefCovering()" class="w-4 h-4"><label class="text-xs font-bold dark:text-slate-300">Covering someone?</label></div>
+              <input type="text" id="ref-covering-name" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg hidden outline-none transition-colors dark:text-white" placeholder="Name of tasker">
+              <button onclick="submitReferralReport()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg font-bold shadow transition-all">Submit</button>
+              <p id="ref-feedback" class="text-center text-xs p-2 rounded hidden"></p>
+            </div>
+            <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 transition-colors"><div class="overflow-y-auto max-h-[500px] p-4 bg-slate-50 dark:bg-slate-900 rounded-lg space-y-3" id="referral-reports-feed"></div></div>
+          </div>
+        </section>
+
+        <!-- RESTORED SECTIONS -->
+        <section id="account-settings-sec" class="hidden bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 max-w-md space-y-4 transition-colors">
+          <h2 class="text-xl font-bold border-b border-slate-100 dark:border-slate-700 pb-2 dark:text-slate-100">⚙️ Account Security</h2>
+          <input type="password" id="self-old-pass" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 transition-colors dark:text-white" placeholder="Old Password">
+          <input type="password" id="self-new-pass" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 transition-colors dark:text-white" placeholder="New Password">
+          <input type="password" id="self-confirm-pass" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 transition-colors dark:text-white" placeholder="Confirm Password">
+          <button onclick="executeSelfPasswordChange()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold p-3 rounded-lg transition-all shadow">Update</button>
+          <p id="self-pass-feedback" class="text-center text-xs p-2 rounded hidden"></p>
+        </section>
+
+        <section id="admin-payroll-sec" class="hidden bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-6 max-w-2xl transition-colors">
+          <h2 class="text-xl font-bold text-indigo-700 dark:text-indigo-400 border-b border-slate-100 dark:border-slate-700 pb-2">Admin: Disburse Payroll</h2>
+          <div class="grid grid-cols-2 gap-4 text-xs">
+            <select id="p-target-user" class="col-span-2 w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none transition-colors dark:text-white"><option value="">Select Tasker</option></select>
+            <input id="p-rate" type="number" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none transition-colors dark:text-white" placeholder="Weekly Rate">
+            <input id="p-hours" type="number" step="0.1" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none transition-colors dark:text-white" placeholder="Weeks Logged">
+            <input id="p-deduct" type="number" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none transition-colors dark:text-white" placeholder="Deductions" value="0">
+            <input id="p-month" type="text" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none transition-colors dark:text-white" placeholder="Period (e.g. Week 1 July)">
+            <select id="p-mode" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none transition-colors dark:text-white"><option value="E-Cash">E-Cash</option><option value="Cash">Cash</option></select>
+            <input type="file" id="p-file" accept="image/*" class="w-full text-slate-600 dark:text-slate-400">
+            <input id="p-remarks" type="text" class="col-span-2 w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none transition-colors dark:text-white" placeholder="Remarks">
+          </div>
+          <button onclick="submitPayrollForm()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-bold shadow transition-all">Disburse</button>
+          <p id="payroll-feedback" class="text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 dark:text-emerald-400 text-xs font-bold p-2 rounded-lg hidden"></p>
+        </section>
+
+        <section id="user-payroll-sec" class="hidden bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 max-w-7xl transition-colors">
+          <h2 class="text-xl font-bold border-b border-slate-100 dark:border-slate-700 pb-2 mb-4 dark:text-slate-100">Payment Ledgers</h2>
+          <div class="overflow-x-auto rounded-lg border border-slate-100 dark:border-slate-700"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-semibold uppercase text-xs"><th class="p-3">Period</th><th class="p-3">Weeks</th><th class="p-3">Mode</th><th class="p-3">Gross</th><th class="p-3">Deduct</th><th class="p-3">Net</th><th class="p-3">Receipt</th><th class="p-3 text-center">Status</th></tr></thead><tbody id="user-payroll-table" class="divide-y divide-slate-50 dark:divide-slate-700 text-xs"></tbody></table></div>
+        </section>
+
         <section id="admin-sec" class="hidden space-y-8 max-w-6xl">
           <div class="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 transition-colors">
             <h3 class="text-sm font-bold uppercase mb-2 dark:text-slate-300">🔍 Data Filters</h3>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-2">
-              <select id="filter-tasker" onchange="applyGlobalFilters()" class="w-full p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-xs outline-none"><option value="ALL">All</option></select>
-              <input type="date" id="filter-from-date" onchange="applyDateFilters()" class="w-full p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-xs outline-none">
-              <input type="date" id="filter-to-date" onchange="applyDateFilters()" class="w-full p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-xs outline-none">
+              <select id="filter-tasker" onchange="applyGlobalFilters()" class="w-full p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-xs outline-none dark:text-white"><option value="ALL">All</option></select>
+              <input type="date" id="filter-from-date" onchange="applyDateFilters()" class="w-full p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-xs outline-none dark:text-white">
+              <input type="date" id="filter-to-date" onchange="applyDateFilters()" class="w-full p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-xs outline-none dark:text-white">
             </div>
-            <button onclick="clearGlobalFilters()" class="text-xs bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 px-3 py-1 rounded transition-colors">Reset</button>
+            <button onclick="clearGlobalFilters()" class="text-xs bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 px-3 py-1 rounded transition-colors dark:text-white">Reset</button>
           </div>
-          <!-- More Admin Tables ... ensure logic keeps dark modes ... -->
+
+          <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-4 transition-colors">
+            <h2 class="text-xl font-bold text-rose-800 dark:text-rose-400">🛡️ Issue Coaching Action</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <select id="admin-coach-target" class="w-full p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-sm outline-none dark:text-white"></select>
+              <select id="admin-coach-status" onchange="toggleAdminCoachingPenalty()" class="w-full p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-sm outline-none dark:text-white"><option value="Verbal warning">Verbal warning</option><option value="NTE">NTE</option><option value="Written Warning">Written Warning</option><option value="Final Warning">Final Warning</option></select>
+            </div>
+            <select id="admin-coach-penalty" class="w-full p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-sm hidden outline-none dark:text-white"><option value="">-- Penalty --</option><option value="Subject for suspension">Suspension</option><option value="Subject for termination">Termination</option></select>
+            <textarea id="admin-coach-text" rows="3" class="w-full p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-sm outline-none dark:text-white" placeholder="Notes"></textarea>
+            <input type="file" id="admin-coach-file" accept="image/*" class="w-full text-xs dark:text-white">
+            <button onclick="submitCoachingReport()" class="w-full bg-rose-600 hover:bg-rose-700 text-white p-3 rounded-lg font-bold shadow transition-all">Issue</button>
+          </div>
+
+          <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 transition-colors"><h2 class="text-xl font-bold text-rose-800 dark:text-rose-400 border-b border-slate-100 dark:border-slate-700 pb-2 mb-3">Master Coaching Logs</h2><div class="overflow-x-auto rounded-lg"><table class="w-full text-left text-xs"><thead><tr class="bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-semibold uppercase"><th class="p-3">Tasker</th><th class="p-3">Date</th><th class="p-3">Issued By</th><th class="p-3">Status</th><th class="p-3">Notes</th><th class="p-3">Admin Proof</th><th class="p-3">Tasker Reply</th><th class="p-3">Tasker Proof</th><th class="p-3">Ack</th></tr></thead><tbody id="admin-coaching-table" class="divide-y divide-slate-50 dark:divide-slate-700"></tbody></table></div></div>
+          
+          <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 transition-colors"><h2 class="text-xl font-bold text-amber-700 dark:text-amber-500 border-b border-slate-100 dark:border-slate-700 pb-2 mb-3">Feedback Reports</h2><div class="overflow-x-auto rounded-lg"><table class="w-full text-left text-xs"><thead><tr class="bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-semibold uppercase"><th class="p-3">Date</th><th class="p-3">Reporter</th><th class="p-3">Target</th><th class="p-3">Category</th><th class="p-3">Reasoning</th><th class="p-3">Proof</th></tr></thead><tbody id="admin-feedback-table" class="divide-y divide-slate-50 dark:divide-slate-700"></tbody></table></div></div>
+          
+          <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 transition-colors"><h2 class="text-xl font-bold text-emerald-800 dark:text-emerald-400 border-b border-slate-100 dark:border-slate-700 pb-2 mb-3">Cash Advance Queue</h2><div class="overflow-x-auto rounded-lg"><table class="w-full text-left text-xs"><thead><tr class="bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-semibold uppercase"><th class="p-3">Tasker</th><th class="p-3">Date</th><th class="p-3">Amt</th><th class="p-3">Reason</th><th class="p-3">Proof</th><th class="p-3">Status</th><th class="p-3">Admin Note</th><th class="p-3">Control</th></tr></thead><tbody id="admin-ca-table" class="divide-y divide-slate-50 dark:divide-slate-700"></tbody></table></div></div>
+          
+          <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-4 transition-colors">
+            <h2 class="text-xl font-bold text-indigo-900 dark:text-indigo-400">👥 Add Tasker</h2>
+            <div class="grid grid-cols-4 gap-4 text-xs">
+              <input type="text" id="add-u-name" class="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white" placeholder="Name">
+              <input type="email" id="add-u-email" class="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white" placeholder="Email">
+              <input type="text" id="add-u-pass" class="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white" placeholder="Pass (ChangeMe123)">
+              <select id="add-u-role" onchange="toggleFormScheduleVisibility()" class="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white"><option value="Employee">Employee</option><option value="Admin">Admin</option></select>
+              <input type="time" id="add-u-shift-start" class="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white" value="09:00">
+              <input type="time" id="add-u-shift-end" class="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white" value="18:00">
+              <input type="text" id="add-u-off" class="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white" value="Saturday, Sunday">
+              <input type="number" id="add-u-leaves" class="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white" value="15">
+              <input type="number" id="add-u-max-break" class="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white" value="15">
+              <input type="number" id="add-u-max-meal" class="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white" value="60">
+              <select id="add-u-half" class="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white"><option value="">No Half Day</option><option value="Monday">Monday</option><option value="Tuesday">Tuesday</option><option value="Wednesday">Wednesday</option><option value="Thursday">Thursday</option><option value="Friday">Friday</option><option value="Saturday">Saturday</option><option value="Sunday">Sunday</option></select>
+              <input type="number" step="0.5" id="add-u-half-hrs" class="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white" placeholder="HD Hrs" value="4">
+              <input type="number" id="add-u-half-meal" class="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white" placeholder="HD Meal(m)" value="0">
+            </div>
+            <button onclick="executeAdminCreateUser()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded shadow">Register Tasker</button>
+            <p id="admin-create-feedback" class="text-xs hidden"></p>
+          </div>
+
+          <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-4 transition-colors">
+            <h2 class="text-xl font-bold text-indigo-900 dark:text-indigo-400">📅 Schedule Overrides</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+              <div class="bg-slate-50 dark:bg-slate-900 p-4 border border-slate-200 dark:border-slate-700 rounded-xl space-y-2 transition-colors">
+                <select id="sched-target-uid" class="w-full p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white"></select>
+                <div class="grid grid-cols-2 gap-2"><input type="time" id="sched-shift-start" class="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white"><input type="time" id="sched-shift-end" class="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white"></div>
+                <div class="grid grid-cols-2 gap-2"><input type="number" id="sched-max-break" class="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white" placeholder="Break"><input type="number" id="sched-max-meal" class="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white" placeholder="Meal"></div>
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                  <select id="sched-half-day-temp" class="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white"><option value="false">Temp Half: No</option><option value="true">Temp: Yes</option></select>
+                  <select id="sched-half-day-perm" class="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white"><option value="">Perm: None</option><option value="Monday">Monday</option><option value="Tuesday">Tuesday</option><option value="Wednesday">Wednesday</option><option value="Thursday">Thursday</option><option value="Friday">Friday</option><option value="Saturday">Saturday</option><option value="Sunday">Sunday</option></select>
+                  <input type="number" step="0.5" id="sched-half-hrs" class="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white" placeholder="HD Hrs" value="4">
+                  <input type="number" id="sched-half-meal" class="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white" placeholder="HD Meal(m)" value="0">
+                </div>
+                <div class="flex gap-2"><button onclick="submitScheduleAdjustment(true)" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded shadow">Perm Save</button><button onclick="submitScheduleAdjustment(false)" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white py-2 rounded shadow">Today Only</button></div>
+              </div>
+              <div class="bg-slate-50 dark:bg-slate-900 p-4 border border-slate-200 dark:border-slate-700 rounded-xl overflow-y-auto max-h-[300px] transition-colors" id="current-schedule-audit-list"></div>
+            </div>
+          </div>
+
           <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 transition-colors"><h2 class="text-xl font-bold border-b border-slate-100 dark:border-slate-700 pb-2 mb-3 dark:text-slate-100">Attendance Dashboard</h2><div class="overflow-x-auto rounded-lg"><table class="w-full text-left text-xs"><thead><tr class="bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-semibold uppercase"><th class="p-3">Name</th><th class="p-3">Date</th><th class="p-3">In</th><th class="p-3">Out</th><th class="p-3">Break</th><th class="p-3">Meal</th><th class="p-3">Status</th><th class="p-3 text-center">Action</th></tr></thead><tbody id="admin-attendance-table" class="divide-y divide-slate-50 dark:divide-slate-700"></tbody></table></div></div>
-          <!-- We truncate the rest of repeating sections for brevity in HTML - JS template engine will handle their dark mode injections cleanly -->
+          
+          <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 transition-colors"><h2 class="text-xl font-bold border-b border-slate-100 dark:border-slate-700 pb-2 mb-3 dark:text-slate-100">Rest Day OT Queue</h2><div class="overflow-x-auto rounded-lg"><table class="w-full text-left text-xs"><thead><tr class="bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-semibold uppercase"><th class="p-3">Name</th><th class="p-3">Date</th><th class="p-3">Reason</th><th class="p-3">Status</th><th class="p-3">Control</th></tr></thead><tbody id="admin-restday-table" class="divide-y divide-slate-50 dark:divide-slate-700"></tbody></table></div></div>
+          
+          <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 transition-colors"><h2 class="text-xl font-bold border-b border-slate-100 dark:border-slate-700 pb-2 mb-3 dark:text-slate-100">Absences Registry</h2><div class="overflow-x-auto rounded-lg"><table class="w-full text-left text-xs"><thead><tr class="bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-semibold uppercase"><th class="p-3">ID</th><th class="p-3">Name</th><th class="p-3">Date</th><th class="p-3">Type</th><th class="p-3">Control</th></tr></thead><tbody id="admin-explicit-absents-table" class="divide-y divide-slate-50 dark:divide-slate-700"></tbody></table></div></div>
+          
+          <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 transition-colors"><h2 class="text-xl font-bold border-b border-slate-100 dark:border-slate-700 pb-2 mb-3 dark:text-slate-100">Payroll Distribution</h2><div class="overflow-x-auto rounded-lg"><table class="w-full text-left text-xs"><thead><tr class="bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-semibold uppercase"><th class="p-3">Name</th><th class="p-3">ID</th><th class="p-3">Period</th><th class="p-3">Wks</th><th class="p-3">Mode</th><th class="p-3">Gross</th><th class="p-3">Deduct</th><th class="p-3">Net</th><th class="p-3">Receipt</th><th class="p-3">Status</th><th class="p-3">Notes</th></tr></thead><tbody id="admin-payments-history-table" class="divide-y divide-slate-50 dark:divide-slate-700"></tbody></table></div></div>
+          
+          <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 transition-colors"><h2 class="text-xl font-bold border-b border-slate-100 dark:border-slate-700 pb-2 mb-3 dark:text-slate-100">Leave Queue</h2><div class="overflow-x-auto rounded-lg"><table class="w-full text-left text-xs"><thead><tr class="bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-semibold uppercase"><th class="p-3">Tasker</th><th class="p-3">Date</th><th class="p-3">Reason</th><th class="p-3">Proof</th><th class="p-3">Status</th><th class="p-3">Control</th></tr></thead><tbody id="admin-leave-table" class="divide-y divide-slate-50 dark:divide-slate-700"></tbody></table></div></div>
+          
+          <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 transition-colors"><h2 class="text-xl font-bold border-b border-slate-100 dark:border-slate-700 pb-2 mb-3 dark:text-slate-100">Exception & Absence Metrics</h2><div class="overflow-x-auto rounded-lg"><table class="w-full text-left text-xs"><thead><tr class="bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-semibold uppercase"><th class="p-3">ID</th><th class="p-3">Name</th><th class="p-3">Days Off</th><th class="p-3">Half Day</th><th class="p-3">Absences</th><th class="p-3 text-orange-600 font-bold">Lost Hrs (Sun-Sat)</th><th class="p-3 text-center">Actions</th></tr></thead><tbody id="admin-absence-table" class="divide-y divide-slate-50 dark:divide-slate-700"></tbody></table></div></div>
         </section>
 
       </main>
@@ -297,8 +406,8 @@
     <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-xl w-full max-w-md space-y-4 border border-slate-100 dark:border-slate-700 transition-colors">
       <h3 class="text-lg font-bold border-b border-slate-100 dark:border-slate-700 pb-2 dark:text-slate-100">Process Cash Advance</h3>
       <input type="hidden" id="ca-modal-req-id">
-      <textarea id="ca-modal-feedback" rows="3" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Notes..."></textarea>
-      <input type="file" id="ca-modal-file" accept="image/*" class="w-full text-xs">
+      <textarea id="ca-modal-feedback" rows="3" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white" placeholder="Notes..."></textarea>
+      <input type="file" id="ca-modal-file" accept="image/*" class="w-full text-xs dark:text-white">
       <div class="flex gap-2"><button onclick="submitCADecision('Approved')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-lg transition-all shadow">Approve</button><button onclick="submitCADecision('Denied')" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 rounded-lg transition-all shadow">Deny</button></div>
       <button onclick="closeCAModal()" class="w-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 font-bold py-2 rounded-lg transition-colors">Cancel</button>
     </div>
@@ -309,8 +418,8 @@
       <h3 class="text-lg font-bold border-b border-slate-100 dark:border-slate-700 pb-2 dark:text-slate-100">Edit Break Durations</h3>
       <p id="break-edit-info" class="text-xs font-bold text-indigo-700 dark:text-indigo-400"></p>
       <input type="hidden" id="break-edit-id">
-      <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Quick Break (Minutes)</label><input type="number" step="1" id="break-edit-quick" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"></div>
-      <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Meal Break (Minutes)</label><input type="number" step="1" id="break-edit-meal" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"></div>
+      <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Quick Break (Minutes)</label><input type="number" step="1" id="break-edit-quick" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 transition-colors dark:text-white"></div>
+      <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Meal Break (Minutes)</label><input type="number" step="1" id="break-edit-meal" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 transition-colors dark:text-white"></div>
       <button onclick="submitBreakEdit()" class="w-full bg-indigo-600 hover:bg-indigo-700 transition-all text-white font-bold py-2.5 rounded-lg text-sm shadow">Save Changes</button>
       <button onclick="closeBreakEditModal()" class="w-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors text-slate-600 dark:text-slate-300 font-bold py-2 rounded-lg text-xs">Cancel</button>
     </div>
@@ -604,7 +713,7 @@
     function applyOtherReportFilter() { const c=document.getElementById('other-public-reports-feed'), v=document.getElementById('other-public-filter-tasker').value; const i=v==="ALL"?cachedOtherReports:cachedOtherReports.filter(r=>r.name===v); c.innerHTML=""; if(!i.length) return c.innerHTML="No reports"; i.forEach(r=>{ c.innerHTML+=`<div class="bg-white dark:bg-slate-800 p-3 border dark:border-slate-600 rounded transition-colors"><div class="flex justify-between text-xs font-bold"><span>${r.name}</span><span class="text-emerald-700 dark:text-emerald-400">${r.date}</span></div><p class="text-xs mt-2 whitespace-pre-wrap dark:text-slate-300">${r.summary}</p></div>`; }); }
 
     function updateUserPayrollUI(p) {
-        const tb=document.getElementById('user-payroll-table'); tb.innerHTML=""; if(!p||!p.length) return tb.innerHTML='<tr><td colspan="8" class="p-3 text-center">No records.</td></tr>'; p.forEach(r=>{ let sb=""; if(r.status==="Acknowledged"||r.status==="Settled & Adjusted"||r.status==="Dispute Approved")sb=`<span class="text-emerald-700 font-bold">✓ ${r.status}</span>`; else if(r.status==="Disputed")sb=`<span class="text-amber-600 font-bold">Pending Dispute</span>`; else if(r.status==="Dispute Rejected")sb=`<span class="text-rose-600 font-bold mb-1 block">❌ Rejected</span><button onclick="acknowledgePayment('${r.payrollId}')" class="bg-indigo-600 text-white px-2 py-1 text-xs rounded">Acknowledge</button>`; else sb=`<button onclick="acknowledgePayment('${r.payrollId}')" class="bg-emerald-600 text-white px-2 py-1 text-[10px] mr-1 rounded shadow">Acknowledge</button><button onclick="disputePayment('${r.payrollId}')" class="bg-rose-600 text-white px-2 py-1 text-[10px] rounded shadow">Dispute</button>`; tb.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3 font-bold">${r.period}</td><td class="p-3">${r.weeks} wks</td><td class="p-3">${r.paymentMode}</td><td class="p-3">₱${r.gross}</td><td class="p-3 text-rose-600 dark:text-rose-400">-₱${r.deductions}</td><td class="p-3 text-indigo-700 dark:text-indigo-400 font-bold">₱${r.net}</td><td class="p-3">${r.receiptImage?`<a href="#" onclick="openImagePreviewOverlayModal('${r.receiptImage}')" class="text-indigo-600 dark:text-indigo-400 underline">View</a>`:'-'}</td><td class="p-3 text-center">${sb}</td></tr>`; });
+        const tb=document.getElementById('user-payroll-table'); tb.innerHTML=""; if(!p||!p.length) return tb.innerHTML='<tr><td colspan="8" class="p-3 text-center">No records.</td></tr>'; p.forEach(r=>{ let sb=""; if(r.status==="Acknowledged"||r.status==="Settled & Adjusted"||r.status==="Dispute Approved")sb=`<span class="text-emerald-700 dark:text-emerald-400 font-bold">✓ ${r.status}</span>`; else if(r.status==="Disputed")sb=`<span class="text-amber-600 dark:text-amber-400 font-bold">Pending Dispute</span>`; else if(r.status==="Dispute Rejected")sb=`<span class="text-rose-600 dark:text-rose-400 font-bold mb-1 block">❌ Rejected</span><button onclick="acknowledgePayment('${r.payrollId}')" class="bg-indigo-600 text-white px-2 py-1 text-xs rounded">Acknowledge</button>`; else sb=`<button onclick="acknowledgePayment('${r.payrollId}')" class="bg-emerald-600 text-white px-2 py-1 text-[10px] mr-1 rounded shadow">Acknowledge</button><button onclick="disputePayment('${r.payrollId}')" class="bg-rose-600 text-white px-2 py-1 text-[10px] rounded shadow">Dispute</button>`; tb.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3 font-bold">${r.period}</td><td class="p-3">${r.weeks} wks</td><td class="p-3">${r.paymentMode}</td><td class="p-3">₱${r.gross}</td><td class="p-3 text-rose-600 dark:text-rose-400">-₱${r.deductions}</td><td class="p-3 text-indigo-700 dark:text-indigo-400 font-bold">₱${r.net}</td><td class="p-3">${r.receiptImage?`<a href="#" onclick="openImagePreviewOverlayModal('${r.receiptImage}')" class="text-indigo-600 dark:text-indigo-400 underline">View</a>`:'-'}</td><td class="p-3 text-center">${sb}</td></tr>`; });
     }
 
     // Interactive Action Handlers
@@ -703,7 +812,32 @@
       });
     }
 
-    function showSection(id) { ['attendance-sec','global-feed-sec','leave-request-sec','restday-request-sec','task-report-sec','other-task-report-sec','referral-report-sec','ca-request-sec','coaching-sec','feedback-submit-sec','account-settings-sec','admin-payroll-sec','user-payroll-sec','admin-sec'].forEach(s=>{document.getElementById(s).classList.add('hidden');}); const t=document.getElementById(id); if(t) { t.classList.remove('hidden'); if(id==='account-settings-sec') { t.className='bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 max-w-md space-y-4 transition-colors'; } else { t.classList.add('space-y-6', 'max-w-6xl'); } } if(id==='task-report-sec'){document.getElementById('rep-date').value=new Date().toISOString().split('T')[0]; loadPublicTaskReportsFeed();} if(id==='other-task-report-sec'){document.getElementById('other-rep-date').value=new Date().toISOString().split('T')[0]; loadOtherTaskReportsFeed();} if(id==='referral-report-sec')loadReferralReportsFeed(); if(id==='feedback-submit-sec'||id==='global-feed-sec')loadGlobalStatusFeed(); if(id==='admin-sec')fetchGlobalAdminLogs(); if(['attendance-sec','leave-request-sec','ca-request-sec','coaching-sec','account-settings-sec','restday-request-sec'].includes(id))refreshUserTimers(); }
+    function showSection(id) { 
+      // Safely hide all sections
+      ['attendance-sec','global-feed-sec','leave-request-sec','restday-request-sec','task-report-sec','other-task-report-sec','referral-report-sec','ca-request-sec','coaching-sec','feedback-submit-sec','account-settings-sec','admin-payroll-sec','user-payroll-sec','admin-sec'].forEach(s => {
+        const el = document.getElementById(s);
+        if (el) el.classList.add('hidden'); 
+      }); 
+
+      // Show the targeted section safely
+      const t = document.getElementById(id); 
+      if (t) { 
+        t.classList.remove('hidden'); 
+        if (id === 'account-settings-sec') { 
+          t.className = 'bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 max-w-md space-y-4 transition-colors'; 
+        } else { 
+          t.classList.add('space-y-6', 'max-w-6xl'); 
+        } 
+      } 
+      
+      if (id === 'task-report-sec') { document.getElementById('rep-date').value = new Date().toISOString().split('T')[0]; loadPublicTaskReportsFeed(); } 
+      if (id === 'other-task-report-sec') { document.getElementById('other-rep-date').value = new Date().toISOString().split('T')[0]; loadOtherTaskReportsFeed(); } 
+      if (id === 'referral-report-sec') loadReferralReportsFeed(); 
+      if (id === 'feedback-submit-sec' || id === 'global-feed-sec') loadGlobalStatusFeed(); 
+      if (id === 'admin-sec') fetchGlobalAdminLogs(); 
+      if (['attendance-sec','leave-request-sec','ca-request-sec','coaching-sec','account-settings-sec','restday-request-sec'].includes(id)) refreshUserTimers(); 
+    }
+
     function logout() { currentUser=null; clearTimeout(inactivityTimer); clearInterval(liveTimerTickerInterval); localStorage.removeItem("olympuz_active_session"); localStorage.removeItem("olympuz_token"); location.reload(); }
     
     function populateTaskerDropdownOptions(a) { 
@@ -743,8 +877,8 @@
       flt(d.attendance||[]).forEach(r=>{ att.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3">${r.name}</td><td class="p-3">${r.date}</td><td class="p-3 text-emerald-600 dark:text-emerald-400">${r.timeIn}</td><td class="p-3 text-rose-600 dark:text-rose-400">${r.timeOut}</td><td class="p-3">${r.breakText} ${r.overBreak>0?'(+'+r.overBreak+'m)':''}</td><td class="p-3">${r.lunchText} ${r.overLunch>0?'(+'+r.overLunch+'m)':''}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-[11px] font-bold ${getStatusBadgeStyle(r.status)}">${r.status}</span></td><td class="p-3 text-center"><button onclick="openBreakEditModal('${r.attendanceId}', '${r.name.replace(/'/g, "\\'")}', '${r.date}', ${r.acc_break}, ${r.acc_lunch})" class="text-[10px] bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded shadow transition">Edit</button></td></tr>`; });
       flt(d.explicitAbsents||[]).forEach(r=>{ eAbs.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3">${r.userId}</td><td class="p-3 font-bold">${r.name}</td><td class="p-3 text-rose-600 dark:text-rose-400">${r.date}</td><td class="p-3 italic text-xs">${r.type}</td><td class="p-3"><button onclick="executeAdminUntagAbsentLog('${r.absentId}')" class="text-xs bg-slate-100 dark:bg-slate-700 p-1 border dark:border-slate-600 rounded">Remove</button></td></tr>`; });
       flt(d.payments||[]).forEach(r=>{ pay.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3 font-bold">${r.name}</td><td class="p-3 text-xs">${r.userId}</td><td class="p-3">${r.period}</td><td class="p-3">${r.weeks}</td><td class="p-3">${r.paymentMode}</td><td class="p-3">₱${r.gross}</td><td class="p-3 text-rose-600 dark:text-rose-400">-₱${r.deductions}</td><td class="p-3 font-bold text-emerald-600 dark:text-emerald-400">₱${r.net}</td><td class="p-3">${r.receiptImage?`<a href="#" onclick="openImagePreviewOverlayModal('${r.receiptImage}')" class="text-indigo-600 dark:text-indigo-400 underline">View</a>`:'-'}</td><td class="p-3 font-bold">${r.status}</td><td class="p-3 text-xs">${r.disputeReason||'-'}</td></tr>`; });
-      flt(d.restDays||[]).forEach(r=>{ const cnt=r.status==="Pending"?`<button onclick="executeAdminMakeRestDayDecision('${r.requestId}','Approved')" class="bg-emerald-600 text-white px-2 py-1 mr-1 rounded">Approve</button><button onclick="executeAdminMakeRestDayDecision('${r.requestId}','Denied')" class="bg-rose-600 text-white px-2 py-1 rounded">Deny</button>`:`Evaluated`; rds.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3">${r.name}</td><td class="p-3">${r.date}</td><td class="p-3">${r.comments}</td><td class="p-3">${r.status}</td><td class="p-3">${cnt}</td></tr>`; });
-      flt(d.cashAdvances||[]).forEach(r=>{ const cnt=r.status==="Pending"?`<button onclick="openCAModal('${r.id}')" class="bg-indigo-600 text-white px-2 py-1 rounded">Review</button>`:`Evaluated`; caAdmin.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3">${r.name}</td><td class="p-3">${r.requestDate}</td><td class="p-3 text-emerald-600 dark:text-emerald-400 font-bold">₱${r.amount}</td><td class="p-3">${r.reason}</td><td class="p-3">${r.attachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.attachment}')" class="text-indigo-600 dark:text-indigo-400 underline">View</a>`:'-'}</td><td class="p-3 font-bold">${r.status}</td><td class="p-3">${r.adminAttachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.adminAttachment}')" class="text-emerald-600 dark:text-emerald-400 underline">Note</a>`:'-'}</td><td class="p-3">${cnt}</td></tr>`; });
+      flt(d.restDays||[]).forEach(r=>{ const cnt=r.status==="Pending"?`<button onclick="executeAdminMakeRestDayDecision('${r.requestId}','Approved')" class="bg-emerald-600 text-white px-2 py-1 mr-1 rounded shadow">Approve</button><button onclick="executeAdminMakeRestDayDecision('${r.requestId}','Denied')" class="bg-rose-600 text-white px-2 py-1 rounded shadow">Deny</button>`:`Evaluated`; rds.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3">${r.name}</td><td class="p-3">${r.date}</td><td class="p-3">${r.comments}</td><td class="p-3">${r.status}</td><td class="p-3">${cnt}</td></tr>`; });
+      flt(d.cashAdvances||[]).forEach(r=>{ const cnt=r.status==="Pending"?`<button onclick="openCAModal('${r.id}')" class="bg-indigo-600 text-white px-2 py-1 rounded shadow">Review</button>`:`Evaluated`; caAdmin.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3">${r.name}</td><td class="p-3">${r.requestDate}</td><td class="p-3 text-emerald-600 dark:text-emerald-400 font-bold">₱${r.amount}</td><td class="p-3">${r.reason}</td><td class="p-3">${r.attachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.attachment}')" class="text-indigo-600 dark:text-indigo-400 underline">View</a>`:'-'}</td><td class="p-3 font-bold">${r.status}</td><td class="p-3">${r.adminAttachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.adminAttachment}')" class="text-emerald-600 dark:text-emerald-400 underline">Note</a>`:'-'}</td><td class="p-3">${cnt}</td></tr>`; });
       flt(d.coachingReports||[]).forEach(r=>{ coach.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3 font-bold">${r.user_name}</td><td class="p-3">${r.timestamp}</td><td class="p-3">${r.admin_name}</td><td class="p-3 font-bold text-rose-600 dark:text-rose-400">${r.status}</td><td class="p-3 text-xs">${r.coaching_text}</td><td class="p-3">${r.admin_attachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.admin_attachment}')" class="text-indigo-600 dark:text-indigo-400 underline">View</a>`:'-'}</td><td class="p-3 text-xs">${r.tasker_reply||'-'}</td><td class="p-3">${r.tasker_attachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.tasker_attachment}')" class="text-indigo-600 dark:text-indigo-400 underline">View</a>`:'-'}</td><td class="p-3">${r.is_acknowledged?'Yes':'No'}</td></tr>`; });
       flt(d.feedbackReports||[]).forEach(r=>{ fb.innerHTML+=`<tr class="border-b dark:border-slate-700"><td class="p-3">${r.timestamp}</td><td class="p-3">${r.reporter_name}</td><td class="p-3 font-bold">${r.target_user_name}</td><td class="p-3 font-bold text-amber-700 dark:text-amber-500">${r.category}</td><td class="p-3 text-xs">${r.reason}</td><td class="p-3">${r.attachment?`<a href="#" onclick="openImagePreviewOverlayModal('${r.attachment}')" class="text-indigo-600 dark:text-indigo-400 underline">View</a>`:'-'}</td></tr>`; });
       
@@ -752,8 +886,8 @@
         if(st!=="ALL"&&r.name!==st)return; 
         
         let susBtn = r.isSuspended
-          ? `<button onclick="executeAdminLiftSuspension('${r.id}')" class="text-[10px] bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-2 py-1 mr-1 mt-1 rounded">Lift Sus</button>`
-          : `<button onclick="executeAdminSuspendUser('${r.id}')" class="text-[10px] bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-1 mr-1 mt-1 rounded">Suspend</button>`;
+          ? `<button onclick="executeAdminLiftSuspension('${r.id}')" class="text-[10px] bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-2 py-1 mr-1 mt-1 rounded shadow">Lift Sus</button>`
+          : `<button onclick="executeAdminSuspendUser('${r.id}')" class="text-[10px] bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-1 mr-1 mt-1 rounded shadow">Suspend</button>`;
 
         abs.innerHTML+=`<tr class="border-b dark:border-slate-700">
           <td class="p-3">${r.id}</td>
