@@ -1021,6 +1021,93 @@
         fb.classList.add('hidden');
       }
     }
+
+    // Automatically fetches lost hours and calculates deductions dynamically based on the tasker's unique schedule
+    function autoCalculateDeduction() {
+      const pt = document.getElementById('p-target-user').value;
+      if (!pt) return;
+      const [tId, tNm] = pt.split('|');
+      
+      const rateInput = document.getElementById('p-rate').value;
+      const rate = parseFloat(rateInput) || 0;
+      
+      let lostHours = 0;
+      let weeklyHours = 40; // Default fallback
+      
+      if (cachedAdminMasterData && cachedAdminMasterData.absences) {
+        const userAbs = cachedAdminMasterData.absences.find(u => u.id === tId);
+        if (userAbs) {
+          lostHours = userAbs.lostHoursWeek || 0;
+          
+          // --- DYNAMIC WEEKLY HOURS CALCULATION ---
+          const sched = userAbs.permanentSchedule;
+          if (sched && sched.shift_start && sched.shift_end) {
+            const sMin = parseToMinutes(sched.shift_start);
+            const eMin = parseToMinutes(sched.shift_end);
+            
+            if (sMin !== null && eMin !== null) {
+              let diffM = eMin - sMin;
+              if (diffM < 0) diffM += 1440; // Cross-midnight handler
+              
+              // Subtract meal break (unpaid) to get net work minutes per day
+              const meal = parseInt(sched.max_lunch) || 60;
+              const dailyNetHours = Math.max(0, diffM - meal) / 60;
+              
+              // Calculate how many days they actually work
+              const daysOffCount = (sched.days_off || "").split(',').filter(d => d.trim().length > 0).length;
+              const workingDays = 7 - daysOffCount;
+              
+              weeklyHours = dailyNetHours * workingDays;
+              
+              // Adjust for permanent half-days if they have one configured
+              if (sched.half_day_config && sched.half_day_config !== "None" && sched.half_day_hours) {
+                const hdParts = sched.half_day_hours.split('|');
+                if (hdParts.length === 2) {
+                  const hdS = parseToMinutes(hdParts[0]);
+                  const hdE = parseToMinutes(hdParts[1]);
+                  if (hdS !== null && hdE !== null) {
+                    let hdDiff = hdE - hdS;
+                    if (hdDiff < 0) hdDiff += 1440;
+                    const hdMeal = parseInt(sched.half_day_meal) || 0;
+                    const hdNetHours = Math.max(0, hdDiff - hdMeal) / 60;
+                    
+                    // Replace one standard working day with the half-day hours
+                    weeklyHours = (weeklyHours - dailyNetHours) + hdNetHours;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      // Prevent division by zero just in case (fallback to 40)
+      weeklyHours = weeklyHours > 0 ? weeklyHours : 40;
+      
+      // Calculate Exact Hourly Rate based on THEIR specific schedule
+      const hourlyRate = rate / weeklyHours;
+      
+      // Compute deduction
+      const deduction = (hourlyRate * lostHours).toFixed(2);
+      
+      // Inject to UI
+      document.getElementById('p-deduct').value = deduction > 0 ? deduction : 0;
+      
+      // Provide detailed feedback so admins know exactly how the math was done
+      const fb = document.getElementById('payroll-feedback');
+      const remarksInput = document.getElementById('p-remarks'); // Grab the remarks field
+      
+      if (lostHours > 0 && rate > 0) {
+        fb.innerText = `Calculated: ${lostHours} lost hours @ ₱${hourlyRate.toFixed(2)}/hr (based on a ${weeklyHours} hr work week).`;
+        fb.className = "text-amber-600 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-400 text-xs font-bold p-2 rounded-lg mt-2 block";
+        
+        // AUTO-FILL THE REMARKS FOR THE TASKER TO SEE
+        remarksInput.value = `Auto-Deduction: ${lostHours} lost hours.`; 
+      } else {
+        fb.classList.add('hidden');
+        if (remarksInput.value.includes("Auto-Deduction")) remarksInput.value = ""; // Clear it if no deductions
+      }
+    }
     
     function submitPayrollForm() { 
       const pt = document.getElementById('p-target-user').value; 
