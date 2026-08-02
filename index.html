@@ -678,12 +678,13 @@
       if (!Array.isArray(window.cachedGlobalFeed)) window.cachedGlobalFeed = []; const f = document.getElementById('global-feed-table'); if (window.cachedGlobalFeed.length === 0) { f.innerHTML = '<tr><td colspan="9" class="p-4 text-center">No logs.</td></tr>'; return; }
       let h = ""; window.cachedGlobalFeed.forEach(r => {
         let ls = "00:00:00", rs = "00:00:00";
+        let rawProd = "-"; // Explicitly track raw productive time
         const sNow = Date.now() - window.serverTimeOffset;
 
         // --- REAL-TIME BREAK / LUNCH CALCULATIONS ---
         let cBreakMins = r.acc_break || 0;
         let cLunchMins = r.acc_lunch || 0;
-        
+
         if (r.currentSessionType === 'QUICK BREAK' && r.currentSessionStart) {
             cBreakMins += Math.max(0, sNow - new Date(r.currentSessionStart).getTime()) / 60000;
         } else if (r.currentSessionType === 'MEAL BREAK' && r.currentSessionStart) {
@@ -692,20 +693,21 @@
 
         let lBreakText = `${Math.floor(cBreakMins)}/${r.permanentSchedule?.maxBreak || 15}m`;
         let lLunchText = `${Math.floor(cLunchMins)}/${r.permanentSchedule?.maxMeal || 60}m`;
-        
+
         // Pulse effects if currently active in break state
         if (r.currentSessionType === 'QUICK BREAK') lBreakText = `<span class="text-amber-500 animate-pulse font-bold">${lBreakText}</span>`;
         if (r.currentSessionType === 'MEAL BREAK') lLunchText = `<span class="text-orange-500 animate-pulse font-bold">${lLunchText}</span>`;
 
         // Status-Based Logic
         if (r.status === 'Day Off' || r.status === 'On Leave' || r.status === 'No Schedule' || r.status === 'Absent' || r.status === 'Suspended' || r.status === 'Shift Not Started Yet') {
-          ls = "-"; rs = "-";
+          ls = "-"; rs = "-"; rawProd = "-";
         } else if (r.isLiveTracking && r.rawLoginMs) {
           const eLog = r.shiftStartMs ? Math.max(r.rawLoginMs, r.shiftStartMs) : r.rawLoginMs;
           const ded = (cBreakMins + cLunchMins) * 60000;
           const net = Math.max(0, sNow - eLog - ded);
-          ls = `<span class="text-indigo-600 dark:text-indigo-400 font-bold">${Math.floor(net/3600000).toString().padStart(2,'0')}:${Math.floor((net/60000)%60).toString().padStart(2,'0')}:${Math.floor((net/1000)%60).toString().padStart(2,'0')}</span>`;
-          
+          rawProd = `${Math.floor(net/3600000).toString().padStart(2,'0')}:${Math.floor((net/60000)%60).toString().padStart(2,'0')}:${Math.floor((net/1000)%60).toString().padStart(2,'0')}`;
+          ls = `<span class="text-indigo-600 dark:text-indigo-400 font-bold">${rawProd}</span>`;
+
           if (r.finalRequiredEndMs) {
             // Factor in live-overages to push out Required End dynamically
             const oBreak = Math.max(0, Math.floor(cBreakMins) - (r.permanentSchedule?.maxBreak || 15));
@@ -718,23 +720,34 @@
             if (dMs <= 0) rs = "Ready to Clock Out";
             else rs = `<span class="text-emerald-600 dark:text-emerald-400 font-bold animate-pulse">${Math.floor(dMs/3600000).toString().padStart(2,'0')}:${Math.floor((dMs/60000)%60).toString().padStart(2,'0')}:${Math.floor((dMs/1000)%60).toString().padStart(2,'0')}</span>`;
           }
-        } else if (r.timeOut !== "-") { 
-          ls = r.staticLoggedTime || "-"; 
-          if (r.finalRequiredEndMs) rs = "Completed"; 
-        } else { 
-          if (r.permanentSchedule) { 
+        } else if (r.timeOut !== "-") {
+          rawProd = r.staticLoggedTime || "-";
+          ls = rawProd;
+          if (r.finalRequiredEndMs) rs = "Completed";
+        } else {
+          if (r.permanentSchedule) {
             const sM = parseToMinutes(r.permanentSchedule.shiftStart) || 0;
             const eM = parseToMinutes(r.permanentSchedule.shiftEnd) || 0;
             let diffM = eM - sM;
-            if (diffM < 0) diffM += 1440; 
+            if (diffM < 0) diffM += 1440;
             let rh = Math.max(0, (diffM - (r.permanentSchedule.maxMeal || 60)) / 60);
             if (rh > 0) rs = `${Math.floor(rh).toString().padStart(2,'0')}:${Math.floor((rh - Math.floor(rh)) * 60).toString().padStart(2,'0')}:00`;
             else rs = "-";
-          } 
+          }
         }
-        
+
         let lt = r.currentSessionType === "DUTY" ? '<span class="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300 px-2 py-1 rounded text-[10px] font-black uppercase animate-pulse">⚡ Productive</span>' : r.currentSessionType === "QUICK BREAK" ? '<span class="bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400 px-2 py-1 rounded text-[10px] font-black uppercase animate-pulse">☕ Quick Break</span>' : r.currentSessionType === "MEAL BREAK" ? '<span class="bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400 px-2 py-1 rounded text-[10px] font-black uppercase animate-pulse">🍽️ Meal Break</span>' : r.timeOut !== "-" ? '<span class="bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 px-2 py-1 rounded text-[10px] font-black uppercase">🏁 Shift Ended</span>' : '<span class="bg-slate-100 dark:bg-slate-700 text-slate-400 px-2 py-1 rounded text-[10px] font-black uppercase">💤 Offline</span>';
-        
+
+        // --- NEW: Time tagging breakdown under Live Activity status ---
+        lt = `<div class="flex flex-col items-start gap-1">
+          <div>${lt}</div>
+          <div class="flex flex-col text-[9px] text-slate-500 dark:text-slate-400 font-mono mt-1">
+            <span>Prod: ${rawProd}</span>
+            <span>Break: ${Math.floor(cBreakMins)}m</span>
+            <span>Meal: ${Math.floor(cLunchMins)}m</span>
+          </div>
+        </div>`;
+
         h += `<tr class="border-b dark:border-slate-700"><td class="p-3 font-bold">${r.name}</td><td class="p-3">${lt}</td><td class="p-3 text-emerald-600 dark:text-emerald-400 font-mono">${r.timeIn}</td><td class="p-3 font-mono">${ls}</td><td class="p-3 font-mono">${rs}</td><td class="p-3 font-mono">${lLunchText}</td><td class="p-3 font-mono">${lBreakText}</td><td class="p-3 text-rose-600 dark:text-rose-400 font-mono">${r.timeOut}</td><td class="p-3 text-center"><span class="px-2 py-0.5 rounded text-[11px] font-bold ${getStatusBadgeStyle(r.status)}">${r.status}</span></td></tr>`;
       }); f.innerHTML = h;
     }
