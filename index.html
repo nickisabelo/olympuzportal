@@ -425,9 +425,13 @@
 
   <div id="break-edit-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 px-4 transition-all duration-300">
     <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-xl w-full max-w-sm space-y-4 border border-slate-100 dark:border-slate-700 transition-colors">
-      <h3 class="text-lg font-bold border-b border-slate-100 dark:border-slate-700 pb-2 dark:text-slate-100">Edit Break Durations</h3>
+      <h3 class="text-lg font-bold border-b border-slate-100 dark:border-slate-700 pb-2 dark:text-slate-100">Edit Attendance Record</h3>
       <p id="break-edit-info" class="text-xs font-bold text-indigo-700 dark:text-indigo-400"></p>
       <input type="hidden" id="break-edit-id">
+      <div class="grid grid-cols-2 gap-4">
+        <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Time In</label><input type="time" id="break-edit-timein" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 transition-colors dark:text-white"></div>
+        <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Time Out</label><input type="time" id="break-edit-timeout" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 transition-colors dark:text-white"></div>
+      </div>
       <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Quick Break (Minutes)</label><input type="number" step="1" id="break-edit-quick" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 transition-colors dark:text-white"></div>
       <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Meal Break (Minutes)</label><input type="number" step="1" id="break-edit-meal" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 transition-colors dark:text-white"></div>
       <button onclick="submitBreakEdit()" class="w-full bg-indigo-600 hover:bg-indigo-700 transition-all text-white font-bold py-2.5 rounded-lg text-sm shadow">Save Changes</button>
@@ -788,11 +792,13 @@
       });
     }
 
-    function openBreakEditModal(attId, name, date, currentQuick, currentMeal) {
+    function openBreakEditModal(attId, name, date, currentQuick, currentMeal, timeIn, timeOut) {
       document.getElementById('break-edit-id').value = attId;
       document.getElementById('break-edit-info').innerText = `${name} | Shift Date: ${date}`;
       document.getElementById('break-edit-quick').value = currentQuick || 0;
       document.getElementById('break-edit-meal').value = currentMeal || 0;
+      document.getElementById('break-edit-timein').value = (timeIn && timeIn !== '-') ? timeIn : '';
+      document.getElementById('break-edit-timeout').value = (timeOut && timeOut !== '-') ? timeOut : '';
       document.getElementById('break-edit-modal').classList.remove('hidden');
     }
     
@@ -802,9 +808,12 @@
       const id = document.getElementById('break-edit-id').value;
       const qb = document.getElementById('break-edit-quick').value;
       const mb = document.getElementById('break-edit-meal').value;
+      const ti = document.getElementById('break-edit-timein').value;
+      const to = document.getElementById('break-edit-timeout').value;
+      
       if (!id || qb === "" || mb === "") return alert("Please check your input values.");
       
-      callAPI('POST', '', { action: "adminUpdateBreakDurations", attendanceId: id, newBreak: qb, newLunch: mb }, r => {
+      callAPI('POST', '', { action: "adminUpdateBreakDurations", attendanceId: id, newBreak: qb, newLunch: mb, newTimeIn: ti, newTimeOut: to }, r => {
         alert(r.message);
         if (r.success) { closeBreakEditModal(); fetchGlobalAdminLogs(); loadGlobalStatusFeed(); }
       });
