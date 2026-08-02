@@ -308,11 +308,11 @@
         <section id="admin-payroll-sec" class="hidden bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-6 max-w-2xl transition-colors">
           <h2 class="text-xl font-bold text-indigo-700 dark:text-indigo-400 border-b border-slate-100 dark:border-slate-700 pb-2">Admin: Disburse Payroll</h2>
           <div class="grid grid-cols-2 gap-4 text-xs">
-            <select id="p-target-user" class="col-span-2 w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none transition-colors dark:text-white"><option value="">Select Tasker</option></select>
-            <input id="p-rate" type="number" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none transition-colors dark:text-white" placeholder="Weekly Rate">
+            <select id="p-target-user" onchange="autoCalculateDeduction()" class="col-span-2 w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none transition-colors dark:text-white"><option value="">Select Tasker</option></select>
+            <input id="p-rate" type="number" oninput="autoCalculateDeduction()" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none transition-colors dark:text-white" placeholder="Weekly Rate">
             <input id="p-hours" type="number" step="0.1" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none transition-colors dark:text-white" placeholder="Weeks Logged">
             <input id="p-deduct" type="number" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none transition-colors dark:text-white" placeholder="Deductions" value="0">
-            <input id="p-month" type="text" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none transition-colors dark:text-white" placeholder="Period (e.g. Week 1 July)">
+            <input id="p-month" type="text" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none transition-colors dark:text-white" placeholder="Date Range (e.g. July 1 - July 7)">
             <select id="p-mode" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none transition-colors dark:text-white"><option value="E-Cash">E-Cash</option><option value="Cash">Cash</option></select>
             <input type="file" id="p-file" accept="image/*" class="w-full text-slate-600 dark:text-slate-400">
             <input id="p-remarks" type="text" class="col-span-2 w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none transition-colors dark:text-white" placeholder="Remarks">
@@ -940,6 +940,87 @@
     function adminResolveDispute(id,st,rs) { const n=prompt("Notes:"); if(n===null)return; callAPI('POST','',{action:"updatePayrollReviewStatus",payrollId:id,status:st,disputeReason:rs+(n?"\nNote: "+n:"")}, r=>{ alert(r.message); fetchGlobalAdminLogs(); }); }
     
     function executeAdminCreateUser() { const p={action:"adminCreateUser",name:document.getElementById('add-u-name').value,email:document.getElementById('add-u-email').value,password:document.getElementById('add-u-pass').value||"ChangeMe123",role:document.getElementById('add-u-role').value,shiftStart:document.getElementById('add-u-shift-start').value,shiftEnd:document.getElementById('add-u-shift-end').value,daysOff:document.getElementById('add-u-off').value,leaveAllowance:document.getElementById('add-u-leaves').value,maxBreak:document.getElementById('add-u-max-break').value,maxMeal:document.getElementById('add-u-max-meal').value,halfDay:document.getElementById('add-u-half').value,halfDayHours:document.getElementById('add-u-half-hrs').value,halfDayMeal:document.getElementById('add-u-half-meal').value}; if(!p.name||!p.email)return alert("Compile fields."); callAPI('POST','',p, r=>{ alert(r.message); if(r.success)fetchGlobalAdminLogs(); loadGlobalStatusFeed(); }); }
+
+    // Automatically fetches lost hours and calculates deductions dynamically based on the tasker's unique schedule
+    function autoCalculateDeduction() {
+      const pt = document.getElementById('p-target-user').value;
+      if (!pt) return;
+      const [tId, tNm] = pt.split('|');
+      
+      const rateInput = document.getElementById('p-rate').value;
+      const rate = parseFloat(rateInput) || 0;
+      
+      let lostHours = 0;
+      let weeklyHours = 40; // Default fallback
+      
+      if (cachedAdminMasterData && cachedAdminMasterData.absences) {
+        const userAbs = cachedAdminMasterData.absences.find(u => u.id === tId);
+        if (userAbs) {
+          lostHours = userAbs.lostHoursWeek || 0;
+          
+          // --- DYNAMIC WEEKLY HOURS CALCULATION ---
+          const sched = userAbs.permanentSchedule;
+          if (sched && sched.shift_start && sched.shift_end) {
+            const sMin = parseToMinutes(sched.shift_start);
+            const eMin = parseToMinutes(sched.shift_end);
+            
+            if (sMin !== null && eMin !== null) {
+              let diffM = eMin - sMin;
+              if (diffM < 0) diffM += 1440; // Cross-midnight handler
+              
+              // Subtract meal break (unpaid) to get net work minutes per day
+              const meal = parseInt(sched.max_lunch) || 60;
+              const dailyNetHours = Math.max(0, diffM - meal) / 60;
+              
+              // Calculate how many days they actually work
+              const daysOffCount = (sched.days_off || "").split(',').filter(d => d.trim().length > 0).length;
+              const workingDays = 7 - daysOffCount;
+              
+              weeklyHours = dailyNetHours * workingDays;
+              
+              // Adjust for permanent half-days if they have one configured
+              if (sched.half_day_config && sched.half_day_config !== "None" && sched.half_day_hours) {
+                const hdParts = sched.half_day_hours.split('|');
+                if (hdParts.length === 2) {
+                  const hdS = parseToMinutes(hdParts[0]);
+                  const hdE = parseToMinutes(hdParts[1]);
+                  if (hdS !== null && hdE !== null) {
+                    let hdDiff = hdE - hdS;
+                    if (hdDiff < 0) hdDiff += 1440;
+                    const hdMeal = parseInt(sched.half_day_meal) || 0;
+                    const hdNetHours = Math.max(0, hdDiff - hdMeal) / 60;
+                    
+                    // Replace one standard working day with the half-day hours
+                    weeklyHours = (weeklyHours - dailyNetHours) + hdNetHours;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      // Prevent division by zero just in case (fallback to 40)
+      weeklyHours = weeklyHours > 0 ? weeklyHours : 40;
+      
+      // Calculate Exact Hourly Rate based on THEIR specific schedule
+      const hourlyRate = rate / weeklyHours;
+      
+      // Compute deduction
+      const deduction = (hourlyRate * lostHours).toFixed(2);
+      
+      // Inject to UI
+      document.getElementById('p-deduct').value = deduction > 0 ? deduction : 0;
+      
+      // Provide detailed feedback so admins know exactly how the math was done
+      const fb = document.getElementById('payroll-feedback');
+      if (lostHours > 0 && rate > 0) {
+        fb.innerText = `Calculated: ${lostHours} lost hours @ ₱${hourlyRate.toFixed(2)}/hr (based on a ${weeklyHours} hr work week).`;
+        fb.className = "text-amber-600 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-400 text-xs font-bold p-2 rounded-lg mt-2 block";
+      } else {
+        fb.classList.add('hidden');
+      }
+    }
     
     function submitPayrollForm() { 
       const pt = document.getElementById('p-target-user').value; 
