@@ -893,7 +893,6 @@
         if (aud) aud.innerHTML+=`<div class="py-2 text-xs border-b dark:border-slate-700 dark:text-slate-200"><b>${u.name}</b><br>Shift: ${ps.shift_start||ps.shiftStart||'09:00'}-${ps.shift_end||ps.shiftEnd||'18:00'} | Half: ${ps.half_day_config?ps.half_day_config:'None'}<br>Q-Break: ${ps.max_break||ps.maxBreak||15}m | Meal: ${ps.max_lunch||ps.maxMeal||60}m | HD Meal: ${ps.half_day_meal||0}m</div>`; 
       });
       
-      // CHANGED TO A REGULAR FUNCTION TO PREVENT INITIALIZATION CRASHES
       function flt(a) {
          return a.filter(r=>{ if(st!=="ALL"&&((r.name||r.user_name||r.target_user_name)!==st))return false; if(ft||tt){const rt=new Date(r.date||r.timestamp||r.requestDate||r.leave_date).getTime(); if(ft&&rt<ft)return false; if(tt&&rt>tt)return false;} return true; });
       }
