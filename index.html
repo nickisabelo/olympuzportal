@@ -492,12 +492,13 @@
       if (!t) return 'bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400'; 
       const n = t.trim().toLowerCase(); 
       // 🔴 Critical: Absent, Suspended
-      i// 🟠 Warning: Undertime, Late, No Show Yet
-      if (n === 'undertime' || n === 'late' || n === 'no show yet') return 'bg-orange-500 dark:bg-orange-700 text-white shadow-sm'; 
+      if (n === 'absent' || n === 'suspended') return 'bg-rose-600 dark:bg-rose-800 text-white shadow-sm'; 
+      // 🟠 Warning: Undertime, Late
+      if (n === 'undertime' || n === 'late') return 'bg-orange-500 dark:bg-orange-700 text-white shadow-sm'; 
       // 🟡 Needs Attention: Over Lunch, Over Break
       if (n.includes('over break') || n.includes('over lunch')) return 'bg-amber-400 dark:bg-amber-600 text-amber-900 dark:text-amber-50 shadow-sm'; 
-      // 🔵 Informational: On Leave, No Schedule, Day Off, Not Yet Started
-      if (n === 'on leave' || n === 'day off' || n === 'no schedule' || n === 'shift not started yet' || n === 'not yet started') return 'bg-indigo-500 dark:bg-indigo-700 text-white shadow-sm';
+      // 🔵 Informational: On Leave, No Schedule, Day Off, Shift Not Started Yet
+      if (n === 'on leave' || n === 'day off' || n === 'no schedule' || n === 'shift not started yet') return 'bg-indigo-500 dark:bg-indigo-700 text-white shadow-sm'; 
       // 💚 Excellent: Completed
       if (n === 'completed') return 'bg-emerald-800 dark:bg-emerald-950 text-white shadow-sm'; 
       // 🟢 Good: On Time
