@@ -698,7 +698,7 @@
         if (r.currentSessionType === 'MEAL BREAK') lLunchText = `<span class="text-orange-500 animate-pulse font-bold">${lLunchText}</span>`;
 
         // Status-Based Logic
-        if (r.status === 'Day Off' || r.status === 'On Leave' || r.status === 'No Schedule' || r.status === 'Absent' || r.status === 'Suspended' || r.status === 'Shift Not Started Yet') {
+        if (r.status === 'Day Off' || r.status === 'On Leave' || r.status === 'No Schedule' || r.status === 'Absent' || r.status === 'Suspended' || r.status === 'Not Yet Started' || r.status === 'No Show Yet') {
           ls = "-"; rs = "-";
         } else if (r.isLiveTracking && r.rawLoginMs) {
           const eLog = r.shiftStartMs ? Math.max(r.rawLoginMs, r.shiftStartMs) : r.rawLoginMs;
