@@ -770,14 +770,40 @@
         const c=document.getElementById('referral-reports-feed'); if(!c) return; c.innerHTML=""; if(!d||!d.length) return c.innerHTML='<div class="text-slate-400 text-xs">No records</div>'; d.forEach(r=>{ c.innerHTML+=`<div class="bg-white dark:bg-slate-800 p-3 rounded shadow-sm border dark:border-slate-600 text-xs transition-colors"><div class="flex justify-between"><span class="font-bold">${r.user_name}</span><span>${r.timestamp}</span></div><div class="flex justify-between mt-2 pt-2 border-t dark:border-slate-700 text-indigo-700 dark:text-indigo-400 font-bold"><span>Source: ${r.source} ${r.covering_for?'(Covering)':''}</span><span>${r.num_referrals} Refs</span></div></div>`; });
     }
 
-    function updatePublicTaskReportsUI(d) {
-        cachedPublicReports=d||[]; const f=document.getElementById('public-filter-tasker'); if(!f) return; const v=f.value; f.innerHTML='<option value="ALL">All</option>'; [...new Set(cachedPublicReports.map(r=>r.name))].sort().forEach(n=>f.innerHTML+=`<option value="${n}">${n}</option>`); f.value=v; applyPublicReportFilter();
+    // Helper function to convert Firebase Objects or Arrays safely into standard Arrays
+    function normalizeFirebaseArray(data) {
+        if (!data) return [];
+        if (Array.isArray(data)) return data.filter(Boolean);
+        if (typeof data === 'object') {
+            return Object.keys(data).map(key => data[key]).filter(Boolean);
+        }
+        return [];
     }
-    
-    function applyPublicReportFilter() { const c=document.getElementById('public-reports-feed'), f=document.getElementById('public-filter-tasker'); if(!c||!f) return; const v=f.value; const i=v==="ALL"?cachedPublicReports:cachedPublicReports.filter(r=>r.name===v); c.innerHTML=""; if(!i.length) return c.innerHTML="No reports"; i.forEach(r=>{ c.innerHTML+=`<div class="bg-white dark:bg-slate-800 p-3 border dark:border-slate-600 rounded transition-colors"><div class="flex justify-between text-xs font-bold"><span>${r.name}</span><span class="text-emerald-700 dark:text-emerald-400">${r.date}</span></div><p class="text-xs mt-2 whitespace-pre-wrap dark:text-slate-300">${r.summary}</p></div>`; }); }
+
+    function updatePublicTaskReportsUI(d) {
+        cachedPublicReports = normalizeFirebaseArray(d);
+        const f = document.getElementById('public-filter-tasker'); 
+        if (!f) return; 
+        const v = f.value; 
+        f.innerHTML = '<option value="ALL">All Reports</option>'; 
+        [...new Set(cachedPublicReports.map(r => r.name))].sort().forEach(n => {
+            if (n) f.innerHTML += `<option value="${n}">${n}</option>`;
+        }); 
+        f.value = v || "ALL"; 
+        applyPublicReportFilter();
+    }
 
     function updateOtherTaskReportsUI(d) {
-        cachedOtherReports=d||[]; const f=document.getElementById('other-public-filter-tasker'); if(!f) return; const v=f.value; f.innerHTML='<option value="ALL">All</option>'; [...new Set(cachedOtherReports.map(r=>r.name))].sort().forEach(n=>f.innerHTML+=`<option value="${n}">${n}</option>`); f.value=v; applyOtherReportFilter();
+        cachedOtherReports = normalizeFirebaseArray(d);
+        const f = document.getElementById('other-public-filter-tasker'); 
+        if (!f) return; 
+        const v = f.value; 
+        f.innerHTML = '<option value="ALL">All Reports</option>'; 
+        [...new Set(cachedOtherReports.map(r => r.name))].sort().forEach(n => {
+            if (n) f.innerHTML += `<option value="${n}">${n}</option>`;
+        }); 
+        f.value = v || "ALL"; 
+        applyOtherReportFilter();
     }
 
     function applyOtherReportFilter() { const c=document.getElementById('other-public-reports-feed'), f=document.getElementById('other-public-filter-tasker'); if(!c||!f) return; const v=f.value; const i=v==="ALL"?cachedOtherReports:cachedOtherReports.filter(r=>r.name===v); c.innerHTML=""; if(!i.length) return c.innerHTML="No reports"; i.forEach(r=>{ c.innerHTML+=`<div class="bg-white dark:bg-slate-800 p-3 border dark:border-slate-600 rounded transition-colors"><div class="flex justify-between text-xs font-bold"><span>${r.name}</span><span class="text-emerald-700 dark:text-emerald-400">${r.date}</span></div><p class="text-xs mt-2 whitespace-pre-wrap dark:text-slate-300">${r.summary}</p></div>`; }); }
