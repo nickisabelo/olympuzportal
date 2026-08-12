@@ -753,9 +753,20 @@
     }
 
     function updateReferralReportsUI(d) {
-        const c=document.getElementById('referral-reports-feed'); if(!c) return; c.innerHTML=""; if(!d||!d.length) return c.innerHTML='<div class="text-slate-400 text-xs">No records</div>'; d.forEach(r=>{ c.innerHTML+=`<div class="bg-white dark:bg-slate-800 p-3 rounded shadow-sm border dark:border-slate-600 text-xs transition-colors"><div class="flex justify-between"><span class="font-bold">${r.user_name}</span><span>${r.timestamp}</span></div><div class="flex justify-between mt-2 pt-2 border-t dark:border-slate-700 text-indigo-700 dark:text-indigo-400 font-bold"><span>Source: ${r.source} ${r.covering_for?'(Covering)':''}</span><span>${r.num_referrals} Refs</span></div></div>`; });
+      const reports = normalizeFirebaseArray(d);
+      const c = document.getElementById('referral-reports-feed'); 
+      if (!c) return; 
+      c.innerHTML = ""; 
+      if (!reports.length) {
+        c.innerHTML = '<div class="text-slate-400 text-xs">No records</div>';
+        return;
+      }
+      reports.forEach(r => { 
+        c.innerHTML += `<div class="bg-white dark:bg-slate-800 p-3 rounded shadow-sm border dark:border-slate-600 text-xs transition-colors"><div class="flex justify-between"><span class="font-bold">${r.user_name}</span><span>${r.timestamp}</span></div><div class="flex justify-between mt-2 pt-2 border-t dark:border-slate-700 text-indigo-700 dark:text-indigo-400 font-bold"><span>Source: ${r.source} ${r.covering_for ? '(Covering '+r.covering_for+')' : ''}</span><span>${r.num_referrals} Refs</span></div></div>`; 
+      });
     }
 
+    // Safely converts Firebase Key-Value Objects or Arrays into standard Javascript Arrays
     function normalizeFirebaseArray(data) {
       if (!data) return [];
       if (Array.isArray(data)) return data.filter(Boolean);
