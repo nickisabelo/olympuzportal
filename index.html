@@ -840,41 +840,27 @@
     function acknowledgeCoaching(id) { const rep=document.getElementById('cr-'+id).value, fi=document.getElementById('crf-'+id); const ex=b=>{ callAPI('POST','',{action:"acknowledgeCoaching",coachingId:id,taskerReply:rep,taskerAttachment:b}, r=>{ alert(r.message); if(r.success) { refreshUserTimers(); fetchGlobalAdminLogs(); } }); }; if(fi&&fi.files[0]) compressImage(fi.files[0], ex); else ex(''); }
     function submitCAForm() { const a=parseFloat(document.getElementById('ca-amount').value), r=document.getElementById('ca-reason').value, fi=document.getElementById('ca-file'); if(isNaN(a)||a<=0||!r.trim()) return alert("Invalid."); const ex=b=>{ callAPI('POST','',{action:"submitCARequest",userName:currentUser.name,amount:a,reason:r,attachment:b}, res=>{ alert(res.message); if(res.success){ document.getElementById('ca-amount').value=""; document.getElementById('ca-reason').value=""; if(fi)fi.value=""; refreshUserTimers(); fetchGlobalAdminLogs(); } }); }; if(fi&&fi.files[0]) compressImage(fi.files[0], ex); else ex(''); }
     
-    if (activeAction === "submitDailyReport") {
-          await env.DB.prepare("INSERT INTO reports (id, user_id, name, date, summary, timestamp) VALUES (?, ?, ?, ?, ?, ?)")
-            .bind(crypto.randomUUID(), session.sub, body.userName, body.reportDate, body.summary, new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila' })).run();
-          
-          const { results } = await env.DB.prepare("SELECT * FROM reports ORDER BY timestamp DESC LIMIT 50").all();
-          const res = (results || []).map(({ user_id, ...report }) => ({ ...report, userId: user_id }));
-          pushToFirebase('taskReports', res);
+    function submitDailyWorkReport() { 
+      const d = document.getElementById('rep-date').value, s = document.getElementById('rep-summary').value; 
+      if (!d || !s.trim()) return alert("Incomplete"); 
+      callAPI('POST', '', { action: "submitDailyReport", userId: currentUser.id, userName: currentUser.name, reportDate: d, summary: s }, r => { 
+        alert(r.message); 
+        if (r.success) { 
+          document.getElementById('rep-summary').value = ""; 
+          loadPublicTaskReportsFeed(); 
+        } 
+      }); 
+    }
 
-          return json({ success: true, message: "Daily Report logged.", data: res });
-        }
-
-        if (activeAction === "submitOtherTaskReport") {
-          await env.DB.prepare("INSERT INTO other_reports (id, user_id, name, date, summary, timestamp) VALUES (?, ?, ?, ?, ?, ?)")
-            .bind(crypto.randomUUID(), session.sub, body.userName, body.reportDate, body.summary, new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila' })).run();
-          
-          const { results } = await env.DB.prepare("SELECT * FROM other_reports ORDER BY timestamp DESC LIMIT 50").all();
-          const res = (results || []).map(({ user_id, ...report }) => ({ ...report, userId: user_id }));
-          pushToFirebase('otherReports', res);
-
-          return json({ success: true, message: "Other Task Report securely logged.", data: res });
-        }
-
-        if (activeAction === "submitReferralReport") {
-          if (!body.source || body.numReferrals === undefined) return json({ success: false, message: "Missing required fields." }, 400);
-          const id = crypto.randomUUID();
-          const timestamp = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila' });
-          await env.DB.prepare("INSERT INTO referrals (id, user_id, user_name, source, num_referrals, covering_for, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?)")
-            .bind(id, session.sub, body.userName, body.source, body.numReferrals, body.coveringFor || "", timestamp).run();
-          
-          // REALTIME FIREBASE SYNC FOR REFERRALS
-          const { results } = await env.DB.prepare("SELECT * FROM referrals ORDER BY timestamp DESC LIMIT 200").all();
-          pushToFirebase('referralReports', results);
-
-          return json({ success: true, message: "Referral tally successfully submitted.", data: results });
-        }
+    function submitOtherWorkReport() { 
+      const d = document.getElementById('other-rep-date').value, s = document.getElementById('other-rep-summary').value; 
+      if (!d || !s.trim()) return alert("Incomplete"); 
+      callAPI('POST', '', { action: "submitOtherTaskReport", userId: currentUser.id, userName: currentUser.name, reportDate: d, summary: s }, r => { 
+        alert(r.message); 
+        if (r.success) { 
+          document.getElementById('other-rep-summary').value = ""; 
+          loadOtherTaskReportsFeed(); 
+        } 
       }); 
     }
     
