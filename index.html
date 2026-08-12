@@ -587,11 +587,11 @@
       }
 
       fbDatabase.ref('taskReports').on('value', snap => {
-          if (snap.exists()) updatePublicTaskReportsUI(snap.val());
+          updatePublicTaskReportsUI(snap.val());
       });
 
       fbDatabase.ref('otherReports').on('value', snap => {
-          if (snap.exists()) updateOtherTaskReportsUI(snap.val());
+          updateOtherTaskReportsUI(snap.val());
       });
 
       fbDatabase.ref('referralReports').on('value', snap => {
