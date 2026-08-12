@@ -843,9 +843,7 @@
       if (cont) cont.classList[document.getElementById('ref-source').value==='Others'?'remove':'add']('hidden'); 
     }
     function toggleRefCovering() { document.getElementById('ref-covering-name').classList[document.getElementById('ref-is-covering').checked?'remove':'add']('hidden'); }
-    
-    function submitReferralReport() { let s = document.getElementById('ref-source').value; if(s==='Others') s=document.getElementById('ref-source-other').value.trim(); const c = parseInt(document.getElementById('ref-count').value); const ic=document.getElementById('ref-is-covering').checked, cn=document.getElementById('ref-covering-name').value.trim(); if(!s||isNaN(c)||c<0||(ic&&!cn)) return alert("Check inputs."); const fb = document.getElementById('ref-feedback'); fb.className="text-xs p-2 bg-amber-50 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400 rounded mt-2"; fb.innerText="Sending..."; fb.classList.remove('hidden'); callAPI('POST', '', {action:"submitReferralReport",userName:currentUser.name,source:s,numReferrals:c,coveringFor:ic?cn:""}, r=>{ fb.innerText=r.message||"Error"; fb.className=r.success?"text-xs p-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400 rounded mt-2":"text-xs p-2 bg-rose-50 dark:bg-rose-900/30 text-rose-800 dark:text-rose-400 rounded mt-2"; if(r.success) { document.getElementById('ref-count').value=""; loadReferralReportsFeed(); } }); }
-    function submitFeedbackReport() { const v=document.getElementById('fb-target-user').value, c=document.getElementById('fb-category').value, r=document.getElementById('fb-reason').value, fi=document.getElementById('fb-file'); if(!v||!c||!r.trim()) return alert("Incomplete"); const [tId, tNm]=v.split('|'); const execute=b=>{ callAPI('POST','',{action:"submitFeedbackReport",targetUserId:tId,targetName:tNm,category:c,reason:r,attachment:b}, res=>{ if(res.success) { document.getElementById('fb-target-user').value=""; document.getElementById('fb-reason').value=""; if(fi) fi.value=""; fetchGlobalAdminLogs(); alert("Sent!"); } }); }; if(fi&&fi.files[0]) compressImage(fi.files[0], execute); else execute(''); }
+  
     function toggleAdminCoachingPenalty() { document.getElementById('admin-coach-penalty').classList[document.getElementById('admin-coach-status').value==='Final Warning'?'remove':'add']('hidden'); }
     function submitCoachingReport() { const uid=document.getElementById('admin-coach-target').value, st=document.getElementById('admin-coach-status').value, pt=document.getElementById('admin-coach-penalty').value, txt=document.getElementById('admin-coach-text').value, fi=document.getElementById('admin-coach-file'); if(!uid||!txt.trim()) return alert("Required fields."); const tnm=document.getElementById('admin-coach-target').options[document.getElementById('admin-coach-target').selectedIndex].text.split(' [')[0]; const ex=b=>{ callAPI('POST','',{action:"submitCoachingReport",targetUserId:uid,targetName:tnm,status:st,penaltyTag:pt,coachingText:txt,adminAttachment:b}, r=>{ if(r.success){ document.getElementById('admin-coach-text').value=""; if(fi)fi.value=""; fetchGlobalAdminLogs(); } alert(r.message); }); }; if(fi&&fi.files[0]) compressImage(fi.files[0], ex); else ex(''); }
     function acknowledgeCoaching(id) { const rep=document.getElementById('cr-'+id).value, fi=document.getElementById('crf-'+id); const ex=b=>{ callAPI('POST','',{action:"acknowledgeCoaching",coachingId:id,taskerReply:rep,taskerAttachment:b}, r=>{ alert(r.message); if(r.success) { refreshUserTimers(); fetchGlobalAdminLogs(); } }); }; if(fi&&fi.files[0]) compressImage(fi.files[0], ex); else ex(''); }
@@ -854,26 +852,54 @@
     function submitDailyWorkReport() { 
       const d = document.getElementById('rep-date').value, s = document.getElementById('rep-summary').value; 
       if (!d || !s.trim()) return alert("Incomplete"); 
-      callAPI('POST', '', { action: "submitDailyReport", userId: currentUser.id, userName: currentUser.name, reportDate: d, summary: s }, r => { 
-        alert(r.message); 
+      callAPI('POST', '?action=submitDailyReport', { action: "submitDailyReport", userId: currentUser.id, userName: currentUser.name, reportDate: d, summary: s }, r => { 
         if (r.success) { 
+          alert(r.message || "Daily Report logged.");
           document.getElementById('rep-summary').value = ""; 
           loadPublicTaskReportsFeed(); 
-        } 
+        } else {
+          alert(r.message || r.error || "Submission failed.");
+        }
       }); 
     }
 
     function submitOtherWorkReport() { 
       const d = document.getElementById('other-rep-date').value, s = document.getElementById('other-rep-summary').value; 
       if (!d || !s.trim()) return alert("Incomplete"); 
-      callAPI('POST', '', { action: "submitOtherTaskReport", userId: currentUser.id, userName: currentUser.name, reportDate: d, summary: s }, r => { 
-        alert(r.message); 
+      callAPI('POST', '?action=submitOtherTaskReport', { action: "submitOtherTaskReport", userId: currentUser.id, userName: currentUser.name, reportDate: d, summary: s }, r => { 
         if (r.success) { 
+          alert(r.message || "Other Task Report logged.");
           document.getElementById('other-rep-summary').value = ""; 
           loadOtherTaskReportsFeed(); 
+        } else {
+          alert(r.message || r.error || "Submission failed.");
+        }
+      }); 
+    }
+
+    function submitReferralReport() { 
+      let s = document.getElementById('ref-source').value; 
+      if (s === 'Others') s = document.getElementById('ref-source-other').value.trim(); 
+      const c = parseInt(document.getElementById('ref-count').value); 
+      const ic = document.getElementById('ref-is-covering').checked, cn = document.getElementById('ref-covering-name').value.trim(); 
+      if (!s || isNaN(c) || c < 0 || (ic && !cn)) return alert("Check inputs."); 
+      
+      const fb = document.getElementById('ref-feedback'); 
+      fb.className = "text-xs p-2 bg-amber-50 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400 rounded mt-2"; 
+      fb.innerText = "Sending..."; 
+      fb.classList.remove('hidden'); 
+      
+      callAPI('POST', '?action=submitReferralReport', { action: "submitReferralReport", userName: currentUser.name, source: s, numReferrals: c, coveringFor: ic ? cn : "" }, r => { 
+        fb.innerText = r.message || (r.success ? "Submitted" : "Error"); 
+        fb.className = r.success ? "text-xs p-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400 rounded mt-2" : "text-xs p-2 bg-rose-50 dark:bg-rose-900/30 text-rose-800 dark:text-rose-400 rounded mt-2"; 
+        if (r.success) { 
+          document.getElementById('ref-count').value = ""; 
+          loadReferralReportsFeed(); 
         } 
       }); 
     }
+
+    
     
     function openCAModal(id) { document.getElementById('ca-modal-req-id').value=id; document.getElementById('ca-modal-feedback').value=""; document.getElementById('ca-modal-file').value=""; document.getElementById('ca-decision-modal').classList.remove('hidden'); }
     function closeCAModal() { document.getElementById('ca-decision-modal').classList.add('hidden'); }
