@@ -10,14 +10,12 @@
   
   <!-- Enforce Tailwind Class-based Dark Mode & Safely Suppress Warning -->
   <script>
-    // Safely silence the CDN production warning without breaking the config
     const originalWarn = console.warn;
     console.warn = function(...args) {
       if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com should not be used in production')) return;
       originalWarn.apply(console, args);
     };
 
-    // Correctly apply the Dark Mode configuration so the switch works
     tailwind.config = {
       darkMode: 'class',
       theme: {
@@ -153,7 +151,6 @@
               <button onclick="loadGlobalStatusFeed()" class="text-xs font-bold bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-400 px-3 py-1.5 rounded-lg transition-all hover:bg-indigo-100 dark:hover:bg-indigo-900/50 shrink-0">🔄 Sync Database</button>
             </div>
             
-            <!-- NEW STATUS LEGEND -->
             <div class="mb-4 flex flex-wrap gap-x-4 gap-y-2 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
               <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-600 block shadow-sm"></span> 🔴 Critical (Absent/Suspended)</div>
               <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-orange-500 block shadow-sm"></span> 🟠 Warning (Late/Undertime)</div>
@@ -491,17 +488,11 @@
     function getStatusBadgeStyle(t) { 
       if (!t) return 'bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400'; 
       const n = t.trim().toLowerCase(); 
-      // 🔴 Critical: Absent, Suspended
       if (n === 'absent' || n === 'suspended') return 'bg-rose-600 dark:bg-rose-800 text-white shadow-sm'; 
-      // 🟠 Warning: Undertime, Late, No Show Yet
       if (n === 'undertime' || n === 'late' || n === 'no show yet') return 'bg-orange-500 dark:bg-orange-700 text-white shadow-sm'; 
-      // 🟡 Needs Attention: Over Lunch, Over Break
       if (n.includes('over break') || n.includes('over lunch')) return 'bg-amber-400 dark:bg-amber-600 text-amber-900 dark:text-amber-50 shadow-sm'; 
-      // 🔵 Informational: On Leave, No Schedule, Day Off, Not Yet Started
       if (n === 'on leave' || n === 'day off' || n === 'no schedule' || n === 'shift not started yet' || n === 'not yet started') return 'bg-indigo-500 dark:bg-indigo-700 text-white shadow-sm'; 
-      // 💚 Excellent: Completed
       if (n === 'completed') return 'bg-emerald-800 dark:bg-emerald-950 text-white shadow-sm'; 
-      // 🟢 Good: On Time
       if (n.startsWith('on time') || n === 'rest day ot') return 'bg-emerald-500 dark:bg-emerald-700 text-white shadow-sm'; 
 
       return 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'; 
@@ -680,7 +671,6 @@
         let ls = "00:00:00", rs = "00:00:00";
         const sNow = Date.now() - window.serverTimeOffset;
 
-        // --- REAL-TIME BREAK / LUNCH CALCULATIONS ---
         let cBreakMins = r.acc_break || 0;
         let cLunchMins = r.acc_lunch || 0;
  
@@ -693,11 +683,9 @@
         let lBreakText = `${Math.floor(cBreakMins)}/${r.permanentSchedule?.maxBreak || 15}m`;
         let lLunchText = `${Math.floor(cLunchMins)}/${r.permanentSchedule?.maxMeal || 60}m`;
  
-        // Pulse effects if currently active in break state
         if (r.currentSessionType === 'QUICK BREAK') lBreakText = `<span class="text-amber-500 animate-pulse font-bold">${lBreakText}</span>`;
         if (r.currentSessionType === 'MEAL BREAK') lLunchText = `<span class="text-orange-500 animate-pulse font-bold">${lLunchText}</span>`;
 
-        // Status-Based Logic
         if (r.status === 'Day Off' || r.status === 'On Leave' || r.status === 'No Schedule' || r.status === 'Absent' || r.status === 'Suspended' || r.status === 'Not Yet Started' || r.status === 'No Show Yet') {
           ls = "-"; rs = "-";
         } else if (r.isLiveTracking && r.rawLoginMs) {
@@ -707,7 +695,6 @@
           ls = `<span class="text-indigo-600 dark:text-indigo-400 font-bold">${Math.floor(net/3600000).toString().padStart(2,'0')}:${Math.floor((net/60000)%60).toString().padStart(2,'0')}:${Math.floor((net/1000)%60).toString().padStart(2,'0')}</span>`;
  
           if (r.finalRequiredEndMs) {
-            // Factor in live-overages to push out Required End dynamically
             const oBreak = Math.max(0, Math.floor(cBreakMins) - (r.permanentSchedule?.maxBreak || 15));
             const oLunch = Math.max(0, Math.floor(cLunchMins) - (r.permanentSchedule?.maxMeal || 60));
             const baseOverageMs = (Math.max(0, Math.round(r.acc_break || 0) - (r.permanentSchedule?.maxBreak || 15)) + Math.max(0, Math.round(r.acc_lunch || 0) - (r.permanentSchedule?.maxMeal || 60))) * 60000;
@@ -733,7 +720,6 @@
           }
         }
  
-        // --- LIVE SESSION TIMER INJECTION ---
         let sessionTimer = "";
         if (r.currentSessionStart && (r.currentSessionType === 'DUTY' || r.currentSessionType === 'QUICK BREAK' || r.currentSessionType === 'MEAL BREAK')) {
             const elapsedMs = Math.max(0, sNow - new Date(r.currentSessionStart).getTime());
@@ -770,7 +756,6 @@
         const c=document.getElementById('referral-reports-feed'); if(!c) return; c.innerHTML=""; if(!d||!d.length) return c.innerHTML='<div class="text-slate-400 text-xs">No records</div>'; d.forEach(r=>{ c.innerHTML+=`<div class="bg-white dark:bg-slate-800 p-3 rounded shadow-sm border dark:border-slate-600 text-xs transition-colors"><div class="flex justify-between"><span class="font-bold">${r.user_name}</span><span>${r.timestamp}</span></div><div class="flex justify-between mt-2 pt-2 border-t dark:border-slate-700 text-indigo-700 dark:text-indigo-400 font-bold"><span>Source: ${r.source} ${r.covering_for?'(Covering)':''}</span><span>${r.num_referrals} Refs</span></div></div>`; });
     }
 
-    // Safely converts Firebase Objects/Dictionaries or Arrays into standard Arrays
     function normalizeFirebaseArray(data) {
       if (!data) return [];
       if (Array.isArray(data)) return data.filter(Boolean);
@@ -780,7 +765,6 @@
       return [];
     }
 
-    // 1. Define Filter Functions First
     function applyPublicReportFilter() { 
       const c = document.getElementById('public-reports-feed');
       const f = document.getElementById('public-filter-tasker'); 
@@ -813,7 +797,6 @@
       }); 
     }
 
-    // 2. Define UI Handlers that invoke the filters
     function updatePublicTaskReportsUI(d) {
       cachedPublicReports = normalizeFirebaseArray(d); 
       const f = document.getElementById('public-filter-tasker'); 
@@ -857,27 +840,29 @@
     function acknowledgeCoaching(id) { const rep=document.getElementById('cr-'+id).value, fi=document.getElementById('crf-'+id); const ex=b=>{ callAPI('POST','',{action:"acknowledgeCoaching",coachingId:id,taskerReply:rep,taskerAttachment:b}, r=>{ alert(r.message); if(r.success) { refreshUserTimers(); fetchGlobalAdminLogs(); } }); }; if(fi&&fi.files[0]) compressImage(fi.files[0], ex); else ex(''); }
     function submitCAForm() { const a=parseFloat(document.getElementById('ca-amount').value), r=document.getElementById('ca-reason').value, fi=document.getElementById('ca-file'); if(isNaN(a)||a<=0||!r.trim()) return alert("Invalid."); const ex=b=>{ callAPI('POST','',{action:"submitCARequest",userName:currentUser.name,amount:a,reason:r,attachment:b}, res=>{ alert(res.message); if(res.success){ document.getElementById('ca-amount').value=""; document.getElementById('ca-reason').value=""; if(fi)fi.value=""; refreshUserTimers(); fetchGlobalAdminLogs(); } }); }; if(fi&&fi.files[0]) compressImage(fi.files[0], ex); else ex(''); }
     
-    if (activeAction === "submitDailyReport") {
-          await env.DB.prepare("INSERT INTO reports (id, user_id, name, date, summary, timestamp) VALUES (?, ?, ?, ?, ?, ?)")
-            .bind(crypto.randomUUID(), session.sub, body.userName, body.reportDate, body.summary, new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila' })).run();
-          
-          const { results } = await env.DB.prepare("SELECT * FROM reports ORDER BY timestamp DESC LIMIT 50").all();
-          const res = (results || []).map(({ user_id, ...report }) => ({ ...report, userId: user_id }));
-          pushToFirebase('taskReports', res);
+    function submitDailyWorkReport() { 
+      const d = document.getElementById('rep-date').value, s = document.getElementById('rep-summary').value; 
+      if (!d || !s.trim()) return alert("Incomplete"); 
+      callAPI('POST', '', { action: "submitDailyReport", userId: currentUser.id, userName: currentUser.name, reportDate: d, summary: s }, r => { 
+        alert(r.message); 
+        if (r.success) { 
+          document.getElementById('rep-summary').value = ""; 
+          loadPublicTaskReportsFeed(); 
+        } 
+      }); 
+    }
 
-          return json({ success: true, message: "Daily Report logged.", data: res });
-        }
-
-        if (activeAction === "submitOtherTaskReport") {
-          await env.DB.prepare("INSERT INTO other_reports (id, user_id, name, date, summary, timestamp) VALUES (?, ?, ?, ?, ?, ?)")
-            .bind(crypto.randomUUID(), session.sub, body.userName, body.reportDate, body.summary, new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila' })).run();
-          
-          const { results } = await env.DB.prepare("SELECT * FROM other_reports ORDER BY timestamp DESC LIMIT 50").all();
-          const res = (results || []).map(({ user_id, ...report }) => ({ ...report, userId: user_id }));
-          pushToFirebase('otherReports', res);
-
-          return json({ success: true, message: "Other Task Report securely logged.", data: res });
-        }
+    function submitOtherWorkReport() { 
+      const d = document.getElementById('other-rep-date').value, s = document.getElementById('other-rep-summary').value; 
+      if (!d || !s.trim()) return alert("Incomplete"); 
+      callAPI('POST', '', { action: "submitOtherTaskReport", userId: currentUser.id, userName: currentUser.name, reportDate: d, summary: s }, r => { 
+        alert(r.message); 
+        if (r.success) { 
+          document.getElementById('other-rep-summary').value = ""; 
+          loadOtherTaskReportsFeed(); 
+        } 
+      }); 
+    }
     
     function openCAModal(id) { document.getElementById('ca-modal-req-id').value=id; document.getElementById('ca-modal-feedback').value=""; document.getElementById('ca-modal-file').value=""; document.getElementById('ca-decision-modal').classList.remove('hidden'); }
     function closeCAModal() { document.getElementById('ca-decision-modal').classList.add('hidden'); }
@@ -967,7 +952,6 @@
     }
 
     function showSection(id) { 
-      // Safely hide all section containers with null checks
       const sectionIds = [
         'attendance-sec','global-feed-sec','leave-request-sec','restday-request-sec',
         'task-report-sec','other-task-report-sec','referral-report-sec','ca-request-sec',
@@ -980,7 +964,6 @@
         if (el) el.classList.add('hidden'); 
       }); 
 
-      // Show targeted section safely
       const t = document.getElementById(id); 
       if (t) { 
         t.classList.remove('hidden'); 
@@ -1088,7 +1071,6 @@
     
     function executeAdminCreateUser() { const p={action:"adminCreateUser",name:document.getElementById('add-u-name').value,email:document.getElementById('add-u-email').value,password:document.getElementById('add-u-pass').value||"ChangeMe123",role:document.getElementById('add-u-role').value,shiftStart:document.getElementById('add-u-shift-start').value,shiftEnd:document.getElementById('add-u-shift-end').value,daysOff:document.getElementById('add-u-off').value,leaveAllowance:document.getElementById('add-u-leaves').value,maxBreak:document.getElementById('add-u-max-break').value,maxMeal:document.getElementById('add-u-max-meal').value,halfDay:document.getElementById('add-u-half').value,halfDayHours:document.getElementById('add-u-half-hrs').value,halfDayMeal:document.getElementById('add-u-half-meal').value}; if(!p.name||!p.email)return alert("Compile fields."); callAPI('POST','',p, r=>{ alert(r.message); if(r.success)fetchGlobalAdminLogs(); loadGlobalStatusFeed(); }); }
 
-    // Automatically fetches lost hours and calculates deductions dynamically based on the tasker's unique schedule
     function autoCalculateDeduction() {
       const pt = document.getElementById('p-target-user').value;
       if (!pt) return;
@@ -1098,14 +1080,13 @@
       const rate = parseFloat(rateInput) || 0;
       
       let lostHours = 0;
-      let weeklyHours = 40; // Default fallback
+      let weeklyHours = 40;
       
       if (cachedAdminMasterData && cachedAdminMasterData.absences) {
         const userAbs = cachedAdminMasterData.absences.find(u => u.id === tId);
         if (userAbs) {
           lostHours = userAbs.lostHoursWeek || 0;
           
-          // --- DYNAMIC WEEKLY HOURS CALCULATION ---
           const sched = userAbs.permanentSchedule;
           if (sched && sched.shift_start && sched.shift_end) {
             const sMin = parseToMinutes(sched.shift_start);
@@ -1113,19 +1094,16 @@
             
             if (sMin !== null && eMin !== null) {
               let diffM = eMin - sMin;
-              if (diffM < 0) diffM += 1440; // Cross-midnight handler
+              if (diffM < 0) diffM += 1440;
               
-              // Subtract meal break (unpaid) to get net work minutes per day
               const meal = parseInt(sched.max_lunch) || 60;
               const dailyNetHours = Math.max(0, diffM - meal) / 60;
               
-              // Calculate how many days they actually work
               const daysOffCount = (sched.days_off || "").split(',').filter(d => d.trim().length > 0).length;
               const workingDays = 7 - daysOffCount;
               
               weeklyHours = dailyNetHours * workingDays;
               
-              // Adjust for permanent half-days if they have one configured
               if (sched.half_day_config && sched.half_day_config !== "None" && sched.half_day_hours) {
                 const hdParts = sched.half_day_hours.split('|');
                 if (hdParts.length === 2) {
@@ -1137,7 +1115,6 @@
                     const hdMeal = parseInt(sched.half_day_meal) || 0;
                     const hdNetHours = Math.max(0, hdDiff - hdMeal) / 60;
                     
-                    // Replace one standard working day with the half-day hours
                     weeklyHours = (weeklyHours - dailyNetHours) + hdNetHours;
                   }
                 }
@@ -1147,112 +1124,23 @@
         }
       }
       
-      // Prevent division by zero just in case (fallback to 40)
       weeklyHours = weeklyHours > 0 ? weeklyHours : 40;
       
-      // Calculate Exact Hourly Rate based on THEIR specific schedule
       const hourlyRate = rate / weeklyHours;
-      
-      // Compute deduction
       const deduction = (hourlyRate * lostHours).toFixed(2);
       
-      // Inject to UI
       document.getElementById('p-deduct').value = deduction > 0 ? deduction : 0;
       
-      // Provide detailed feedback so admins know exactly how the math was done
       const fb = document.getElementById('payroll-feedback');
-      if (lostHours > 0 && rate > 0) {
-        fb.innerText = `Calculated: ${lostHours} lost hours @ ₱${hourlyRate.toFixed(2)}/hr (based on a ${weeklyHours} hr work week).`;
-        fb.className = "text-amber-600 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-400 text-xs font-bold p-2 rounded-lg mt-2 block";
-      } else {
-        fb.classList.add('hidden');
-      }
-    }
-
-    // Automatically fetches lost hours and calculates deductions dynamically based on the tasker's unique schedule
-    function autoCalculateDeduction() {
-      const pt = document.getElementById('p-target-user').value;
-      if (!pt) return;
-      const [tId, tNm] = pt.split('|');
-      
-      const rateInput = document.getElementById('p-rate').value;
-      const rate = parseFloat(rateInput) || 0;
-      
-      let lostHours = 0;
-      let weeklyHours = 40; // Default fallback
-      
-      if (cachedAdminMasterData && cachedAdminMasterData.absences) {
-        const userAbs = cachedAdminMasterData.absences.find(u => u.id === tId);
-        if (userAbs) {
-          lostHours = userAbs.lostHoursWeek || 0;
-          
-          // --- DYNAMIC WEEKLY HOURS CALCULATION ---
-          const sched = userAbs.permanentSchedule;
-          if (sched && sched.shift_start && sched.shift_end) {
-            const sMin = parseToMinutes(sched.shift_start);
-            const eMin = parseToMinutes(sched.shift_end);
-            
-            if (sMin !== null && eMin !== null) {
-              let diffM = eMin - sMin;
-              if (diffM < 0) diffM += 1440; // Cross-midnight handler
-              
-              // Subtract meal break (unpaid) to get net work minutes per day
-              const meal = parseInt(sched.max_lunch) || 60;
-              const dailyNetHours = Math.max(0, diffM - meal) / 60;
-              
-              // Calculate how many days they actually work
-              const daysOffCount = (sched.days_off || "").split(',').filter(d => d.trim().length > 0).length;
-              const workingDays = 7 - daysOffCount;
-              
-              weeklyHours = dailyNetHours * workingDays;
-              
-              // Adjust for permanent half-days if they have one configured
-              if (sched.half_day_config && sched.half_day_config !== "None" && sched.half_day_hours) {
-                const hdParts = sched.half_day_hours.split('|');
-                if (hdParts.length === 2) {
-                  const hdS = parseToMinutes(hdParts[0]);
-                  const hdE = parseToMinutes(hdParts[1]);
-                  if (hdS !== null && hdE !== null) {
-                    let hdDiff = hdE - hdS;
-                    if (hdDiff < 0) hdDiff += 1440;
-                    const hdMeal = parseInt(sched.half_day_meal) || 0;
-                    const hdNetHours = Math.max(0, hdDiff - hdMeal) / 60;
-                    
-                    // Replace one standard working day with the half-day hours
-                    weeklyHours = (weeklyHours - dailyNetHours) + hdNetHours;
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      
-      // Prevent division by zero just in case (fallback to 40)
-      weeklyHours = weeklyHours > 0 ? weeklyHours : 40;
-      
-      // Calculate Exact Hourly Rate based on THEIR specific schedule
-      const hourlyRate = rate / weeklyHours;
-      
-      // Compute deduction
-      const deduction = (hourlyRate * lostHours).toFixed(2);
-      
-      // Inject to UI
-      document.getElementById('p-deduct').value = deduction > 0 ? deduction : 0;
-      
-      // Provide detailed feedback so admins know exactly how the math was done
-      const fb = document.getElementById('payroll-feedback');
-      const remarksInput = document.getElementById('p-remarks'); // Grab the remarks field
+      const remarksInput = document.getElementById('p-remarks');
       
       if (lostHours > 0 && rate > 0) {
         fb.innerText = `Calculated: ${lostHours} lost hours @ ₱${hourlyRate.toFixed(2)}/hr (based on a ${weeklyHours} hr work week).`;
         fb.className = "text-amber-600 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-400 text-xs font-bold p-2 rounded-lg mt-2 block";
-        
-        // AUTO-FILL THE REMARKS FOR THE TASKER TO SEE
         remarksInput.value = `Auto-Deduction: ${lostHours} lost hours.`; 
       } else {
         fb.classList.add('hidden');
-        if (remarksInput.value.includes("Auto-Deduction")) remarksInput.value = ""; // Clear it if no deductions
+        if (remarksInput.value.includes("Auto-Deduction")) remarksInput.value = "";
       }
     }
     
