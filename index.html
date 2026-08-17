@@ -384,6 +384,25 @@
             <p id="admin-create-feedback" class="text-xs hidden"></p>
           </div>
 
+          <!-- NEW: Manual RDOT Plotting -->
+          <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-4 transition-colors">
+            <h2 class="text-xl font-bold text-emerald-800 dark:text-emerald-400">📅 Plot Manual RDOT</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              <select id="admin-rdot-target" class="w-full p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none dark:text-white"></select>
+              <input type="date" id="admin-rdot-date" class="w-full p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none dark:text-white" title="RDOT Date">
+              <div class="grid grid-cols-2 gap-2">
+                <input type="time" id="admin-rdot-start" class="w-full p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none dark:text-white" title="Shift Start">
+                <input type="time" id="admin-rdot-end" class="w-full p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none dark:text-white" title="Shift End">
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <input type="number" id="admin-rdot-break" class="w-full p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none dark:text-white" placeholder="Q-Break (mins)">
+                <input type="number" id="admin-rdot-meal" class="w-full p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none dark:text-white" placeholder="Meal (mins)">
+              </div>
+              <input type="text" id="admin-rdot-remarks" class="md:col-span-2 w-full p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg outline-none dark:text-white" placeholder="Remarks/Comments (e.g. Mandatory Client Overtime)">
+            </div>
+            <button onclick="submitManualRDOT()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white p-3 rounded-lg font-bold shadow transition-all">Plot RDOT Schedule</button>
+          </div>
+
           <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-4 transition-colors">
             <h2 class="text-xl font-bold text-indigo-900 dark:text-indigo-400">📅 Schedule Overrides</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
@@ -967,6 +986,43 @@
     }
     
     function submitLeaveForm() { const d=document.getElementById('l-date').value, r=document.getElementById('l-reason').value, fi=document.getElementById('l-file'); if(!d||!r) return alert("Complete fields."); const ex=b=>{ callAPI('POST','',{action:"submitLeaveRequest",userId:currentUser.id,userName:currentUser.name,leaveDate:d,reason:r,attachment:b}, res=>{ alert(res.message); if(res.success){ document.getElementById('l-date').value=""; document.getElementById('l-reason').value=""; if(fi)fi.value=""; refreshUserTimers(); fetchGlobalAdminLogs(); } }); }; if(fi&&fi.files[0]) compressImage(fi.files[0], ex); else ex(''); }
+    function submitManualRDOT() {
+      const t = document.getElementById('admin-rdot-target').value;
+      const d = document.getElementById('admin-rdot-date').value;
+      const ss = document.getElementById('admin-rdot-start').value;
+      const se = document.getElementById('admin-rdot-end').value;
+      const mb = document.getElementById('admin-rdot-break').value;
+      const mm = document.getElementById('admin-rdot-meal').value;
+      const rm = document.getElementById('admin-rdot-remarks').value;
+
+      if (!t || !d || !ss || !se || !mb || !mm) return alert("Please complete all required fields (Target, Date, Times, Breaks).");
+
+      const tSelect = document.getElementById('admin-rdot-target');
+      const tName = tSelect.options[tSelect.selectedIndex].text;
+
+      callAPI('POST', '', {
+        action: "adminPlotManualRDOT",
+        targetUserId: t,
+        targetName: tName,
+        targetDate: d,
+        shiftStart: ss,
+        shiftEnd: se,
+        maxBreak: mb,
+        maxMeal: mm,
+        comments: rm
+      }, r => {
+        alert(r.message);
+        if (r.success) {
+          document.getElementById('admin-rdot-date').value = "";
+          document.getElementById('admin-rdot-start').value = "";
+          document.getElementById('admin-rdot-end').value = "";
+          document.getElementById('admin-rdot-break').value = "";
+          document.getElementById('admin-rdot-meal').value = "";
+          document.getElementById('admin-rdot-remarks').value = "";
+          fetchGlobalAdminLogs();
+        }
+      });
+    }
     function submitRestDayForm() { const d=document.getElementById('rd-date').value, c=document.getElementById('rd-comments').value; if(!d||!c) return alert("Complete fields."); callAPI('POST','',{action:"submitRestDayRequest",userId:currentUser.id,userName:currentUser.name,targetDate:d,comments:c}, res=>{ alert(res.message); if(res.success){ document.getElementById('rd-date').value=""; document.getElementById('rd-comments').value=""; refreshUserTimers(); fetchGlobalAdminLogs(); } }); }
     function adminExecuteLeave(id,st) { const c=prompt("Comments:"); if(c===null)return; callAPI('POST','',{action:"processLeaveAction",requestId:id,status:st,comment:c}, r=>{ alert(r.message); fetchGlobalAdminLogs(); refreshUserTimers(); }); }
     function executeAdminMakeRestDayDecision(id,st) { const c=prompt("Comments:"); if(c===null)return; callAPI('POST','',{action:"processRestDayAction",requestId:id,status:st,feedback:c}, r=>{ alert(r.message); fetchGlobalAdminLogs(); refreshUserTimers(); }); }
@@ -1076,6 +1132,8 @@
         a.forEach(t=>f.innerHTML+=`<option value="${t.name}">${t.name}</option>`); 
         f.value=v; 
       }
+      const art=document.getElementById('admin-rdot-target');
+      if(art){ art.innerHTML='<option value="">Select Tasker</option>'; a.forEach(t=>art.innerHTML+=`<option value="${t.id}">${t.name}</option>`); }
       
       const tg=document.getElementById('sched-target-uid'); 
       if(tg) {
