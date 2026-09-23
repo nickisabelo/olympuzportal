@@ -424,6 +424,7 @@
                 <select id="sched-target-uid" class="w-full p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white"></select>
                 <div class="grid grid-cols-2 gap-2"><input type="time" id="sched-shift-start" class="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white"><input type="time" id="sched-shift-end" class="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white"></div>
                 <div class="grid grid-cols-2 gap-2"><input type="number" id="sched-max-break" class="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white" placeholder="Break"><input type="number" id="sched-max-meal" class="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white" placeholder="Meal"></div>
+                <input type="text" id="sched-days-off" class="w-full p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white" placeholder="Days Off (e.g. Saturday, Sunday)">
                 <div class="grid grid-cols-2 gap-2 mt-2">
                   <select id="sched-half-day-temp" class="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white"><option value="false">Temp Half: No</option><option value="true">Temp: Yes</option></select>
                   <select id="sched-half-day-perm" class="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded outline-none dark:text-white"><option value="">Perm: None</option><option value="Monday">Monday</option><option value="Tuesday">Tuesday</option><option value="Wednesday">Wednesday</option><option value="Thursday">Thursday</option><option value="Friday">Friday</option><option value="Saturday">Saturday</option><option value="Sunday">Sunday</option></select>
@@ -446,7 +447,7 @@
           
           <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 transition-colors"><h2 class="text-xl font-bold border-b border-slate-100 dark:border-slate-700 pb-2 mb-3 dark:text-slate-100">Leave Queue</h2><div class="overflow-x-auto rounded-lg"><table class="w-full text-left text-xs"><thead><tr class="bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-semibold uppercase"><th class="p-3">Tasker</th><th class="p-3">Date</th><th class="p-3">Reason</th><th class="p-3">Proof</th><th class="p-3">Status</th><th class="p-3">Control</th></tr></thead><tbody id="admin-leave-table" class="divide-y divide-slate-50 dark:divide-slate-700"></tbody></table></div></div>
           
-          <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 transition-colors"><h2 class="text-xl font-bold border-b border-slate-100 dark:border-slate-700 pb-2 mb-3 dark:text-slate-100">Exception & Absence Metrics</h2><div class="overflow-x-auto rounded-lg"><table class="w-full text-left text-xs"><thead><tr class="bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-semibold uppercase"><th class="p-3">ID</th><th class="p-3">Name</th><th class="p-3">Days Off</th><th class="p-3">Half Day</th><th class="p-3">Absences</th><th class="p-3 text-orange-600 font-bold">Lost Hrs (Sun-Sat)</th><th class="p-3 text-center">Actions</th></tr></thead><tbody id="admin-absence-table" class="divide-y divide-slate-50 dark:divide-slate-700"></tbody></table></div></div>
+          <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 transition-colors"><h2 class="text-xl font-bold border-b border-slate-100 dark:border-slate-700 pb-2 mb-3 dark:text-slate-100">Exception & Absence Metrics</h2><div class="overflow-x-auto rounded-lg"><table class="w-full text-left text-xs"><thead><tr class="bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-semibold uppercase"><th class="p-3">ID</th><th class="p-3">Name</th><th class="p-3">Days Off</th><th class="p-3">Half Day</th><th class="p-3">Absences</th><th class="p-3 text-orange-600 font-bold">Lost Hrs (filter range)</th><th class="p-3 text-center">Actions</th></tr></thead><tbody id="admin-absence-table" class="divide-y divide-slate-50 dark:divide-slate-700"></tbody></table></div></div>
         </section>
 
       </main>
@@ -632,6 +633,8 @@
       loadGlobalStatusFeed();
       if (currentUser.role === 'Admin') fetchGlobalAdminLogs();
 
+      // Authenticated API is the source of truth. Firebase mirrors are optional UX only —
+      // never trust a public RTDB dump for admin/payroll data.
       fbDatabase.ref('stats/' + currentUser.id).on('value', snap => {
           if (snap.exists()) updateLiveUserStatsUI(snap.val());
       });
@@ -639,12 +642,6 @@
       fbDatabase.ref('feed').on('value', snap => {
           if (snap.exists()) updateGlobalStatusFeedUI(snap.val());
       });
-
-      if (currentUser.role === 'Admin') {
-          fbDatabase.ref('admin').on('value', snap => {
-              if (snap.exists()) updateAdminDashboardUI(snap.val());
-          });
-      }
 
       fbDatabase.ref('taskReports').on('value', snap => {
           updatePublicTaskReportsUI(snap.val());
@@ -661,6 +658,16 @@
       fbDatabase.ref('payroll/' + currentUser.id).on('value', snap => {
           if (snap.exists()) updateUserPayrollUI(snap.val());
       });
+
+      if (window._olympuzFeedPoll) clearInterval(window._olympuzFeedPoll);
+      window._olympuzFeedPoll = setInterval(() => {
+        if (!currentUser) return;
+        loadGlobalStatusFeed();
+        refreshUserTimers();
+        if (currentUser.role === 'Admin' && document.getElementById('admin-sec') && !document.getElementById('admin-sec').classList.contains('hidden')) {
+          fetchGlobalAdminLogs();
+        }
+      }, 20000);
 
       initializeRealtimeTicker();
     }
@@ -728,7 +735,7 @@
             const dr = document.getElementById('fb-target-user'); 
             if (dr) { 
                 const v = dr.value; dr.innerHTML = '<option value="">Target Tasker</option>'; 
-                window.cachedGlobalFeed.forEach(t => { if(currentUser && t.id!==currentUser.id) dr.innerHTML+=`<option value="${t.id}|${t.name}">${t.name}</option>`; }); 
+                window.cachedGlobalFeed.forEach(t => { if(currentUser && t.id!==currentUser.id) dr.innerHTML+=`<option value="${esc(t.id)}|${esc(t.name)}">${esc(t.name)}</option>`; }); 
                 if(v) dr.value=v; 
             } 
         }
@@ -755,7 +762,14 @@
         if (r.currentSessionType === 'QUICK BREAK') lBreakText = `<span class="text-amber-500 animate-pulse font-bold">${lBreakText}</span>`;
         if (r.currentSessionType === 'MEAL BREAK') lLunchText = `<span class="text-orange-500 animate-pulse font-bold">${lLunchText}</span>`;
 
-        if (r.status === 'Day Off' || r.status === 'On Leave' || r.status === 'No Schedule' || r.status === 'Absent' || r.status === 'Suspended' || r.status === 'Not Yet Started' || r.status === 'No Show Yet') {
+        let displayStatus = r.status;
+        if (r.shiftStartMs && !r.isLiveTracking && (r.timeIn === '-' || !r.timeIn) && !['Day Off','On Leave','No Schedule','Suspended'].includes(r.status)) {
+          if (sNow < r.shiftStartMs) displayStatus = 'Not Yet Started';
+          else if (sNow <= r.shiftStartMs + (15 * 60000)) displayStatus = 'No Show Yet';
+          else displayStatus = 'Absent';
+        }
+
+        if (displayStatus === 'Day Off' || displayStatus === 'On Leave' || displayStatus === 'No Schedule' || displayStatus === 'Absent' || displayStatus === 'Suspended' || displayStatus === 'Not Yet Started' || displayStatus === 'No Show Yet') {
           ls = "-"; rs = "-";
         } else if (r.isLiveTracking && r.rawLoginMs) {
           const eLog = r.shiftStartMs ? Math.max(r.rawLoginMs, r.shiftStartMs) : r.rawLoginMs;
@@ -813,7 +827,7 @@
             lt = '<span class="bg-slate-100 dark:bg-slate-700 text-slate-400 px-2 py-1 rounded text-[10px] font-black uppercase inline-block">💤 Offline</span>';
         }
  
-        h += `<tr class="border-b dark:border-slate-700"><td class="p-3 font-bold">${esc(r.name)}</td><td class="p-3">${lt}</td><td class="p-3 text-emerald-600 dark:text-emerald-400 font-mono">${r.timeIn}</td><td class="p-3 font-mono">${ls}</td><td class="p-3 font-mono">${rs}</td><td class="p-3 font-mono">${lLunchText}</td><td class="p-3 font-mono">${lBreakText}</td><td class="p-3 text-rose-600 dark:text-rose-400 font-mono">${r.timeOut}</td><td class="p-3 text-center"><span class="px-2 py-0.5 rounded text-[11px] font-bold ${getStatusBadgeStyle(r.status)}">${r.status}</span></td></tr>`;
+        h += `<tr class="border-b dark:border-slate-700"><td class="p-3 font-bold">${esc(r.name)}</td><td class="p-3">${lt}</td><td class="p-3 text-emerald-600 dark:text-emerald-400 font-mono">${esc(r.timeIn)}</td><td class="p-3 font-mono">${ls}</td><td class="p-3 font-mono">${rs}</td><td class="p-3 font-mono">${lLunchText}</td><td class="p-3 font-mono">${lBreakText}</td><td class="p-3 text-rose-600 dark:text-rose-400 font-mono">${esc(r.timeOut)}</td><td class="p-3 text-center"><span class="px-2 py-0.5 rounded text-[11px] font-bold ${getStatusBadgeStyle(displayStatus)}">${esc(displayStatus)}</span></td></tr>`;
       }); f.innerHTML = h;
     }
     
@@ -1021,7 +1035,7 @@
     function closeCAModal() { document.getElementById('ca-decision-modal').classList.add('hidden'); }
     function submitCADecision(st) { const rid=document.getElementById('ca-modal-req-id').value, f=document.getElementById('ca-modal-feedback').value, fi=document.getElementById('ca-modal-file'); if(st==='Denied'&&!f.trim()) return alert("Need feedback"); const ex=b=>{ callAPI('POST','',{action:"processCAAction",requestId:rid,status:st,feedback:f,adminAttachment:b}, res=>{ alert(res.message); closeCAModal(); if(res.success) { refreshUserTimers(); fetchGlobalAdminLogs(); } }); }; if(st==='Approved'&&fi.files[0]) compressImage(fi.files[0], ex); else ex(''); }
     
-    function submitScheduleAdjustment(p) { const t=document.getElementById('sched-target-uid').value, ss=document.getElementById('sched-shift-start').value, se=document.getElementById('sched-shift-end').value, mb=document.getElementById('sched-max-break').value, mm=document.getElementById('sched-max-meal').value, hdt=document.getElementById('sched-half-day-temp').value, hdp=document.getElementById('sched-half-day-perm').value, hhr=document.getElementById('sched-half-hrs').value, hm=document.getElementById('sched-half-meal').value; if(!t||!ss||!se||!mb||!mm) return alert("Incomplete"); callAPI('POST','',{action:p?"updatePermanentSchedule":"updateDailyScheduleAdjustment",targetUserId:t,shiftStart:ss,shiftEnd:se,maxBreak:mb,maxMeal:mm,isHalfDay:hdt,halfDay:hdp,halfDayHours:hhr,halfDayMeal:hm,date:getManilaDateString()}, r=>{ alert(r.message); if(r.success) { fetchGlobalAdminLogs(); loadGlobalStatusFeed(); } }); }
+    function submitScheduleAdjustment(p) { const t=document.getElementById('sched-target-uid').value, ss=document.getElementById('sched-shift-start').value, se=document.getElementById('sched-shift-end').value, mb=document.getElementById('sched-max-break').value, mm=document.getElementById('sched-max-meal').value, hdt=document.getElementById('sched-half-day-temp').value, hdp=document.getElementById('sched-half-day-perm').value, hhr=document.getElementById('sched-half-hrs').value, hm=document.getElementById('sched-half-meal').value, dof=document.getElementById('sched-days-off')?.value; if(!t||!ss||!se||!mb||!mm) return alert("Incomplete"); const payload={action:p?"updatePermanentSchedule":"updateDailyScheduleAdjustment",targetUserId:t,shiftStart:ss,shiftEnd:se,maxBreak:mb,maxMeal:mm,isHalfDay:hdt,halfDay:hdp,halfDayHours:hhr,halfDayMeal:hm,date:getManilaDateString()}; if(p && dof !== undefined) payload.daysOff = dof; callAPI('POST','',payload, r=>{ alert(r.message); if(r.success) { fetchGlobalAdminLogs(); loadGlobalStatusFeed(); } }); }
     function toggleFormScheduleVisibility() { const o=document.getElementById('add-u-role').value==='Admin'?'0.35':'1', d=document.getElementById('add-u-role').value==='Admin'; ['add-u-shift-start','add-u-shift-end','add-u-off','add-u-max-break','add-u-max-meal','add-u-half','add-u-half-hrs','add-u-half-meal'].forEach(id=>{ const el=document.getElementById(id); if (el) { el.closest('div').style.opacity=o; el.disabled=d; } }); }
     
     function openImagePreviewOverlayModal(url) { if(!url)return alert("No image"); window.open().document.write(`<body style="margin:0; background:#0f172a; display:flex; justify-content:center; align-items:center; min-h:100vh;"><img src="${url}" style="max-width:95%; max-height:95vh; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5); border-radius:12px;" /></body>`); }
@@ -1081,7 +1095,7 @@
     function executeAdminRemoveUser(id,nm) { if(!confirm("Purge?"))return; callAPI('POST','',{action:"adminDeleteUser",targetUserId:id}, r=>{ alert(r.message); fetchGlobalAdminLogs(); loadGlobalStatusFeed(); }); }
     
     function executeAdminTagStatus(id, nm) {
-      const d = prompt("Date YYYY-MM-DD:", new Date().toISOString().split('T')[0]);
+      const d = prompt("Date YYYY-MM-DD:", getManilaDateString());
       if (!d) return;
       const type = prompt("Select Tag:\n1 = Absent\n2 = On Leave\n3 = No Schedule", "1");
       if (!type) return;
@@ -1142,6 +1156,7 @@
     }
 
     function showSection(id) { 
+      if (id === 'admin-sec' && (!currentUser || currentUser.role !== 'Admin')) return;
       const sectionIds = [
         'attendance-sec','global-feed-sec','leave-request-sec','restday-request-sec',
         'task-report-sec','other-task-report-sec','referral-report-sec','ca-request-sec',
@@ -1164,15 +1179,15 @@
         } 
       } 
       
-      if (id === 'task-report-sec') { const repDate = document.getElementById('rep-date'); if (repDate) repDate.value = new Date().toISOString().split('T')[0]; loadPublicTaskReportsFeed(); } 
-      if (id === 'other-task-report-sec') { const otherRepDate = document.getElementById('other-rep-date'); if (otherRepDate) otherRepDate.value = new Date().toISOString().split('T')[0]; loadOtherTaskReportsFeed(); } 
+      if (id === 'task-report-sec') { const repDate = document.getElementById('rep-date'); if (repDate) repDate.value = getManilaDateString(); loadPublicTaskReportsFeed(); } 
+      if (id === 'other-task-report-sec') { const otherRepDate = document.getElementById('other-rep-date'); if (otherRepDate) otherRepDate.value = getManilaDateString(); loadOtherTaskReportsFeed(); } 
       if (id === 'referral-report-sec') loadReferralReportsFeed(); 
       if (id === 'feedback-submit-sec' || id === 'global-feed-sec') loadGlobalStatusFeed(); 
       if (id === 'admin-sec') fetchGlobalAdminLogs(); 
       if (['attendance-sec','leave-request-sec','ca-request-sec','coaching-sec','account-settings-sec','restday-request-sec'].includes(id)) refreshUserTimers(); 
     }
 
-    function logout() { currentUser=null; clearTimeout(inactivityTimer); clearInterval(liveTimerTickerInterval); localStorage.removeItem("olympuz_active_session"); localStorage.removeItem("olympuz_token"); location.reload(); }
+    function logout() { currentUser=null; clearTimeout(inactivityTimer); clearInterval(liveTimerTickerInterval); if (window._olympuzFeedPoll) clearInterval(window._olympuzFeedPoll); localStorage.removeItem("olympuz_active_session"); localStorage.removeItem("olympuz_token"); location.reload(); }
     
     function populateTaskerDropdownOptions(a) { 
       const f=document.getElementById('filter-tasker'); 
