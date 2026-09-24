@@ -6,16 +6,18 @@
   <title>Olympuz Operations Portal</title>
   <link rel="icon" type="image/png" href="Logo New.png">
   
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Enforce Tailwind Class-based Dark Mode & Safely Suppress Warning -->
+  <!-- Suppress Tailwind CDN prod warning before the CDN script loads -->
   <script>
-    const originalWarn = console.warn;
-    console.warn = function(...args) {
-      if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com should not be used in production')) return;
-      originalWarn.apply(console, args);
-    };
-
+    (function () {
+      const originalWarn = console.warn;
+      console.warn = function (...args) {
+        if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com should not be used in production')) return;
+        originalWarn.apply(console, args);
+      };
+    })();
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
@@ -60,7 +62,13 @@
       </div>
       <div id="credentials-form" class="space-y-4">
         <div><label class="block text-xs font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">Corporate Email</label><input type="email" id="email" class="w-full p-3 border border-slate-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"></div>
-        <div><label class="block text-xs font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">Password</label><input type="password" id="password" class="w-full p-3 border border-slate-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"></div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">Password</label>
+          <input type="password" id="password" class="w-full p-3 border border-slate-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+          <div class="mt-1.5 text-right">
+            <button type="button" onclick="showPasswordResetForm()" class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:underline">Forgot password?</button>
+          </div>
+        </div>
         <button onclick="handleLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg font-bold shadow-md hover:shadow-lg transition-all mt-2">Sign In</button>
       </div>
       <div id="otp-form" class="space-y-4 hidden">
@@ -68,6 +76,23 @@
         <div><label class="block text-xs font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">6-Digit Code</label><input type="text" id="otp-code" maxlength="6" class="w-full p-3 border border-slate-200 dark:border-slate-600 rounded-lg text-center tracking-widest font-mono text-xl bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all"></div>
         <button onclick="handleVerifyOTP()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white p-3 rounded-lg font-bold shadow-md hover:shadow-lg transition-all">Verify Code</button>
         <button onclick="cancelOTPFlow()" class="w-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 p-2 rounded-lg text-xs font-semibold mt-1 transition-colors">Back to Login</button>
+      </div>
+      <div id="reset-form" class="space-y-4 hidden">
+        <div class="bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 p-4 rounded-xl text-xs text-indigo-950 dark:text-indigo-200">
+          <strong>Reset your password</strong>
+          <p class="mt-1 text-indigo-800 dark:text-indigo-300">Enter your corporate email. We’ll send a 6-digit code so you can set a new password.</p>
+        </div>
+        <div id="reset-request-step" class="space-y-4">
+          <div><label class="block text-xs font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">Corporate Email</label><input type="email" id="reset-email" class="w-full p-3 border border-slate-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"></div>
+          <button onclick="handleRequestPasswordReset()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg font-bold shadow-md hover:shadow-lg transition-all">Send Reset Code</button>
+        </div>
+        <div id="reset-confirm-step" class="space-y-4 hidden">
+          <div><label class="block text-xs font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">6-Digit Code</label><input type="text" id="reset-code" maxlength="6" class="w-full p-3 border border-slate-200 dark:border-slate-600 rounded-lg text-center tracking-widest font-mono text-xl bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all"></div>
+          <div><label class="block text-xs font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">New Password</label><input type="password" id="reset-new-password" class="w-full p-3 border border-slate-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"></div>
+          <div><label class="block text-xs font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">Confirm Password</label><input type="password" id="reset-confirm-password" class="w-full p-3 border border-slate-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"></div>
+          <button onclick="handleConfirmPasswordReset()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white p-3 rounded-lg font-bold shadow-md hover:shadow-lg transition-all">Update Password</button>
+        </div>
+        <button onclick="cancelPasswordResetFlow()" class="w-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 p-2 rounded-lg text-xs font-semibold transition-colors">Back to Login</button>
       </div>
       <p id="login-err" class="text-red-500 dark:text-rose-400 text-xs font-semibold mt-4 text-center hidden bg-red-50 dark:bg-rose-900/30 border border-red-100 dark:border-rose-800/50 p-2 rounded"></p>
     </div>
@@ -558,7 +583,7 @@
 
     function getManilaDateString() { const d = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila' })); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
     function compressImage(file, callback) { if (!file || !file.type.startsWith('image/')) { const r = new FileReader(); r.onload = e => callback(e.target.result); r.readAsDataURL(file); return; } const r = new FileReader(); r.onload = e => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); let w = img.width, h = img.height; const MAX = 800; if (w > h && w > MAX) { h *= MAX/w; w = MAX; } else if (h > MAX) { w *= MAX/h; h = MAX; } canvas.width=w; canvas.height=h; canvas.getContext('2d').drawImage(img,0,0,w,h); callback(canvas.toDataURL('image/jpeg',0.6)); }; img.src = e.target.result; }; r.readAsDataURL(file); }
-    function callAPI(method, urlParams, payload, callback) { let t = localStorage.getItem("olympuz_token"); let headers = { 'Content-Type': 'application/json' }; if (t) headers['Authorization'] = 'Bearer ' + t; let c = { method, headers }; if (payload) c.body = JSON.stringify(payload); const conn = urlParams.includes('?') ? '&' : '?'; fetch(API_URL + urlParams + conn + "_t=" + Date.now(), c).then(r => { if (r.status === 401 && payload?.action !== "loginUser") { logout(); alert("Security Session Expired. Please sign in again."); return null; } return r.json(); }).then(d => { if (d) callback(d); }).catch(e => console.log(e)); }
+    function callAPI(method, urlParams, payload, callback) { let t = localStorage.getItem("olympuz_token"); let headers = { 'Content-Type': 'application/json' }; if (t) headers['Authorization'] = 'Bearer ' + t; let c = { method, headers }; if (payload) c.body = JSON.stringify(payload); const conn = urlParams.includes('?') ? '&' : '?'; const publicAuthActions = new Set(["loginUser", "setInitialPassword", "requestPasswordReset", "confirmPasswordReset", "verifyLoginOTP"]); fetch(API_URL + urlParams + conn + "_t=" + Date.now(), c).then(r => { if (r.status === 401 && !publicAuthActions.has(payload?.action)) { logout(); alert("Security Session Expired. Please sign in again."); return null; } return r.json(); }).then(d => { if (d) callback(d); }).catch(e => console.log(e)); }
 
     window.onload = function() { const s = localStorage.getItem("olympuz_active_session"); if (s) { try { const p = JSON.parse(s); if (Date.now() < p.expiresAt) { currentUser = p.user; bootPortalSession(); resetInactivityTracker(); } else { logout(); } } catch(e) { logout(); } } };
     let lastTokenRefresh = 0;
@@ -573,7 +598,7 @@
     function resetInactivityTracker() { if (!currentUser) return; localStorage.setItem("olympuz_active_session", JSON.stringify({ user: currentUser, expiresAt: Date.now() + MAX_INACTIVITY_LIMIT })); clearTimeout(inactivityTimer); inactivityTimer = setTimeout(() => { alert("Session Expired: Inactivity Logout."); logout(); }, MAX_INACTIVITY_LIMIT); maybeRefreshToken(); }
     ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(ev => { document.addEventListener(ev, () => { if (currentUser) resetInactivityTracker(); }, true); });
 
-    function handleLogin() { const e = document.getElementById('email').value, p = document.getElementById('password').value, err = document.getElementById('login-err'); err.classList.add('hidden'); if (!e || !p) { err.innerText = "Complete all fields."; err.classList.remove('hidden'); return; } tempLoginEmail = e; callAPI('POST', '', { action: "loginUser", email: e, password: p, deviceId }, function(r) { if (r.success) { if (r.requirePasswordChange) { handleForcedPasswordChange(e, p); } else if (r.requireOtp) { document.getElementById('credentials-form').classList.add('hidden'); document.getElementById('otp-form').classList.remove('hidden'); document.getElementById('otp-code').value = ""; if (r.message) alert(r.message); } else { if (r.token) localStorage.setItem("olympuz_token", r.token); currentUser = r.user; bootPortalSession(); } } else { err.innerText = r.message || r.error || "Login failed."; err.classList.remove('hidden'); } }); }
+    function handleLogin() { const e = document.getElementById('email').value, p = document.getElementById('password').value, err = document.getElementById('login-err'); err.classList.add('hidden'); if (!e || !p) { err.innerText = "Complete all fields."; err.classList.remove('hidden'); return; } tempLoginEmail = e; callAPI('POST', '', { action: "loginUser", email: e, password: p, deviceId }, function(r) { if (r.success) { if (r.requirePasswordChange) { handleForcedPasswordChange(e, p); } else if (r.requireOtp) { document.getElementById('credentials-form').classList.add('hidden'); document.getElementById('reset-form').classList.add('hidden'); document.getElementById('otp-form').classList.remove('hidden'); document.getElementById('otp-code').value = ""; if (r.message) alert(r.message); } else { if (r.token) localStorage.setItem("olympuz_token", r.token); currentUser = r.user; bootPortalSession(); } } else { err.innerText = r.message || r.error || "Login failed."; err.classList.remove('hidden'); } }); }
 
     // Minimal first-login password-change flow for admin-created accounts (see setInitialPassword
     // on the worker) — a dedicated in-page form would be nicer, but this keeps the fix self-contained
@@ -593,6 +618,65 @@
     }
     function handleVerifyOTP() { const c = document.getElementById('otp-code').value, err = document.getElementById('login-err'); err.classList.add('hidden'); if (!c || c.length < 6) return alert("Provide code."); callAPI('POST', '', { action: "verifyLoginOTP", email: tempLoginEmail, code: c, deviceId }, function(r) { if (r.success) { if (r.token) localStorage.setItem("olympuz_token", r.token); currentUser = r.user; bootPortalSession(); } else { err.innerText = r.message || r.error || "Failed."; err.classList.remove('hidden'); alert(r.message || r.error); } }); }
     function cancelOTPFlow() { document.getElementById('otp-form').classList.add('hidden'); document.getElementById('credentials-form').classList.remove('hidden'); }
+
+    function showPasswordResetForm() {
+      const err = document.getElementById('login-err');
+      err.classList.add('hidden');
+      document.getElementById('credentials-form').classList.add('hidden');
+      document.getElementById('otp-form').classList.add('hidden');
+      document.getElementById('reset-form').classList.remove('hidden');
+      document.getElementById('reset-request-step').classList.remove('hidden');
+      document.getElementById('reset-confirm-step').classList.add('hidden');
+      document.getElementById('reset-email').value = document.getElementById('email').value || "";
+      document.getElementById('reset-code').value = "";
+      document.getElementById('reset-new-password').value = "";
+      document.getElementById('reset-confirm-password').value = "";
+    }
+    function cancelPasswordResetFlow() {
+      document.getElementById('reset-form').classList.add('hidden');
+      document.getElementById('credentials-form').classList.remove('hidden');
+      document.getElementById('login-err').classList.add('hidden');
+    }
+    function handleRequestPasswordReset() {
+      const email = document.getElementById('reset-email').value.trim();
+      const err = document.getElementById('login-err');
+      err.classList.add('hidden');
+      if (!email) { err.innerText = "Enter your corporate email."; err.classList.remove('hidden'); return; }
+      tempLoginEmail = email;
+      callAPI('POST', '', { action: "requestPasswordReset", email, deviceId }, function(r) {
+        if (r.success) {
+          document.getElementById('reset-request-step').classList.add('hidden');
+          document.getElementById('reset-confirm-step').classList.remove('hidden');
+          alert(r.message || "If that email is registered, a reset code has been sent.");
+        } else {
+          err.innerText = r.message || r.error || "Unable to send reset code.";
+          err.classList.remove('hidden');
+        }
+      });
+    }
+    function handleConfirmPasswordReset() {
+      const email = (document.getElementById('reset-email').value || tempLoginEmail || "").trim();
+      const code = document.getElementById('reset-code').value.trim();
+      const newPassword = document.getElementById('reset-new-password').value;
+      const confirmPassword = document.getElementById('reset-confirm-password').value;
+      const err = document.getElementById('login-err');
+      err.classList.add('hidden');
+      if (!email || !code || !newPassword || !confirmPassword) { err.innerText = "Complete all fields."; err.classList.remove('hidden'); return; }
+      if (code.length < 6) { err.innerText = "Enter the 6-digit code."; err.classList.remove('hidden'); return; }
+      if (newPassword.length < 8) { err.innerText = "New password must be at least 8 characters."; err.classList.remove('hidden'); return; }
+      if (newPassword !== confirmPassword) { err.innerText = "Passwords do not match."; err.classList.remove('hidden'); return; }
+      callAPI('POST', '', { action: "confirmPasswordReset", email, code, newPassword, deviceId }, function(r) {
+        if (r.success) {
+          alert(r.message || "Password updated. Please sign in.");
+          document.getElementById('email').value = email;
+          document.getElementById('password').value = "";
+          cancelPasswordResetFlow();
+        } else {
+          err.innerText = r.message || r.error || "Reset failed.";
+          err.classList.remove('hidden');
+        }
+      });
+    }
 
     // ==========================================
     // REALTIME FIREBASE INTEGRATION & UI RENDER
